@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>CSS-only Marquee Menu Effect | Codrops</title>
+	<meta name="description" content="A menu with a css-only marquee hover effect" />
+	<meta name="keywords" content="marquee, css, animation, loop, infinite, hover, menu, navigation" />
+	<meta name="author" content="Codrops" />
+	<link rel="shortcut icon" href="favicon.ico">
+	<link rel="stylesheet" href="https://use.typekit.net/zhq0vyf.css">
+	<link rel="stylesheet" type="text/css" href="../css/categories.css" />
+	<script>
+	document.documentElement.className = "js";
+	var supportsCssVars = function() { var e, t = document.createElement("style"); return t.innerHTML = "root: { --tmp-var: bold; }", document.head.appendChild(t), e = !!(window.CSS && window.CSS.supports && window.CSS.supports("font-weight", "var(--tmp-var)")), t.parentNode.removeChild(t), e };
+	supportsCssVars() || alert("Please view this demo in a modern browser that supports CSS Variables.");
+	</script>
+
+</head>
+
+<body class="demo-1">
+	<main>
+		<div class="frame">
+			<div class="frame__title-wrap">
+				<!-- <h1 class="frame__title">CSS-only Marquee Menu Effect</h1>
+				<p class="frame__info">based on Francesco Zagami's <a href="https://dribbble.com/shots/9524661-Homepage-Menu-Interaction">Dribbble shot</a></p> -->
+			</div>
+			<div class="frame__links">
+				<a href="home.html">HOME</a>
+				<a href="login.html">LOGIN</a>
+			</div>
+		</div>
+		<nav class="menu">
+			<div class="menu__item">
+				<a class="menu__item-link">VIDEOS GAMES</a>
+				<img class="menu__item-img" src="https://media0.giphy.com/media/ECvlptev6UZCGeSikQ/200.gif" alt="Some image"/>
+				<div class="marquee">
+					<div class="marquee__inner" aria-hidden="true">
+						<span>VIDEOS GAMES</span>
+						<span>VIDEOS GAMES</span>
+						<span>VIDEOS GAMES</span>
+						<span>VIDEOS GAMES</span>
+					</div>
+				</div>
+			</div>
+			<div class="menu__item">
+				<a class="menu__item-link">MANGAS/ANIMES</a>
+                <img class="menu__item-img" src="https://www.icegif.com/wp-content/uploads/2023/11/icegif-559.gif" alt="Manga image"/>
+				<div class="marquee">
+					<div class="marquee__inner" aria-hidden="true">
+						<span>MANGAS/ANIMES</span>
+						<span>MANGAS/ANIMES</span>
+						<span>MANGAS/ANIMES</span>
+						<span>MANGAS/ANIMES</span>
+					</div>
+				</div>
+			</div>
+			<div class="menu__item">
+				<a class="menu__item-link">MUSIQUES</a>
+				<!-- <img class="menu__item-img" src="../css/img/tumblr_9078682a26b41020c0138698de37a9ee_608c72c4_500.webp" alt="Some image"/> -->
+                <img class="menu__item-img" src="https://i0.wp.com/grungecake.com/wp-content/uploads/2023/10/tyla-water-grungecake-thumbnail.gif?fit=520%2C312&ssl=1" alt="Some image"/>
+				<div class="marquee">
+					<div class="marquee__inner" aria-hidden="true">
+						<span>MUSIQUES</span>
+						<span>MUSIQUES</span>
+						<span>MUSIQUES</span>
+						<span>MUSIQUES</span>
+					</div>
+				</div>
+			</div>
+			<div class="menu__item">
+				<a class="menu__item-link">Our Crew</a>
+				<img class="menu__item-img" src="img/4.jpg" alt="Some image"/>
+				<div class="marquee">
+					<div class="marquee__inner" aria-hidden="true">
+						<span>ANIMAUX</span>
+						<span>ANIMAUX</span>
+						<span>ANIMAUX</span>
+						<span>ANIMAUX</span>
+					</div>
+				</div>
+			</div>
+			<div class="menu__item">
+				<a class="menu__item-link">Contact</a>
+				<img class="menu__item-img" src="img/5.jpg" alt="Some image"/>
+				<div class="marquee">
+					<div class="marquee__inner" aria-hidden="true">
+						<span>Contact</span>
+						<span>Contact</span>
+						<span>Contact</span>
+						<span>Contact</span>
+					</div>
+				</div>
+			</div>
+		</nav>
+		<div class="frame">
+			<p>Images by <a href="https://www.instagram.com/byfoul/">Frankie Cordoba AKA Foulster</a></p>
+		</div>
+	</main>
+</body>
+
+</html>
