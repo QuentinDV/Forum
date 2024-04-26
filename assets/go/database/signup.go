@@ -12,8 +12,8 @@ import (
 
 // Fonction pour insérer un nouvel compte dans la base de données
 func InsertAccount(db *sql.DB, account Account) error {
-	_, err := db.Exec("INSERT INTO accounts (id, email, password, username, isAdmin) VALUES (?, ?, ?, ?, ?)",
-		account.Id, account.Email, account.Password, account.Username, account.IsAdmin)
+	_, err := db.Exec("INSERT INTO accounts (id, email, password, username, ImageUrl, isAdmin) VALUES (?, ?, ?, ?, ?, ?)",
+		account.Id, account.Email, account.Password, account.Username, account.ImageUrl, account.IsAdmin)
 	return err
 }
 
@@ -39,7 +39,7 @@ func IsUsernameTaken(db *sql.DB, username string) (bool, error) {
 	return count > 0, nil
 }
 
-func CreateAccount(email, password, username string, isAdmin bool) ([]string, error) {
+func CreateAccount(email, password, username, imageUrl string, isAdmin bool) ([]string, error) {
 	// Connexion à la base de données
 	db, err := ConnectDB("database.db")
 	if err != nil {
@@ -89,6 +89,7 @@ func CreateAccount(email, password, username string, isAdmin bool) ([]string, er
 		Email:    email,
 		Password: hashPasswordSHA256(password),
 		Username: username,
+		ImageUrl: imageUrl,
 		IsAdmin:  isAdmin,
 	}
 	err = InsertAccount(db, newAccount)
@@ -118,6 +119,3 @@ func hashPasswordSHA256(password string) string {
 	return hex.EncodeToString(hash)
 }
 
-// func checkPassword(password, hashedPassword string) bool {
-// 	return hashedPassword == hashPasswordSHA256(password)
-// }
