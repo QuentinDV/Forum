@@ -7,16 +7,18 @@ import (
 	"net/http"
 )
 
-func main() {
-	database.CreateAccount("quentin.dassivignon@ynov.com", "quentin123", "quentindv", true)
-	database.CreateAccount("owandji.dieng@ynov.com", "owandji123", "owandji", true)
+var ConnectedAccount = database.Account{Id: "0", Username: "Guest", ImageUrl: "https://i.pinimg.com/474x/63/bc/94/63bc9469cae29b897565a08f0647db3c.jpg"}
 
+func main() {
 	// Pages
 	http.HandleFunc("/home", web.Home)
 	http.HandleFunc("/categories", web.Categories)
 	http.HandleFunc("/login", web.LogIn)
 	http.HandleFunc("/signup", web.SignUp)
 	http.HandleFunc("/settings", web.Settings)
+
+	//Forms
+	http.HandleFunc("/signupform", web.SignUpForm)
 
 	// Elements
 	http.Handle("/assets/css/", http.StripPrefix("/assets/css/", http.FileServer(http.Dir("./assets/css"))))
