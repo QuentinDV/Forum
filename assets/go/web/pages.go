@@ -10,17 +10,17 @@ func Home(w http.ResponseWriter, r *http.Request) {
 }
 
 func Categories(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./html/categories.html")
+	http.ServeFile(w, r, "assets/html/categories.html")
 }
 
 func LogIn(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./html/login.html")
+	http.ServeFile(w, r, "assets/html/login.html")
 }
 
 func SignUp(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./html/signup.html")
+	http.ServeFile(w, r, "assets/html/signup.html")
 }
 
 func Settings(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./html/settings.html")
+	http.ServeFile(w, r, "assets/html/settings.html")
 }
