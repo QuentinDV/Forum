@@ -1,8 +1,13 @@
 package web
 
 import (
+	"forum/assets/go/database"
+	"html/template"
 	"net/http"
 )
+
+type SignUpError struct {
+}
 
 func SignUpForm(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
@@ -10,15 +15,15 @@ func SignUpForm(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
 		return
 	}
-	// username := r.Form.Get("username")
-	load := r.Form.Get("load")
-	delete := r.Form.Get("delete")
+	username := r.Form.Get("username")
+	email := r.Form.Get("email")
+	password := r.Form.Get("pswrd")
 
-	if load == "true" {
-		http.Redirect(w, r, "/hangman/load", http.StatusSeeOther)
-	} else if delete == "true" {
-		http.Redirect(w, r, "/hangman/delete", http.StatusSeeOther)
+	// Acc := database.Account{Username: username, Email: email, Password: password}
+	Acc, err := database.CreateAccount(email, password, username)
+	if err != nil {
+		return
 	}
-
-	http.Redirect(w, r, "/hangman/choose_difficulty", http.StatusSeeOther)
+	tmpl := template.Must(template.ParseFiles("assets/html/.html"))
+	tmpl.Execute(w, Acc)
 }

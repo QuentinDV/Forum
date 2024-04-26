@@ -25,7 +25,8 @@ func ConnectDB(dbPath string) (*sql.DB, error) {
         password TEXT NOT NULL,
         username TEXT UNIQUE NOT NULL,
         ImageUrl TEXT NOT NULL,
-        isAdmin BOOLEAN NOT NULL DEFAULT 0 -- Nouvelle colonne isAdmin
+        isAdmin BOOLEAN NOT NULL DEFAULT 0, -- Nouvelle colonne isAdmin
+        CreationDate TEXT NOT NULL
     )`)
 	if err != nil {
 		return nil, err

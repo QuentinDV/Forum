@@ -39,7 +39,7 @@ func IsUsernameTaken(db *sql.DB, username string) (bool, error) {
 	return count > 0, nil
 }
 
-func CreateAccount(email, password, username, imageUrl string, isAdmin bool) ([]string, error) {
+func CreateAccount(email, password, username string) ([]string, error) {
 	// Connexion à la base de données
 	db, err := ConnectDB("database.db")
 	if err != nil {
@@ -89,8 +89,8 @@ func CreateAccount(email, password, username, imageUrl string, isAdmin bool) ([]
 		Email:    email,
 		Password: hashPasswordSHA256(password),
 		Username: username,
-		ImageUrl: imageUrl,
-		IsAdmin:  isAdmin,
+		ImageUrl: "https://i.pinimg.com/474x/63/bc/94/63bc9469cae29b897565a08f0647db3c.jpg",
+		IsAdmin:  false,
 	}
 	err = InsertAccount(db, newAccount)
 	if err != nil {
@@ -118,4 +118,3 @@ func hashPasswordSHA256(password string) string {
 	hash := hasher.Sum(nil)
 	return hex.EncodeToString(hash)
 }
-
