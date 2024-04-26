@@ -24,6 +24,8 @@ func main() {
 	http.Handle("/assets/img/", http.StripPrefix("/assets/img/", http.FileServer(http.Dir("./assets/img"))))
 
 	// Liens
+	fmt.Println("\nPlay : http://localhost:8080/categories")
+	fmt.Println("\nPlay : http://localhost:8080/login")
 	fmt.Println("\nPlay : http://localhost:8080/home")
 	fmt.Println("\nPlay : http://localhost:8080/login")
 	http.ListenAndServe(":8080", nil)
