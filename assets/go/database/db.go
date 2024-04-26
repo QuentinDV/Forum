@@ -3,11 +3,13 @@ package database
 import "database/sql"
 
 type Account struct {
-	Id       string
-	Email    string
-	Password string
-	Username string
-	IsAdmin  bool
+	Id           string
+	Email        string
+	Password     string
+	Username     string
+	ImageUrl     string
+	IsAdmin      bool
+	CreationDate string
 }
 
 // Fonction pour créer une nouvelle connexion à la base de données SQLite
@@ -22,6 +24,7 @@ func ConnectDB(dbPath string) (*sql.DB, error) {
         email TEXT UNIQUE NOT NULL,
         password TEXT NOT NULL,
         username TEXT UNIQUE NOT NULL,
+        ImageUrl TEXT NOT NULL,
         isAdmin BOOLEAN NOT NULL DEFAULT 0 -- Nouvelle colonne isAdmin
     )`)
 	if err != nil {
