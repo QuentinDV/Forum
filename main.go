@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+
 func main() {
 	// Pages
 	http.HandleFunc("/home", web.Home)
