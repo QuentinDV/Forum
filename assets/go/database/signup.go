@@ -4,22 +4,16 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	"encoding/hex"
+	"fmt"
 	"log"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type Account struct {
-	Id       string
-	Email    string
-	Password string
-	Username string
-}
-
 // Fonction pour insérer un nouvel compte dans la base de données
 func InsertAccount(db *sql.DB, account Account) error {
-	_, err := db.Exec("INSERT INTO accounts (id, email, password, username) VALUES (?, ?, ?, ?)",
-		account.Id, account.Email, account.Password, account.Username)
+	_, err := db.Exec("INSERT INTO accounts (id, email, password, username, isAdmin) VALUES (?, ?, ?, ?, ?)",
+		account.Id, account.Email, account.Password, account.Username, account.IsAdmin)
 	return err
 }
 
@@ -45,7 +39,7 @@ func IsUsernameTaken(db *sql.DB, username string) (bool, error) {
 	return count > 0, nil
 }
 
-func CreateAccount(email, password, username string) (string, error) {
+func CreateAccount(email, password, username string, isAdmin bool) ([]string, error) {
 	// Connexion à la base de données
 	db, err := ConnectDB("database.db")
 	if err != nil {
@@ -53,37 +47,67 @@ func CreateAccount(email, password, username string) (string, error) {
 	}
 	defer db.Close()
 
+	// Get the last ID from the database
+	var lastID string
+	row := db.QueryRow("SELECT id FROM accounts ORDER BY id DESC LIMIT 1")
+	err = row.Scan(&lastID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			lastID = "0"
+		} else {
+			return []string{""}, err
+		}
+	}
+
+	// Increment the last ID
+	newID := incrementID(lastID)
+
 	// Vérifier si l'email est déjà pris
 	emailTaken, err := IsEmailTaken(db, email)
 	if err != nil {
-		return "", err
-	}
-	if emailTaken {
-		return "email", nil
+		return []string{""}, err
 	}
 
 	// Vérifier si le pseudonyme est déjà pris
 	usernameTaken, err := IsUsernameTaken(db, username)
 	if err != nil {
-		return "", err
+		return []string{""}, err
 	}
-	if usernameTaken {
-		return "username", nil
+
+	if emailTaken && usernameTaken {
+		return []string{"email", "username"}, nil
+	}
+	if emailTaken {
+		return []string{"email"}, nil
+	} else if usernameTaken {
+		return []string{"username"}, nil
 	}
 
 	// Exemple d'utilisation : Création et insertion d'un nouveau compte
 	newAccount := Account{
-		Id:       "1",
+		Id:       newID,
 		Email:    email,
 		Password: hashPasswordSHA256(password),
 		Username: username,
+		IsAdmin:  isAdmin,
 	}
 	err = InsertAccount(db, newAccount)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return "", nil
+	return []string{""}, nil
+}
+
+// Function to increment the ID
+func incrementID(lastID string) string {
+	var id int
+	_, err := fmt.Sscanf(lastID, "%d", &id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	id++
+	return fmt.Sprintf("%d", id)
 }
 
 // Function for hash a password
