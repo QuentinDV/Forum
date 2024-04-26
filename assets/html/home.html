@@ -5,52 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forum</title>
     <link rel="stylesheet" href="/assets/css/home.css">
+    <link rel="stylesheet" href="/assets/css/login.css">
 </head>
 <body>
-    <div class="menu__item">
-        <a class="menu__item-link">Our Crew</a>
-        <div class="marquee">
-            <div class="marquee__inner" aria-hidden="true">
-                <span>ANIMAUX</span>
-                <span>ANIMAUX</span>
-                <span>ANIMAUX</span>
-                <span>ANIMAUX</span>
-            </div>
-        </div>
-    </div>
-    <button id="openMenu">Paramètres</button>
-
-
+    
+    <button class="settings" id="openMenu">Paramètres</button>
     
     <div id="menu" class="menu-hidden" style="display: none;">
         <ul>
-            <!-- <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNkRvYc2Z_dfV55ySQpeNw8Vz1g0L9L7WO4_kW7bFgDPu0npCu" alt=""> -->
-            <div loginss>
+            <div login>
                 <ul id="menu">
                     <div class="form-structor">
                         <div class="signup">
+                            <form id="register">
                             <h2 class="form-title" id="signup"><span>or</span>Sign up</h2>
                             <div class="form-holder">
-                                <input type="text" class="input" placeholder="Name" />
-                                <input type="email" class="input" placeholder="Email" />
-                                <input type="password" class="input" placeholder="Password" />
+                                <input type="text" class="input" name="name" placeholder="Name" required/>
+                                <input type="email" class="input" name="email" placeholder="Email" required />
+                                <input type="password" class="input" name="pswrd" placeholder="Password" required />
                             </div>
                             <button class="submit-btn">Sign up</button>
+                            </form>
                         </div>
+                        <form id="login" action="">
                         <div class="login slide-up">
                             <div class="center">
                                 <h2 class="form-title" id="login"><span>or</span>Log in</h2>
                                 <div class="form-holder">
-                                    <input type="email" class="input" placeholder="Email" />
-                                    <input type="password" class="input" placeholder="Password" />
+                                    <input type="email" class="input" name="email" placeholder="Email" required />
+                                    <input type="password" class="input" name="psrd" placeholder="Password" required />
                                 </div>
                                 <button class="submit-btn">Log in</button>
+                            </form>
                             </div>
                         </div>
                     </div>
                 </div>
         </ul>
     </div> 
+
 </body>
     <script src="/assets/js/login.js"></script>
     <script src="/assets/js/settings.js"></script>
