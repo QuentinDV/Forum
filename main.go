@@ -2,12 +2,14 @@ package main
 
 import (
 	"fmt"
+	"forum/assets/go/database"
 	"forum/assets/go/web"
 	"net/http"
 )
 
 func main() {
-	// database.CreateAccount("quentin.dassivignon@ynov.com", "quentin123", "blazefast")
+	database.CreateAccount("quentin.dassivignon@ynov.com", "quentin123", "quentindv", true)
+	database.CreateAccount("owandji.dieng@ynov.com", "owandji123", "owandji", true)
 
 	// Pages
 	http.HandleFunc("/home", web.Home)
