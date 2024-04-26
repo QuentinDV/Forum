@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+
 func main() {
 	database.CreateAccount("quentin.dassivignon@ynov.com", "quentin123", "quentindv", true)
 	database.CreateAccount("owandji.dieng@ynov.com", "owandji123", "owandji", true)
