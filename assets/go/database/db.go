@@ -8,6 +8,7 @@ type Account struct {
 	Password     string
 	Username     string
 	ImageUrl     string
+	IsBan        bool
 	IsAdmin      bool
 	CreationDate string
 }
@@ -25,11 +26,24 @@ func ConnectDB(dbPath string) (*sql.DB, error) {
         password TEXT NOT NULL,
         username TEXT UNIQUE NOT NULL,
         ImageUrl TEXT NOT NULL,
-        isAdmin BOOLEAN NOT NULL DEFAULT 0, -- Nouvelle colonne isAdmin
+        isBan BOOLEAN NOT NULL DEFAULT 0,
+        isAdmin BOOLEAN NOT NULL DEFAULT 0, 
         CreationDate TEXT NOT NULL
     )`)
 	if err != nil {
 		return nil, err
 	}
 	return db, nil
+}
+
+// Fonction pour insérer un nouvel compte dans la base de données
+func InsertAccount(db *sql.DB, account Account) error {
+	_, err := db.Exec("INSERT INTO accounts (id, email, password, username, ImageUrl, isBan, isAdmin, CreationDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+		account.Id, account.Email, account.Password, account.Username, account.ImageUrl, account.IsBan, account.IsAdmin, account.CreationDate)
+	return err
+}
+
+func DeleteAccount(db *sql.DB, id string) error {
+	_, err := db.Exec("DELETE FROM accounts WHERE id = ?", id)
+	return err
 }

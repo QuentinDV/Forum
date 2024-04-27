@@ -1,6 +1,7 @@
 package web
 
 import (
+	"fmt"
 	"forum/assets/go/database"
 	"html/template"
 	"net/http"
@@ -19,11 +20,12 @@ func SignUpForm(w http.ResponseWriter, r *http.Request) {
 	email := r.Form.Get("email")
 	password := r.Form.Get("pswrd")
 
-	// Acc := database.Account{Username: username, Email: email, Password: password}
-	Acc, err := database.CreateAccount(email, password, username)
+	fmt.Println(email, password, username)
+
+	Acc, err := database.CreateAccount(email, password, username, false)
 	if err != nil {
 		return
 	}
-	tmpl := template.Must(template.ParseFiles("assets/html/.html"))
+	tmpl := template.Must(template.ParseFiles("assets/html/home.html"))
 	tmpl.Execute(w, Acc)
 }

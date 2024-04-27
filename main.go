@@ -9,6 +9,8 @@ import (
 
 var ConnectedAccount = database.Account{Id: "0", Username: "Guest", ImageUrl: "https://i.pinimg.com/474x/63/bc/94/63bc9469cae29b897565a08f0647db3c.jpg"}
 
+const dbPath = "database.db"
+
 func main() {
 	// Pages
 	http.HandleFunc("/home", web.Home)

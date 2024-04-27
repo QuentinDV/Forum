@@ -6,40 +6,12 @@ import (
 	"encoding/hex"
 	"fmt"
 	"log"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
-// Fonction pour insérer un nouvel compte dans la base de données
-func InsertAccount(db *sql.DB, account Account) error {
-	_, err := db.Exec("INSERT INTO accounts (id, email, password, username, ImageUrl, isAdmin) VALUES (?, ?, ?, ?, ?, ?)",
-		account.Id, account.Email, account.Password, account.Username, account.ImageUrl, account.IsAdmin)
-	return err
-}
-
-// Fonction pour vérifier si un email est déjà pris dans la base de données
-func IsEmailTaken(db *sql.DB, email string) (bool, error) {
-	var count int
-	row := db.QueryRow("SELECT COUNT(*) FROM accounts WHERE email = ?", email)
-	err := row.Scan(&count)
-	if err != nil {
-		return false, err
-	}
-	return count > 0, nil
-}
-
-// Fonction pour vérifier si un pseudonyme est déjà pris dans la base de données
-func IsUsernameTaken(db *sql.DB, username string) (bool, error) {
-	var count int
-	row := db.QueryRow("SELECT COUNT(*) FROM accounts WHERE username = ?", username)
-	err := row.Scan(&count)
-	if err != nil {
-		return false, err
-	}
-	return count > 0, nil
-}
-
-func CreateAccount(email, password, username string) ([]string, error) {
+func CreateAccount(email, password, username string, isAdmin bool) ([]string, error) {
 	// Connexion à la base de données
 	db, err := ConnectDB("database.db")
 	if err != nil {
@@ -85,19 +57,44 @@ func CreateAccount(email, password, username string) ([]string, error) {
 
 	// Exemple d'utilisation : Création et insertion d'un nouveau compte
 	newAccount := Account{
-		Id:       newID,
-		Email:    email,
-		Password: hashPasswordSHA256(password),
-		Username: username,
-		ImageUrl: "https://i.pinimg.com/474x/63/bc/94/63bc9469cae29b897565a08f0647db3c.jpg",
-		IsAdmin:  false,
+		Id:           newID,
+		Email:        email,
+		Password:     hashPasswordSHA256(password),
+		Username:     username,
+		ImageUrl:     "https://i.pinimg.com/474x/63/bc/94/63bc9469cae29b897565a08f0647db3c.jpg",
+		IsAdmin:      isAdmin,
+		IsBan:        false,
+		CreationDate: time.Now().Format("2006-01-02 15:04:05"),
 	}
+
 	err = InsertAccount(db, newAccount)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	return []string{""}, nil
+}
+
+// Fonction pour vérifier si un email est déjà pris dans la base de données
+func IsEmailTaken(db *sql.DB, email string) (bool, error) {
+	var count int
+	row := db.QueryRow("SELECT COUNT(*) FROM accounts WHERE email = ?", email)
+	err := row.Scan(&count)
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
+// Fonction pour vérifier si un pseudonyme est déjà pris dans la base de données
+func IsUsernameTaken(db *sql.DB, username string) (bool, error) {
+	var count int
+	row := db.QueryRow("SELECT COUNT(*) FROM accounts WHERE username = ?", username)
+	err := row.Scan(&count)
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
 }
 
 // Function to increment the ID
