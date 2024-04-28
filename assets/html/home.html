@@ -8,9 +8,12 @@
     <link rel="stylesheet" href="/assets/css/login.css">
 </head>
 <body>
-    
+    <h1>Welcome, {{.Username}}!</h1>
+    <p>Your email is: {{.Email}}</p>
+    <img src="{{.ImageUrl}}" alt="ImageUrl of Account">
+
     <button class="settings" id="openMenu">Paramètres</button>
-    
+
     <div id="menu" class="menu-hidden" style="display: none;">
         <ul>
             <div login>
@@ -18,27 +21,44 @@
                     <div class="form-structor">
                         <div class="signup">
                             <form id="register" action="/signupform" method="post">
-                            <h2 class="form-title" id="signup"><span>or</span>Sign up</h2>
-                            <div class="form-holder">
-                                <input autocomplete="off" type="text" class="input" name="username" placeholder="Name" required/>
-                                <input autocomplete="off" type="email" class="input" name="email" placeholder="Email" required />
-                                <input autocomplete="off" type="password" class="input" name="pswrd" placeholder="Password" required />
-                            </div>
-                            <button class="submit-btn">Sign up</button>
-                            </form>
-                        </div>
-                        <form id="login" action="">
-                        <div class="login slide-up">
-                            <div class="center">
-                                <h2 class="form-title" id="login"><span>or</span>Log in</h2>
+                                <h2 class="form-title" id="signup"><span>or</span>Sign up</h2>
                                 <div class="form-holder">
+                                    <input autocomplete="off" type="text" class="input" name="username" placeholder="Username" required/>
                                     <input autocomplete="off" type="email" class="input" name="email" placeholder="Email" required />
-                                    <input autocomplete="off" type="password" class="input" name="psrd" placeholder="Password" required />
+                                    <input autocomplete="off" type="password" class="input" name="pswrd" placeholder="Password" required />
                                 </div>
-                                <button class="submit-btn">Log in</button>
+                                <div class="indentiferror">
+                                    {{ if .EmailError }}
+                                    <p>**This Email is already taken.</p>
+                                    {{ end }}
+                                    {{ if .UsernameError }}
+                                    <p>**This Username is already taken.</p>
+                                    {{ end }}
+                                </div>
+                                <button class="submit-btn">Sign up</button>
                             </form>
-                            </div>
                         </div>
+                        <form id="login" action="/loginform" method="post">
+                            <div class="login slide-up">
+                                <div class="center">
+                                    <h2 class="form-title" id="login"><span>or</span>Log in</h2>
+                                    <div class="form-holder">
+                                        <input autocomplete="off" type="text" class="input" name="identif" placeholder="Email or Username" required />
+                                        <input autocomplete="off" type="password" class="input" name="pswrd" placeholder="Password" required />
+                                    </div>
+                                    <div class="indentiferror">
+                                        {{ if .IndentifError }}
+                                        <p>**This Email or Username is already taken.</p>
+                                        {{ end }}
+                                        {{ if .PassWordError }}
+                                        <p>**This Password is already taken.</p>
+                                        {{ end }}
+                                    </div>
+                                    <button class="submit-btn">Log in</button>
+                                
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
         </ul>

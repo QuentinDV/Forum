@@ -7,11 +7,12 @@ import (
 	"net/http"
 )
 
-var ConnectedAccount = database.Account{Id: "0", Username: "Guest", ImageUrl: "https://i.pinimg.com/474x/63/bc/94/63bc9469cae29b897565a08f0647db3c.jpg"}
-
-const dbPath = "database.db"
-
 func main() {
+	db, err := database.ConnectDB("database.db")
+	if err != nil {
+		return
+	}
+	database.DeleteAccount(db, "3")
 	// Pages
 	http.HandleFunc("/home", web.Home)
 	http.HandleFunc("/categories", web.Categories)
@@ -21,6 +22,7 @@ func main() {
 
 	//Forms
 	http.HandleFunc("/signupform", web.SignUpForm)
+	http.HandleFunc("/loginform", web.LoginForm)
 
 	// Elements
 	http.Handle("/assets/css/", http.StripPrefix("/assets/css/", http.FileServer(http.Dir("./assets/css"))))
@@ -31,6 +33,5 @@ func main() {
 	fmt.Println("\nPlay : http://localhost:8080/categories")
 	fmt.Println("\nPlay : http://localhost:8080/login")
 	fmt.Println("\nPlay : http://localhost:8080/home")
-	fmt.Println("\nPlay : http://localhost:8080/login")
 	http.ListenAndServe(":8080", nil)
 }

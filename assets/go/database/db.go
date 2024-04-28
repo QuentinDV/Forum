@@ -47,3 +47,27 @@ func DeleteAccount(db *sql.DB, id string) error {
 	_, err := db.Exec("DELETE FROM accounts WHERE id = ?", id)
 	return err
 }
+
+func GetAllAccounts(db *sql.DB) ([]Account, error) {
+	rows, err := db.Query("SELECT id, email, password, username, ImageUrl, isBan, isAdmin, CreationDate FROM accounts")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var accounts []Account
+	for rows.Next() {
+		var account Account
+		err = rows.Scan(&account.Id, &account.Email, &account.Password, &account.Username, &account.ImageUrl, &account.IsBan, &account.IsAdmin, &account.CreationDate)
+		if err != nil {
+			return nil, err
+		}
+		accounts = append(accounts, account)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return accounts, nil
+}

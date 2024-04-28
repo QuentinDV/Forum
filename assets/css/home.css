@@ -225,3 +225,8 @@ a:focus {
 	font-style: italic;
 }
 
+.indentiferror {
+	display: flex;
+	justify-content: center;
+	color: red;
+}

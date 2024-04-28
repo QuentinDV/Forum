@@ -11,7 +11,13 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func CreateAccount(email, password, username string, isAdmin bool) ([]string, error) {
+type SignUpError struct {
+	EmailError    bool
+	UsernameError bool
+}
+
+func CreateAccount(email, password, username string, isAdmin bool) (Account, SignUpError, error) {
+	var account Account
 	// Connexion à la base de données
 	db, err := ConnectDB("database.db")
 	if err != nil {
@@ -27,7 +33,7 @@ func CreateAccount(email, password, username string, isAdmin bool) ([]string, er
 		if err == sql.ErrNoRows {
 			lastID = "0"
 		} else {
-			return []string{""}, err
+			return account, SignUpError{}, err
 		}
 	}
 
@@ -37,22 +43,22 @@ func CreateAccount(email, password, username string, isAdmin bool) ([]string, er
 	// Vérifier si l'email est déjà pris
 	emailTaken, err := IsEmailTaken(db, email)
 	if err != nil {
-		return []string{""}, err
+		return account, SignUpError{}, err
 	}
 
 	// Vérifier si le pseudonyme est déjà pris
 	usernameTaken, err := IsUsernameTaken(db, username)
 	if err != nil {
-		return []string{""}, err
+		return account, SignUpError{}, err
 	}
 
 	if emailTaken && usernameTaken {
-		return []string{"email", "username"}, nil
+		return account, SignUpError{EmailError: true, UsernameError: true}, nil
 	}
 	if emailTaken {
-		return []string{"email"}, nil
+		return account, SignUpError{EmailError: true, UsernameError: false}, nil
 	} else if usernameTaken {
-		return []string{"username"}, nil
+		return account, SignUpError{EmailError: false, UsernameError: true}, nil
 	}
 
 	// Exemple d'utilisation : Création et insertion d'un nouveau compte
@@ -72,7 +78,7 @@ func CreateAccount(email, password, username string, isAdmin bool) ([]string, er
 		log.Fatal(err)
 	}
 
-	return []string{""}, nil
+	return newAccount, SignUpError{}, nil
 }
 
 // Fonction pour vérifier si un email est déjà pris dans la base de données
