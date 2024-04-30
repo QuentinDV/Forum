@@ -23,6 +23,8 @@ func main() {
 	//Forms
 	http.HandleFunc("/signupform", web.SignUpForm)
 	http.HandleFunc("/loginform", web.LoginForm)
+	http.HandleFunc("/guestform", web.LogOutForm)
+	http.HandleFunc("/logoutform", web.LogOutForm)
 
 	// Elements
 	http.Handle("/assets/css/", http.StripPrefix("/assets/css/", http.FileServer(http.Dir("./assets/css"))))

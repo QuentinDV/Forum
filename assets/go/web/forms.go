@@ -7,8 +7,6 @@ import (
 	"net/http"
 )
 
-// var ConnectedAccount = database.Account{Id: "0", Username: "Guest", ImageUrl: "https://i.pinimg.com/474x/63/bc/94/63bc9469cae29b897565a08f0647db3c.jpg"}
-
 func SignUpForm(w http.ResponseWriter, r *http.Request) {
 	var account database.Account
 	err := r.ParseForm()
@@ -26,15 +24,24 @@ func SignUpForm(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	
+
 	if Acc == account {
 		tmpl := template.Must(template.ParseFiles("assets/html/home.html"))
 		tmpl.Execute(w, signUpError)
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("assets/html/home.html"))
-	tmpl.Execute(w, Acc)
+	// Mettre à jour les cookies
+	// Créer un nouveau cookie pour l'Account
+	accountCookie := &http.Cookie{
+		Name:  "account",
+		Value: fmt.Sprintf("%s|%s|%s|%s|%s|%t|%t|%s", Acc.Id, Acc.Email, Acc.Password, Acc.Username, Acc.ImageUrl, Acc.IsBan, Acc.IsAdmin, Acc.CreationDate),
+		Path:  "/",
+	}
+	// Définir le cookie
+	http.SetCookie(w, accountCookie)
+
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
 
 func LoginForm(w http.ResponseWriter, r *http.Request) {
@@ -51,6 +58,7 @@ func LoginForm(w http.ResponseWriter, r *http.Request) {
 
 	Acc, logInError, err := database.RecoverAccount(identif, password)
 	if err != nil {
+		// Gérer l'erreur
 		return
 	}
 
@@ -60,6 +68,31 @@ func LoginForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("assets/html/home.html"))
-	tmpl.Execute(w, Acc)
+	fmt.Println("Account Founded")
+	// Mettre à jour les cookies
+	// Créer un nouveau cookie pour l'Account
+	accountCookie := &http.Cookie{
+		Name:  "account",
+		Value: fmt.Sprintf("%s|%s|%s|%s|%s|%t|%t|%s", Acc.Id, Acc.Email, Acc.Password, Acc.Username, Acc.ImageUrl, Acc.IsBan, Acc.IsAdmin, Acc.CreationDate),
+		Path:  "/",
+	}
+
+	// Définir le cookie
+	http.SetCookie(w, accountCookie)
+
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
+}
+
+func LogOutForm(w http.ResponseWriter, r *http.Request) {
+	var Acc = database.Account{Id: "0", Username: "Guest", ImageUrl: "https://i.pinimg.com/474x/63/bc/94/63bc9469cae29b897565a08f0647db3c.jpg"}
+	// Créer un nouveau cookie pour l'Account
+	accountCookie := &http.Cookie{
+		Name:  "account",
+		Value: fmt.Sprintf("%s|%s|%s|%s|%s|%t|%t|%s", Acc.Id, Acc.Email, Acc.Password, Acc.Username, Acc.ImageUrl, Acc.IsBan, Acc.IsAdmin, Acc.CreationDate),
+		Path:  "/",
+	}
+	// Définir le cookie
+	http.SetCookie(w, accountCookie)
+
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }

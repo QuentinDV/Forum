@@ -8,11 +8,17 @@
     <link rel="stylesheet" href="/assets/css/login.css">
 </head>
 <body>
-    <h1>Welcome, {{.Username}}!</h1>
-    <p>Your email is: {{.Email}}</p>
-    <img src="{{.ImageUrl}}" alt="ImageUrl of Account">
+    <!-- Insérer les valeurs des cookies dans les éléments HTML -->
+    <p>Username: <span id="usernameSpan"></span></p>
+    <p>ID: <span id="idSpan"></span></p>
+    <p>Email: <span id="emailSpan"></span></p>
+    <p>Password: <span id="passwordSpan"></span></p>
+    <p>IsBan: <span id="isBanSpan"></span></p>
+    <p>IsAdmin: <span id="isAdminSpan"></span></p>
+    <p>Creation Date: <span id="creationDateSpan"></span></p>
+    <img id="profilePicture" alt="Profile Picture">
 
-    <button class="settings" id="openMenu">Paramètres</button>
+    <button class="settings" id="openMenu">Settings</button>
 
     <div id="menu" class="menu-hidden" style="display: none;">
         <ul>
@@ -27,14 +33,6 @@
                                     <input autocomplete="off" type="email" class="input" name="email" placeholder="Email" required />
                                     <input autocomplete="off" type="password" class="input" name="pswrd" placeholder="Password" required />
                                 </div>
-                                <div class="indentiferror">
-                                    {{ if .EmailError }}
-                                    <p>**This Email is already taken.</p>
-                                    {{ end }}
-                                    {{ if .UsernameError }}
-                                    <p>**This Username is already taken.</p>
-                                    {{ end }}
-                                </div>
                                 <button class="submit-btn">Sign up</button>
                             </form>
                         </div>
@@ -45,14 +43,6 @@
                                     <div class="form-holder">
                                         <input autocomplete="off" type="text" class="input" name="identif" placeholder="Email or Username" required />
                                         <input autocomplete="off" type="password" class="input" name="pswrd" placeholder="Password" required />
-                                    </div>
-                                    <div class="indentiferror">
-                                        {{ if .IndentifError }}
-                                        <p>**This Email or Username is already taken.</p>
-                                        {{ end }}
-                                        {{ if .PassWordError }}
-                                        <p>**This Password is already taken.</p>
-                                        {{ end }}
                                     </div>
                                     <button class="submit-btn">Log in</button>
                                 
@@ -67,5 +57,6 @@
 </body>
     <script src="/assets/js/login.js"></script>
     <script src="/assets/js/settings.js"></script>
+    <script src="/assets/js/cookies.js"></script>
 
 </html>
