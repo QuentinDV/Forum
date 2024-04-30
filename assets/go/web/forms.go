@@ -1,5 +1,6 @@
 package web
 
+// Importing necessary packages
 import (
 	"fmt"
 	"forum/assets/go/database"
@@ -7,19 +8,28 @@ import (
 	"net/http"
 )
 
+// SignUpForm is a function that handles the sign up form submission.
+// It parses the form data, creates a new account in the database,
+// and updates the cookies.
 func SignUpForm(w http.ResponseWriter, r *http.Request) {
+	// Initialize an empty account
 	var account database.Account
+
+	// Parse the form data
 	err := r.ParseForm()
 	if err != nil {
+		// If there is an error, return an internal server error response
 		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
 		return
 	}
+
+	// Get the username, email, and password from the form data
 	username := r.Form.Get("username")
 	email := r.Form.Get("email")
 	password := r.Form.Get("pswrd")
 
-	fmt.Println(email, password, username)
-
+	// If the created account is the same as the empty account,
+	// execute the home template with the sign up error
 	Acc, signUpError, err := database.CreateAccount(email, password, username, false)
 	if err != nil {
 		return
@@ -31,30 +41,37 @@ func SignUpForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Mettre à jour les cookies
-	// Créer un nouveau cookie pour l'Account
+	// Update the cookies
+	// Create a new cookie for the account
 	accountCookie := &http.Cookie{
-		Name:  "account",
+		Name: "account",
+		// The value of the cookie is a string that contains the account's information separated by "|"
 		Value: fmt.Sprintf("%s|%s|%s|%s|%s|%t|%t|%s", Acc.Id, Acc.Email, Acc.Password, Acc.Username, Acc.ImageUrl, Acc.IsBan, Acc.IsAdmin, Acc.CreationDate),
 		Path:  "/",
 	}
-	// Définir le cookie
+	// Set the cookie
 	http.SetCookie(w, accountCookie)
 
+	// Redirect to the home page
 	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
 
+// LoginForm is a function that handles the login form submission.
+// It parses the form data, recovers the account from the database,
+// and updates the cookies.
 func LoginForm(w http.ResponseWriter, r *http.Request) {
+	// Initialize an empty account
 	var account database.Account
+
+	// Parse the form data
 	err := r.ParseForm()
 	if err != nil {
+		// If there is an error, return an internal server error response
 		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
 		return
 	}
 	identif := r.Form.Get("identif")
 	password := r.Form.Get("pswrd")
-
-	fmt.Println(identif, password)
 
 	Acc, logInError, err := database.RecoverAccount(identif, password)
 	if err != nil {
@@ -62,6 +79,8 @@ func LoginForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// If the account found in the database is the same as the empty account,
+	// execute the home template with the login error
 	if Acc == account {
 		tmpl := template.Must(template.ParseFiles("assets/html/home.html"))
 		tmpl.Execute(w, logInError)
@@ -69,30 +88,38 @@ func LoginForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println("Account Founded")
-	// Mettre à jour les cookies
-	// Créer un nouveau cookie pour l'Account
+	// Update the cookies
+	// Create a new cookie for the account
 	accountCookie := &http.Cookie{
-		Name:  "account",
+		Name: "account",
+		// The value of the cookie is a string that contains the account's information separated by "|"
 		Value: fmt.Sprintf("%s|%s|%s|%s|%s|%t|%t|%s", Acc.Id, Acc.Email, Acc.Password, Acc.Username, Acc.ImageUrl, Acc.IsBan, Acc.IsAdmin, Acc.CreationDate),
 		Path:  "/",
 	}
 
-	// Définir le cookie
+	// Set the cookie
 	http.SetCookie(w, accountCookie)
 
+	// Redirect to the home page
 	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
 
+// LogOutForm is a function that handles the logout form submission.
+// It resets the account cookie to a default "Guest" account.
 func LogOutForm(w http.ResponseWriter, r *http.Request) {
+	// Initialize a default "Guest" account
 	var Acc = database.Account{Id: "0", Username: "Guest", ImageUrl: "https://i.pinimg.com/474x/63/bc/94/63bc9469cae29b897565a08f0647db3c.jpg"}
-	// Créer un nouveau cookie pour l'Account
+
+	// Create a new cookie for the account
 	accountCookie := &http.Cookie{
-		Name:  "account",
+		Name: "account",
+		// The value of the cookie is a string that contains the account's information separated by "|"
 		Value: fmt.Sprintf("%s|%s|%s|%s|%s|%t|%t|%s", Acc.Id, Acc.Email, Acc.Password, Acc.Username, Acc.ImageUrl, Acc.IsBan, Acc.IsAdmin, Acc.CreationDate),
 		Path:  "/",
 	}
-	// Définir le cookie
+	// Set the cookie
 	http.SetCookie(w, accountCookie)
 
+	// Redirect to the home page
 	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }

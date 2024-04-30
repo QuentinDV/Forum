@@ -1,7 +1,9 @@
 package database
 
+// Importing necessary packages
 import "database/sql"
 
+// Account struct represents a user account in the system
 type Account struct {
 	Id           string
 	Email        string
@@ -13,7 +15,7 @@ type Account struct {
 	CreationDate string
 }
 
-// Fonction pour créer une nouvelle connexion à la base de données SQLite
+// ConnectDB function creates a new connection to the SQLite database
 func ConnectDB(dbPath string) (*sql.DB, error) {
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
@@ -36,18 +38,26 @@ func ConnectDB(dbPath string) (*sql.DB, error) {
 	return db, nil
 }
 
-// Fonction pour insérer un nouvel compte dans la base de données
+// InsertAccount function inserts a new account into the database.
+// It takes a database connection and an account as input.
+// It returns an error if any.
 func InsertAccount(db *sql.DB, account Account) error {
 	_, err := db.Exec("INSERT INTO accounts (id, email, password, username, ImageUrl, isBan, isAdmin, CreationDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
 		account.Id, account.Email, account.Password, account.Username, account.ImageUrl, account.IsBan, account.IsAdmin, account.CreationDate)
 	return err
 }
 
+// DeleteAccount function deletes an account from the database.
+// It takes a database connection and an account ID as input.
+// It returns an error if any.
 func DeleteAccount(db *sql.DB, id string) error {
 	_, err := db.Exec("DELETE FROM accounts WHERE id = ?", id)
 	return err
 }
 
+// GetAllAccounts function retrieves all accounts from the database.
+// It takes a database connection as input.
+// It returns a slice of accounts and an error if any.
 func GetAllAccounts(db *sql.DB) ([]Account, error) {
 	rows, err := db.Query("SELECT id, email, password, username, ImageUrl, isBan, isAdmin, CreationDate FROM accounts")
 	if err != nil {

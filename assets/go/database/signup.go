@@ -1,5 +1,6 @@
 package database
 
+// Importing necessary packages
 import (
 	"crypto/sha256"
 	"database/sql"
@@ -11,11 +12,15 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+// SignUpError struct holds the error information for sign up process.
 type SignUpError struct {
 	EmailError    bool
 	UsernameError bool
 }
 
+// CreateAccount function creates a new account in the database.
+// It takes email, password, username and admin status as input.
+// It returns the created account, any sign up error and error if any.
 func CreateAccount(email, password, username string, isAdmin bool) (Account, SignUpError, error) {
 	var account Account
 	// Connexion à la base de données
@@ -81,7 +86,9 @@ func CreateAccount(email, password, username string, isAdmin bool) (Account, Sig
 	return newAccount, SignUpError{}, nil
 }
 
-// Fonction pour vérifier si un email est déjà pris dans la base de données
+// IsEmailTaken function checks if an email is already taken in the database.
+// It takes a database connection and an email as input.
+// It returns a boolean indicating if the email is taken and an error if any.
 func IsEmailTaken(db *sql.DB, email string) (bool, error) {
 	var count int
 	row := db.QueryRow("SELECT COUNT(*) FROM accounts WHERE email = ?", email)
@@ -92,7 +99,9 @@ func IsEmailTaken(db *sql.DB, email string) (bool, error) {
 	return count > 0, nil
 }
 
-// Fonction pour vérifier si un pseudonyme est déjà pris dans la base de données
+// IsUsernameTaken function checks if a username is already taken in the database.
+// It takes a database connection and a username as input.
+// It returns a boolean indicating if the username is taken and an error if any.
 func IsUsernameTaken(db *sql.DB, username string) (bool, error) {
 	var count int
 	row := db.QueryRow("SELECT COUNT(*) FROM accounts WHERE username = ?", username)
@@ -103,7 +112,8 @@ func IsUsernameTaken(db *sql.DB, username string) (bool, error) {
 	return count > 0, nil
 }
 
-// Function to increment the ID
+// incrementID function increments the last ID.
+// It takes the last ID as input and returns the incremented ID.
 func incrementID(lastID string) string {
 	var id int
 	_, err := fmt.Sscanf(lastID, "%d", &id)
@@ -114,7 +124,8 @@ func incrementID(lastID string) string {
 	return fmt.Sprintf("%d", id)
 }
 
-// Function for hash a password
+// hashPasswordSHA256 function hashes a password using SHA256 encryption.
+// It takes a password as input and returns the hashed password.
 func hashPasswordSHA256(password string) string {
 	hasher := sha256.New()
 	hasher.Write([]byte(password))

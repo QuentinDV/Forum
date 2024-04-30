@@ -38,16 +38,6 @@ document.getElementById("isBanSpan").innerText = isBan;
 document.getElementById("isAdminSpan").innerText = isAdmin;
 document.getElementById("creationDateSpan").innerText = creationDate;
 
-// Afficher les valeurs dans la console
-console.log('ID:', id);
-console.log('Email:', email);
-console.log('Password:', password);
-console.log('Username:', username);
-console.log('Image URL:', imageUrl);
-console.log('Is Ban:', isBan);
-console.log('Is Admin:', isAdmin);
-console.log('Creation Date:', creationDate);
-
 // Trouver l'élément img par son ID et attribuer l'URL de l'image
 var profilePicture = document.getElementById("profilePicture");
 profilePicture.src = imageUrl;

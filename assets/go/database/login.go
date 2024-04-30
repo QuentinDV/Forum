@@ -1,5 +1,6 @@
 package database
 
+// Importing necessary packages
 import (
 	"database/sql"
 	"strings"
@@ -12,6 +13,7 @@ type LogInError struct {
 	PassWordError bool
 }
 
+// RecoverAccount function retrieves an account from the database using the provided identifier and password.
 func RecoverAccount(identif, password string) (Account, LogInError, error) {
 	var emptyaccount Account
 	var account Account
@@ -41,7 +43,7 @@ func RecoverAccount(identif, password string) (Account, LogInError, error) {
 
 	} else if !correctidentif {
 		return emptyaccount, LogInError{IndentifError: true, PassWordError: false}, nil
-		
+
 	} else if !correctpassword {
 		return emptyaccount, LogInError{IndentifError: false, PassWordError: true}, nil
 	}
@@ -49,12 +51,12 @@ func RecoverAccount(identif, password string) (Account, LogInError, error) {
 	return account, LogInError{}, nil
 }
 
-// Fonction pour vérifier si l'identifiant est un email
+// IsEmail function checks if the provided identifier is an email.
 func IsEmail(identif string) bool {
 	return strings.Contains(identif, "@")
 }
 
-// Fonction pour récupérer un compte par son email
+// GetAccountByEmail function retrieves an account from the database using the provided email.
 func GetAccountByEmail(db *sql.DB, email string) (Account, error) {
 	var account Account
 	row := db.QueryRow("SELECT id, email, password, username, ImageUrl, isAdmin, isBan, CreationDate FROM accounts WHERE email = ?", email)
@@ -65,7 +67,7 @@ func GetAccountByEmail(db *sql.DB, email string) (Account, error) {
 	return account, nil
 }
 
-// Fonction pour récupérer un compte par son username
+// GetAccountByUsername function retrieves an account from the database using the provided username.
 func GetAccountByUsername(db *sql.DB, username string) (Account, error) {
 	var account Account
 	row := db.QueryRow("SELECT id, email, password, username, ImageUrl, isAdmin, isBan, CreationDate FROM accounts WHERE username = ?", username)
@@ -76,6 +78,7 @@ func GetAccountByUsername(db *sql.DB, username string) (Account, error) {
 	return account, nil
 }
 
+// checkPassword function checks if the provided password matches the hashed password from the database.
 func checkPassword(password, hashedPassword string) bool {
 	return hashedPassword == hashPasswordSHA256(password)
 }
