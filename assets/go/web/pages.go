@@ -31,10 +31,10 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "assets/html/signup.html")
 }
 
-// Settings page of the forum.
-func Settings(w http.ResponseWriter, r *http.Request) {
-	// Serve the settings page
-	http.ServeFile(w, r, "assets/html/settings.html")
+// Admin page of the forum.
+func Admin(w http.ResponseWriter, r *http.Request) {
+	// Serve the admin page
+	http.ServeFile(w, r, "assets/html/admin.html")
 }
 
 // getAccountfromCookie is a function that retrieves the account information from the cookie.
