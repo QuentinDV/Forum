@@ -12,9 +12,7 @@
 .accountgrid {
     background-color: #0e5a29;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     color: wheat;
     padding: 10px;
     text-align: center;

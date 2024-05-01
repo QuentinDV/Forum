@@ -3,7 +3,6 @@ package web
 // Importing necessary packages
 import (
 	"database/sql"
-	"fmt"
 	"forum/assets/go/database"
 	"html/template"
 	"net/http"
@@ -48,7 +47,6 @@ func Admin(w http.ResponseWriter, r *http.Request) {
 		return // If there is an error, return
 	}
 
-	fmt.Println(allAcc)
 	tmpl := template.Must(template.ParseFiles("assets/html/admin.html"))
 	tmpl.Execute(w, allAcc)
 	// Serve the admin page

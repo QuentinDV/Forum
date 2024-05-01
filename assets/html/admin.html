@@ -8,13 +8,23 @@
 </head>
 <body>
     <h1>Liste des comptes</h1>
+    <div class="accountgrid">
+        <p><strong>ID:</strong></p>
+        <p><strong>Username:</strong></p>
+        <p><strong>Email:</strong></p>
+        <p><strong>IsBan:</strong></p>
+        <p><strong>IsAdmin:</strong></p>
+        <p><strong>CreationDate:</strong></p>
+    </div>
     <div class="accountgrid-container">
         {{range .}}
             <div class="accountgrid">
-                <p><strong>ID:</strong> {{.Id}}</p>
-                <p><strong>Email:</strong> {{.Email}}</p>
-                <p><strong>Nom d'utilisateur:</strong> {{.Username}}</p>
-                <!-- Ajoutez d'autres champs que vous souhaitez afficher -->
+                <p>{{.Id}}</p>
+                <p>{{.Username}}</p>
+                <p>{{.Email}}</p>
+                <p>{{.IsBan}}</p>
+                <p>{{.IsAdmin}}</p>
+                <p>{{.CreationDate}}</p>
             </div>
         {{end}}
     </div>
