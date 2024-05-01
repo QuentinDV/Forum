@@ -6,7 +6,6 @@ import (
 	"forum/assets/go/database"
 	"html/template"
 	"net/http"
-	"strings"
 )
 
 // Home is the main page of the forum.
@@ -51,28 +50,4 @@ func Admin(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, allAcc)
 	// Serve the admin page
 	// http.ServeFile(w, r, "assets/html/admin.html")
-}
-
-// getAccountfromCookie is a function that retrieves the account information from the cookie.
-func getAccountfromCookie(r *http.Request) database.Account {
-	// Initialize an empty account
-	ConnectedAccount := database.Account{}
-	// Get the "account" cookie
-	cookie, err := r.Cookie("account")
-	// If there is an error (i.e., the cookie does not exist), return the empty account
-	if err != nil {
-		return ConnectedAccount
-	}
-	// Get the value of the cookie
-	cookieValue := cookie.Value
-	// Split the cookie value by "|" to get the account's information
-	cookieValues := strings.Split(cookieValue, "|")
-	// Return a new account with the information from the cookie
-	return database.Account{
-		Id:       cookieValues[0],
-		Email:    cookieValues[1],
-		Password: cookieValues[2],
-		Username: cookieValues[3],
-		ImageUrl: cookieValues[4],
-	}
 }

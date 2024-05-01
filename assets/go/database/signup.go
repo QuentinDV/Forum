@@ -2,14 +2,13 @@ package database
 
 // Importing necessary packages
 import (
-	"crypto/sha256"
 	"database/sql"
-	"encoding/hex"
 	"fmt"
 	"log"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // SignUpError struct holds the error information for sign up process.
@@ -21,16 +20,14 @@ type SignUpError struct {
 // CreateAccount function creates a new account in the database.
 // It takes email, password, username and admin status as input.
 // It returns the created account, any sign up error and error if any.
-func CreateAccount(email, password, username string, isAdmin bool) (Account, SignUpError, error) {
+func CreateAccount(email, password, username string, IsModerator bool, isAdmin bool) (Account, SignUpError, error) {
 	var account Account
-	// Connexion à la base de données
 	db, err := ConnectDB("database.db")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	// Get the last ID from the database
 	var lastID string
 	row := db.QueryRow("SELECT id FROM accounts ORDER BY id DESC LIMIT 1")
 	err = row.Scan(&lastID)
@@ -42,16 +39,13 @@ func CreateAccount(email, password, username string, isAdmin bool) (Account, Sig
 		}
 	}
 
-	// Increment the last ID
 	newID := incrementID(lastID)
 
-	// Vérifier si l'email est déjà pris
 	emailTaken, err := IsEmailTaken(db, email)
 	if err != nil {
 		return account, SignUpError{}, err
 	}
 
-	// Vérifier si le pseudonyme est déjà pris
 	usernameTaken, err := IsUsernameTaken(db, username)
 	if err != nil {
 		return account, SignUpError{}, err
@@ -66,13 +60,18 @@ func CreateAccount(email, password, username string, isAdmin bool) (Account, Sig
 		return account, SignUpError{EmailError: false, UsernameError: true}, nil
 	}
 
-	// Exemple d'utilisation : Création et insertion d'un nouveau compte
+	newpassword, err := hashPasswordBcrypt(password)
+	if err != nil {
+		return account, SignUpError{}, err
+	}
+
 	newAccount := Account{
 		Id:           newID,
 		Email:        email,
-		Password:     hashPasswordSHA256(password),
+		Password:     newpassword,
 		Username:     username,
 		ImageUrl:     "https://i.pinimg.com/474x/63/bc/94/63bc9469cae29b897565a08f0647db3c.jpg",
+		IsModerator:  IsModerator,
 		IsAdmin:      isAdmin,
 		IsBan:        false,
 		CreationDate: time.Now().Format("2006-01-02 15:04:05"),
@@ -124,11 +123,9 @@ func incrementID(lastID string) string {
 	return fmt.Sprintf("%d", id)
 }
 
-// hashPasswordSHA256 function hashes a password using SHA256 encryption.
+// hashPasswordBcrypt function hashes a password using bcrypt.
 // It takes a password as input and returns the hashed password.
-func hashPasswordSHA256(password string) string {
-	hasher := sha256.New()
-	hasher.Write([]byte(password))
-	hash := hasher.Sum(nil)
-	return hex.EncodeToString(hash)
+func hashPasswordBcrypt(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
 }

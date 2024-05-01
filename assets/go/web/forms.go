@@ -30,7 +30,7 @@ func SignUpForm(w http.ResponseWriter, r *http.Request) {
 
 	// If the created account is the same as the empty account,
 	// execute the home template with the sign up error
-	Acc, signUpError, err := database.CreateAccount(email, password, username, false)
+	Acc, signUpError, err := database.CreateAccount(email, password, username, false, false)
 	if err != nil {
 		return
 	}
@@ -46,9 +46,10 @@ func SignUpForm(w http.ResponseWriter, r *http.Request) {
 	accountCookie := &http.Cookie{
 		Name: "account",
 		// The value of the cookie is a string that contains the account's information separated by "|"
-		Value: fmt.Sprintf("%s|%s|%s|%s|%s|%t|%t|%s", Acc.Id, Acc.Email, Acc.Password, Acc.Username, Acc.ImageUrl, Acc.IsBan, Acc.IsAdmin, Acc.CreationDate),
+		Value: fmt.Sprintf("%s|%s|%s|%s|%s|%t|%t|%t|%s", Acc.Id, Acc.Email, Acc.Password, Acc.Username, Acc.ImageUrl, Acc.IsBan, Acc.IsModerator, Acc.IsAdmin, Acc.CreationDate),
 		Path:  "/",
 	}
+
 	// Set the cookie
 	http.SetCookie(w, accountCookie)
 
@@ -75,7 +76,7 @@ func LoginForm(w http.ResponseWriter, r *http.Request) {
 
 	Acc, logInError, err := database.RecoverAccount(identif, password)
 	if err != nil {
-		// Gérer l'erreur
+		// Handle the error
 		return
 	}
 
@@ -87,13 +88,12 @@ func LoginForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("Account Founded")
 	// Update the cookies
 	// Create a new cookie for the account
 	accountCookie := &http.Cookie{
 		Name: "account",
 		// The value of the cookie is a string that contains the account's information separated by "|"
-		Value: fmt.Sprintf("%s|%s|%s|%s|%s|%t|%t|%s", Acc.Id, Acc.Email, Acc.Password, Acc.Username, Acc.ImageUrl, Acc.IsBan, Acc.IsAdmin, Acc.CreationDate),
+		Value: fmt.Sprintf("%s|%s|%s|%s|%s|%t|%t|%t|%s", Acc.Id, Acc.Email, Acc.Password, Acc.Username, Acc.ImageUrl, Acc.IsBan, Acc.IsModerator, Acc.IsAdmin, Acc.CreationDate),
 		Path:  "/",
 	}
 
@@ -114,7 +114,7 @@ func LogOutForm(w http.ResponseWriter, r *http.Request) {
 	accountCookie := &http.Cookie{
 		Name: "account",
 		// The value of the cookie is a string that contains the account's information separated by "|"
-		Value: fmt.Sprintf("%s|%s|%s|%s|%s|%t|%t|%s", Acc.Id, Acc.Email, Acc.Password, Acc.Username, Acc.ImageUrl, Acc.IsBan, Acc.IsAdmin, Acc.CreationDate),
+		Value: fmt.Sprintf("%s|%s|%s|%s|%s|%t|%t|%t|%s", Acc.Id, Acc.Email, Acc.Password, Acc.Username, Acc.ImageUrl, Acc.IsBan, Acc.IsModerator, Acc.IsAdmin, Acc.CreationDate),
 		Path:  "/",
 	}
 	// Set the cookie

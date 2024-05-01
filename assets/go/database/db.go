@@ -11,6 +11,7 @@ type Account struct {
 	Username     string
 	ImageUrl     string
 	IsBan        bool
+	IsModerator  bool
 	IsAdmin      bool
 	CreationDate string
 }
@@ -29,6 +30,7 @@ func ConnectDB(dbPath string) (*sql.DB, error) {
         username TEXT UNIQUE NOT NULL,
         ImageUrl TEXT NOT NULL,
         isBan BOOLEAN NOT NULL DEFAULT 0,
+        isModerator BOOLEAN NOT NULL DEFAULT 0, 
         isAdmin BOOLEAN NOT NULL DEFAULT 0, 
         CreationDate TEXT NOT NULL
     )`)
@@ -42,8 +44,8 @@ func ConnectDB(dbPath string) (*sql.DB, error) {
 // It takes a database connection and an account as input.
 // It returns an error if any.
 func InsertAccount(db *sql.DB, account Account) error {
-	_, err := db.Exec("INSERT INTO accounts (id, email, password, username, ImageUrl, isBan, isAdmin, CreationDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-		account.Id, account.Email, account.Password, account.Username, account.ImageUrl, account.IsBan, account.IsAdmin, account.CreationDate)
+	_, err := db.Exec("INSERT INTO accounts (id, email, password, username, ImageUrl, isBan, isModerator, isAdmin, CreationDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		account.Id, account.Email, account.Password, account.Username, account.ImageUrl, account.IsBan, account.IsModerator, account.IsAdmin, account.CreationDate)
 	return err
 }
 
@@ -59,7 +61,7 @@ func DeleteAccount(db *sql.DB, id string) error {
 // It takes a database connection as input.
 // It returns a slice of accounts and an error if any.
 func GetAllAccounts(db *sql.DB) ([]Account, error) {
-	rows, err := db.Query("SELECT id, email, password, username, ImageUrl, isBan, isAdmin, CreationDate FROM accounts")
+	rows, err := db.Query("SELECT id, email, password, username, ImageUrl, isBan, isModerator, isAdmin, CreationDate FROM accounts")
 	if err != nil {
 		return nil, err
 	}
@@ -68,16 +70,40 @@ func GetAllAccounts(db *sql.DB) ([]Account, error) {
 	var accounts []Account
 	for rows.Next() {
 		var account Account
-		err = rows.Scan(&account.Id, &account.Email, &account.Password, &account.Username, &account.ImageUrl, &account.IsBan, &account.IsAdmin, &account.CreationDate)
-		if err != nil {
+		if err := rows.Scan(&account.Id, &account.Email, &account.Password, &account.Username, &account.ImageUrl, &account.IsBan, &account.IsModerator, &account.IsAdmin, &account.CreationDate); err != nil {
 			return nil, err
 		}
 		accounts = append(accounts, account)
 	}
-
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-
 	return accounts, nil
+}
+
+func ChangeData(db *sql.DB, id string, username string, imageUrl string) error {
+	_, err := db.Exec("UPDATE accounts SET username = ?, ImageUrl = ? WHERE id = ?", username, imageUrl, id)
+	return err
+}
+
+func ChangePassword(db *sql.DB, id string, password string) error {
+	_, err := db.Exec("UPDATE accounts SET password = ? WHERE id = ?", password, id)
+	return err
+}
+
+func BanAccount(db *sql.DB, id string) error {
+	_, err := db.Exec("UPDATE accounts SET isBan = 1 WHERE id = ?", id)
+	return err
+}
+
+func UnbanAccount(db *sql.DB, id string) error {
+	_, err := db.Exec("UPDATE accounts SET isBan = 0 WHERE id = ?", id)
+	return err
+}
+
+func PromoteToModerator(db *sql.DB, id string) error {
+	_, err := db.Exec("UPDATE accounts SET isModerator = 1 WHERE id = ?", id)
+	return err
+}
+
+func DemoteFromModerator(db *sql.DB, id string) error {
+	_, err := db.Exec("UPDATE accounts SET isModerator = 0 WHERE id = ?", id)
+	return err
 }

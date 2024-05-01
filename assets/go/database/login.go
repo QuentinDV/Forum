@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type LogInError struct {
@@ -59,26 +60,21 @@ func IsEmail(identif string) bool {
 // GetAccountByEmail function retrieves an account from the database using the provided email.
 func GetAccountByEmail(db *sql.DB, email string) (Account, error) {
 	var account Account
-	row := db.QueryRow("SELECT id, email, password, username, ImageUrl, isAdmin, isBan, CreationDate FROM accounts WHERE email = ?", email)
-	err := row.Scan(&account.Id, &account.Email, &account.Password, &account.Username, &account.ImageUrl, &account.IsAdmin, &account.IsBan, &account.CreationDate)
-	if err != nil {
-		return Account{}, err
-	}
-	return account, nil
+	row := db.QueryRow("SELECT * FROM accounts WHERE email = ?", email)
+	err := row.Scan(&account.Id, &account.Email, &account.Password, &account.Username, &account.ImageUrl, &account.IsBan, &account.IsModerator, &account.IsAdmin, &account.CreationDate)
+	return account, err
 }
 
 // GetAccountByUsername function retrieves an account from the database using the provided username.
 func GetAccountByUsername(db *sql.DB, username string) (Account, error) {
 	var account Account
-	row := db.QueryRow("SELECT id, email, password, username, ImageUrl, isAdmin, isBan, CreationDate FROM accounts WHERE username = ?", username)
-	err := row.Scan(&account.Id, &account.Email, &account.Password, &account.Username, &account.ImageUrl, &account.IsAdmin, &account.IsBan, &account.CreationDate)
-	if err != nil {
-		return Account{}, err
-	}
-	return account, nil
+	row := db.QueryRow("SELECT * FROM accounts WHERE username = ?", username)
+	err := row.Scan(&account.Id, &account.Email, &account.Password, &account.Username, &account.ImageUrl, &account.IsBan, &account.IsModerator, &account.IsAdmin, &account.CreationDate)
+	return account, err
 }
 
 // checkPassword function checks if the provided password matches the hashed password from the database.
 func checkPassword(password, hashedPassword string) bool {
-	return hashedPassword == hashPasswordSHA256(password)
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+	return err == nil
 }
