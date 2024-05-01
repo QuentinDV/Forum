@@ -35,10 +35,7 @@ document.getElementById("usernameSpan").innerText = username;
 document.getElementById("idSpan").innerText = id;
 document.getElementById("emailSpan").innerText = email;
 document.getElementById("passwordSpan").innerText = password;
-document.getElementById("isBanSpan").innerText = isBan;
-document.getElementById("isModeratorSpan").innerText = isModerator;
-document.getElementById("isAdminSpan").innerText = isAdmin;
-document.getElementById("creationDateSpan").innerText = creationDate;
+// document.getElementById("creationDateSpan").innerText = creationDate;
 
 // Find the img element by its ID and assign the image URL
 var profilePicture = document.getElementById("profilePicture");
