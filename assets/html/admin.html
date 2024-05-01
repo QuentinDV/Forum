@@ -3,9 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings</title>
+    <title>Admin Page</title>
+    <link rel="stylesheet" href="/assets/css/admin.css">
 </head>
 <body>
-    
+    <h1>Liste des comptes</h1>
+    <div class="accountgrid-container">
+        {{range .}}
+            <div class="accountgrid">
+                <p><strong>ID:</strong> {{.Id}}</p>
+                <p><strong>Email:</strong> {{.Email}}</p>
+                <p><strong>Nom d'utilisateur:</strong> {{.Username}}</p>
+                <!-- Ajoutez d'autres champs que vous souhaitez afficher -->
+            </div>
+        {{end}}
+    </div>
 </body>
 </html>

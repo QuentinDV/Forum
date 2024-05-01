@@ -2,7 +2,10 @@ package web
 
 // Importing necessary packages
 import (
+	"database/sql"
+	"fmt"
 	"forum/assets/go/database"
+	"html/template"
 	"net/http"
 	"strings"
 )
@@ -33,8 +36,23 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 
 // Admin page of the forum.
 func Admin(w http.ResponseWriter, r *http.Request) {
+	// Open the database
+	db, err := sql.Open("sqlite3", "database.db")
+	if err != nil {
+		return // If there is an error, return
+	}
+
+	// Get the account from the database
+	allAcc, err := database.GetAllAccounts(db)
+	if err != nil {
+		return // If there is an error, return
+	}
+
+	fmt.Println(allAcc)
+	tmpl := template.Must(template.ParseFiles("assets/html/admin.html"))
+	tmpl.Execute(w, allAcc)
 	// Serve the admin page
-	http.ServeFile(w, r, "assets/html/admin.html")
+	// http.ServeFile(w, r, "assets/html/admin.html")
 }
 
 // getAccountfromCookie is a function that retrieves the account information from the cookie.
