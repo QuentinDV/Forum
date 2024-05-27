@@ -20,6 +20,9 @@ func main() {
 	http.HandleFunc("/loginform", web.LoginForm)
 	http.HandleFunc("/guestform", web.LogOutForm)
 	http.HandleFunc("/logoutform", web.LogOutForm)
+	http.HandleFunc("/banUser", web.BanForm)
+	http.HandleFunc("/promoteToModerator", web.ModeratorForm)
+	http.HandleFunc("/promoteToAdmin", web.AdminForm)
 
 	// Elements
 	http.Handle("/assets/css/", http.StripPrefix("/assets/css/", http.FileServer(http.Dir("./assets/css"))))

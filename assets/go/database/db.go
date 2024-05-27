@@ -1,7 +1,10 @@
 package database
 
 // Importing necessary packages
-import "database/sql"
+import (
+	"database/sql"
+	"fmt"
+)
 
 // Account struct represents a user account in the system
 type Account struct {
@@ -68,11 +71,15 @@ func GetAllAccounts(db *sql.DB) ([]Account, error) {
 	defer rows.Close()
 
 	var accounts []Account
+	fmt.Println("test")
+	fmt.Println(rows)
+	fmt.Println(accounts)
 	for rows.Next() {
 		var account Account
 		if err := rows.Scan(&account.Id, &account.Email, &account.Password, &account.Username, &account.ImageUrl, &account.IsBan, &account.IsModerator, &account.IsAdmin, &account.CreationDate); err != nil {
 			return nil, err
 		}
+		fmt.Println(account)
 		accounts = append(accounts, account)
 	}
 	return accounts, nil
@@ -93,7 +100,7 @@ func BanAccount(db *sql.DB, id string) error {
 	return err
 }
 
-func UnbanAccount(db *sql.DB, id string) error {
+func UnBanAccount(db *sql.DB, id string) error {
 	_, err := db.Exec("UPDATE accounts SET isBan = 0 WHERE id = ?", id)
 	return err
 }
@@ -105,5 +112,15 @@ func PromoteToModerator(db *sql.DB, id string) error {
 
 func DemoteFromModerator(db *sql.DB, id string) error {
 	_, err := db.Exec("UPDATE accounts SET isModerator = 0 WHERE id = ?", id)
+	return err
+}
+
+func PromoteToAdmin(db *sql.DB, id string) error {
+	_, err := db.Exec("UPDATE accounts SET isAdmin = 1 WHERE id = ?", id)
+	return err
+}
+
+func DemoteFromAdmin(db *sql.DB, id string) error {
+	_, err := db.Exec("UPDATE accounts SET isAdmin = 0 WHERE id = ?", id)
 	return err
 }

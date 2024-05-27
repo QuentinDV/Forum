@@ -3,6 +3,7 @@ package web
 // Importing necessary packages
 import (
 	"database/sql"
+	"fmt"
 	"forum/assets/go/database"
 	"html/template"
 	"net/http"
@@ -37,17 +38,20 @@ func Admin(w http.ResponseWriter, r *http.Request) {
 	// Open the database
 	db, err := sql.Open("sqlite3", "database.db")
 	if err != nil {
-		return // If there is an error, return
+		fmt.Println("Error opening database:", err)
+		return
 	}
 
-	// Get the account from the database
 	allAcc, err := database.GetAllAccounts(db)
 	if err != nil {
-		return // If there is an error, return
+		fmt.Println("Error getting all accounts:", err)
+		return
 	}
 
+	// Serve the admin page
 	tmpl := template.Must(template.ParseFiles("assets/html/admin.html"))
 	tmpl.Execute(w, allAcc)
+
 	// Serve the admin page
 	// http.ServeFile(w, r, "assets/html/admin.html")
 }
