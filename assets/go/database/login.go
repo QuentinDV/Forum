@@ -31,12 +31,13 @@ func RecoverAccount(identif, password string) (Account, LogInError, error) {
 	} else {
 		account, err = GetAccountByUsername(db, identif)
 	}
+
 	if err != nil {
 		return emptyaccount, LogInError{}, err
 	}
 
 	// Vérifier si le compte existe
-	correctpassword := !checkPassword(password, account.Password)
+	correctpassword := checkPassword(password, account.Password)
 	correctidentif := !(account == emptyaccount)
 
 	if !correctpassword && !correctidentif {

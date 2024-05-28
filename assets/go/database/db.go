@@ -3,7 +3,6 @@ package database
 // Importing necessary packages
 import (
 	"database/sql"
-	"fmt"
 )
 
 // Account struct represents a user account in the system
@@ -71,15 +70,11 @@ func GetAllAccounts(db *sql.DB) ([]Account, error) {
 	defer rows.Close()
 
 	var accounts []Account
-	fmt.Println("test")
-	fmt.Println(rows)
-	fmt.Println(accounts)
 	for rows.Next() {
 		var account Account
 		if err := rows.Scan(&account.Id, &account.Email, &account.Password, &account.Username, &account.ImageUrl, &account.IsBan, &account.IsModerator, &account.IsAdmin, &account.CreationDate); err != nil {
 			return nil, err
 		}
-		fmt.Println(account)
 		accounts = append(accounts, account)
 	}
 	return accounts, nil
