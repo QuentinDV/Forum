@@ -135,24 +135,26 @@ func BanForm(w http.ResponseWriter, r *http.Request) {
 
 	// Get the username, email, and password from the form data
 	id := r.Form.Get("userId")
+	username := r.Form.Get("username")
 	banstatus := r.Form.Get("banstatus")
 
-	if banstatus == "true" {
-		db, err := database.ConnectDB("database.db")
-		if err != nil {
-			return
-		}
-		defer db.Close()
-		database.UnBanAccount(db, id)
+	if username != "QuentinDV" && username != "OwandjiD" {
+		if banstatus == "true" {
+			db, err := database.ConnectDB("database.db")
+			if err != nil {
+				return
+			}
+			defer db.Close()
+			database.UnBanAccount(db, id)
 
-	} else {
-		db, err := database.ConnectDB("database.db")
-		if err != nil {
-			return
+		} else {
+			db, err := database.ConnectDB("database.db")
+			if err != nil {
+				return
+			}
+			defer db.Close()
+			database.BanAccount(db, id)
 		}
-		defer db.Close()
-		database.BanAccount(db, id)
-
 	}
 
 	// Redirect to the home page
@@ -170,24 +172,26 @@ func ModeratorForm(w http.ResponseWriter, r *http.Request) {
 
 	// Get the username, email, and password from the form data
 	id := r.Form.Get("userId")
+	username := r.Form.Get("username")
 	moderator := r.Form.Get("moderator")
 
-	if moderator == "true" {
-		db, err := database.ConnectDB("database.db")
-		if err != nil {
-			return
-		}
-		defer db.Close()
-		database.DemoteFromModerator(db, id)
+	if username != "QuentinDV" && username != "OwandjiD" {
+		if moderator == "true" {
+			db, err := database.ConnectDB("database.db")
+			if err != nil {
+				return
+			}
+			defer db.Close()
+			database.DemoteFromModerator(db, id)
 
-	} else {
-		db, err := database.ConnectDB("database.db")
-		if err != nil {
-			return
+		} else {
+			db, err := database.ConnectDB("database.db")
+			if err != nil {
+				return
+			}
+			defer db.Close()
+			database.PromoteToModerator(db, id)
 		}
-		defer db.Close()
-		database.PromoteToModerator(db, id)
-
 	}
 
 	// Redirect to the home page
@@ -224,6 +228,32 @@ func AdminForm(w http.ResponseWriter, r *http.Request) {
 			defer db.Close()
 			database.PromoteToAdmin(db, id)
 		}
+	}
+
+	// Redirect to the home page
+	http.Redirect(w, r, "/admin", http.StatusSeeOther)
+}
+
+func DeleteAccountForm(w http.ResponseWriter, r *http.Request) {
+	// Parse the form data
+	err := r.ParseForm()
+	if err != nil {
+		// If there is an error, return an internal server error response
+		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
+		return
+	}
+
+	// Get the username, email, and password from the form data
+	id := r.Form.Get("userId")
+	username := r.Form.Get("username")
+
+	if username != "QuentinDV" && username != "OwandjiD" {
+		db, err := database.ConnectDB("database.db")
+		if err != nil {
+			return
+		}
+		defer db.Close()
+		database.DeleteAccount(db, id)
 	}
 
 	// Redirect to the home page

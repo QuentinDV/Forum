@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="/assets/css/admin.css">
 </head>
 <body>
-    test
     <h1>Liste des comptes</h1>
     <div class="accountgrid">
         <p><strong>ID:</strong></p>
@@ -16,6 +15,7 @@
         <p><strong>IsBan:</strong></p>
         <p><strong>IsModerator:</strong></p>
         <p><strong>IsAdmin:</strong></p>
+        <p><strong>Delete Account</strong></p>
         <p><strong>CreationDate:</strong></p>
     </div>
     <div class="accountgrid-container">
@@ -25,23 +25,30 @@
             <p>{{.Username}}</p>
             <p>{{.Email}}</p>
 
-            <form action="/banUser" method="post">
+            <form action="/banUserform" method="post">
                 <input type="hidden" name="userId" value="{{.Id}}">
+                <input type="hidden" name="username" value="{{.Username}}">
                 <input type="hidden" name="banstatus" value="{{.IsBan}}">
                 <button id="banButton{{.Id}}" type="submit">{{.IsBan}}</button>
             </form>
 
-            <form action="/promoteToModerator" method="post">
+            <form action="/promoteToModeratorform" method="post">
                 <input type="hidden" name="userId" value="{{.Id}}">
+                <input type="hidden" name="username" value="{{.Username}}">
                 <input type="hidden" name="moderator" value="{{.IsModerator}}">
                 <button id="moderatorButton{{.Id}}" type="submit">{{.IsModerator}}</button>
             </form>
 
-            <form action="/promoteToAdmin" method="post">
+            <form action="/promoteToAdminform" method="post">
                 <input type="hidden" name="userId" value="{{.Id}}">
                 <input type="hidden" name="admin" value="{{.IsAdmin}}">
                 <input type="hidden" name="username" value="{{.Username}}">
                 <button id="adminButton{{.Id}}" type="submit">{{.IsAdmin}}</button>
+            </form>
+            <form action="/deleteUserform" method="post">
+                <input type="hidden" name="userId" value="{{.Id}}">
+                <input type="hidden" name="username" value="{{.Username}}">
+                <button id="deleteButton{{.Id}}" type="submit">Delete Account</button>
             </form>
             <p>{{.CreationDate}}</p>
         </div>
