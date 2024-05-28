@@ -21,6 +21,12 @@ func Categories(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "assets/html/categories.html")
 }
 
+// Categories page of the forum.
+func UserProfile(w http.ResponseWriter, r *http.Request) {
+	// Serve the categories page
+	http.ServeFile(w, r, "assets/html/userprofile.html")
+}
+
 // LogIn page of the forum.
 func LogIn(w http.ResponseWriter, r *http.Request) {
 	// Serve the login page
@@ -51,7 +57,4 @@ func Admin(w http.ResponseWriter, r *http.Request) {
 	// Serve the admin page
 	tmpl := template.Must(template.ParseFiles("assets/html/admin.html"))
 	tmpl.Execute(w, allAcc)
-
-	// Serve the admin page
-	// http.ServeFile(w, r, "assets/html/admin.html")
 }

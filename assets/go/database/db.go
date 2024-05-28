@@ -3,6 +3,9 @@ package database
 // Importing necessary packages
 import (
 	"database/sql"
+	"fmt"
+	"io"
+	"os"
 )
 
 // Account struct represents a user account in the system
@@ -90,6 +93,11 @@ func ChangePassword(db *sql.DB, id string, password string) error {
 	return err
 }
 
+func ChangeImageUrl(db *sql.DB, id string, imageUrl string) error {
+	_, err := db.Exec("UPDATE accounts SET ImageUrl = ? WHERE id = ?", imageUrl, id)
+	return err
+}
+
 func BanAccount(db *sql.DB, id string) error {
 	_, err := db.Exec("UPDATE accounts SET isBan = 1 WHERE id = ?", id)
 	return err
@@ -118,4 +126,30 @@ func PromoteToAdmin(db *sql.DB, id string) error {
 func DemoteFromAdmin(db *sql.DB, id string) error {
 	_, err := db.Exec("UPDATE accounts SET isAdmin = 0 WHERE id = ?", id)
 	return err
+}
+
+func SaveFile(filename string, data io.Reader) error {
+	// Create the file
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// Write the data to the file
+	_, err = io.Copy(file, data)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// CountFiles function retrieves the number of files in a directory and returns it.
+func CountFiles(directory string) int {
+	files, err := os.ReadDir(directory)
+	if err != nil {
+		fmt.Println("Error reading directory:", err)
+	}
+	return len(files)
 }

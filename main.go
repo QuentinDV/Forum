@@ -14,16 +14,21 @@ func main() {
 	http.HandleFunc("/categories", web.Categories)
 	http.HandleFunc("/signup", web.SignUp)
 	http.HandleFunc("/admin", web.Admin)
+	http.HandleFunc("/userprofile", web.UserProfile)
 
 	// Forms
 	http.HandleFunc("/signupform", web.SignUpForm)
 	http.HandleFunc("/loginform", web.LoginForm)
 	http.HandleFunc("/guestform", web.LogOutForm)
 	http.HandleFunc("/logoutform", web.LogOutForm)
+
 	http.HandleFunc("/banUserform", web.BanForm)
 	http.HandleFunc("/deleteUserform", web.DeleteAccountForm)
 	http.HandleFunc("/promoteToModeratorform", web.ModeratorForm)
 	http.HandleFunc("/promoteToAdminform", web.AdminForm)
+
+	http.HandleFunc("/PfpUrlform", web.PfpWithUrlForm)
+	http.HandleFunc("/PfpImageForm", web.PfpWithImageForm)
 
 	// Elements
 	http.Handle("/assets/css/", http.StripPrefix("/assets/css/", http.FileServer(http.Dir("./assets/css"))))

@@ -6,6 +6,7 @@ import (
 	"forum/assets/go/database"
 	"html/template"
 	"net/http"
+	"strconv"
 )
 
 // SignUpForm is a function that handles the sign up form submission.
@@ -258,4 +259,100 @@ func DeleteAccountForm(w http.ResponseWriter, r *http.Request) {
 
 	// Redirect to the home page
 	http.Redirect(w, r, "/admin", http.StatusSeeOther)
+}
+
+func PfpWithUrlForm(w http.ResponseWriter, r *http.Request) {
+	// Parse the form data
+	err := r.ParseForm()
+	if err != nil {
+		// If there is an error, return an internal server error response
+		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
+		return
+	}
+
+	// Get the username, email, and password from the form data
+	id := r.Form.Get("userId")
+	imageUrl := r.Form.Get("imageUrl")
+	username := r.Form.Get("username")
+	fmt.Println(username)
+
+	db, err := database.ConnectDB("database.db")
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	database.ChangeImageUrl(db, id, imageUrl)
+
+	Acc, err := database.GetAccountByUsername(db, username)
+	if err != nil {
+		fmt.Println("Error getting account by username:", err)
+		return
+	}
+	// Update the cookies
+	// Create a new cookie for the account
+	accountCookie := &http.Cookie{
+		Name: "account",
+		// The value of the cookie is a string that contains the account's information separated by "|"
+		Value: fmt.Sprintf("%s|%s|%s|%s|%s|%t|%t|%t|%s", Acc.Id, Acc.Email, Acc.Password, Acc.Username, Acc.ImageUrl, Acc.IsBan, Acc.IsModerator, Acc.IsAdmin, Acc.CreationDate),
+		Path:  "/",
+	}
+
+	// Set the cookie
+	http.SetCookie(w, accountCookie)
+
+	// Redirect to the home page
+	http.Redirect(w, r, "/userprofile", http.StatusSeeOther)
+}
+
+func PfpWithImageForm(w http.ResponseWriter, r *http.Request) {
+	// Parse the form data
+	err := r.ParseMultipartForm(4 << 20) // Set maxMemory parameter to 4MB
+	if err != nil {
+		// If there is an error, return an internal server error response
+		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
+		return
+	}
+
+	// Get the username and id from the form data
+	username := r.Form.Get("username")
+	fmt.Println(username)
+	id := r.Form.Get("userId")
+
+	// Get the profile picture file from the form data
+	file, _, err := r.FormFile("profilePicture")
+	if err != nil {
+		http.Error(w, "Error retrieving the file", http.StatusInternalServerError)
+		return
+	}
+	defer file.Close()
+
+	database.SaveFile("./assets/img/pfp/"+strconv.Itoa(database.CountFiles("./assets/img/pfp"))+".png", file)
+
+	db, err := database.ConnectDB("database.db")
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	database.ChangeImageUrl(db, id, "./assets/img/pfp/"+strconv.Itoa(database.CountFiles("./assets/img/pfp"))+".png")
+
+	Acc, err := database.GetAccountByUsername(db, username)
+	if err != nil {
+		fmt.Println("Error getting account by username:", err)
+		return
+	}
+
+	// Update the cookies
+	// Create a new cookie for the account
+	accountCookie := &http.Cookie{
+		Name: "account",
+		// The value of the cookie is a string that contains the account's information separated by "|"
+		Value: fmt.Sprintf("%s|%s|%s|%s|%s|%t|%t|%t|%s", Acc.Id, Acc.Email, Acc.Password, Acc.Username, Acc.ImageUrl, Acc.IsBan, Acc.IsModerator, Acc.IsAdmin, Acc.CreationDate),
+		Path:  "/",
+	}
+
+	// Set the cookie
+	http.SetCookie(w, accountCookie)
+
+	// Redirect to the home page
+	http.Redirect(w, r, "/userprofile", http.StatusSeeOther)
 }
