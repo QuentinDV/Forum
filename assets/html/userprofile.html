@@ -8,7 +8,7 @@
 </head>
 <body>
     <button onclick="location.href='/home'">Home</button>
-    <img id="profilePicture" alt="Profile Picture">
+    <img id="profilePicture" alt="Profile Picture" width="400px">
 
     <form action="/PfpUrlform" method="post">
         <input type="hidden" name="userId" value="{{.Id}}">
@@ -20,7 +20,7 @@
 
     
     <form action="/PfpImageForm" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="userId" value="{{.Id}}">
+        <input type="hidden" id="userId" name="userId" value="{{.Id}}">
         <input type="hidden" id="usernameInput" name="username">
         <input type="file" id="profilePicture" name="profilePicture" accept="image/*">
         <input type="submit" value="Upload Image" name="submit">
@@ -33,6 +33,5 @@
     <p>Creation Date: <span id="creationDateSpan"></span></p>
 </body>
 <script src="/assets/js/cookies.js"></script>
-<script src="/assets/js/userprofile.js"></script>
 
 </html>

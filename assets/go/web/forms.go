@@ -6,7 +6,6 @@ import (
 	"forum/assets/go/database"
 	"html/template"
 	"net/http"
-	"strconv"
 )
 
 // SignUpForm is a function that handles the sign up form submission.
@@ -276,6 +275,7 @@ func PfpWithUrlForm(w http.ResponseWriter, r *http.Request) {
 	username := r.Form.Get("username")
 	fmt.Println(username)
 
+	// Change the image url in the database
 	db, err := database.ConnectDB("database.db")
 	if err != nil {
 		return
@@ -283,6 +283,7 @@ func PfpWithUrlForm(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 	database.ChangeImageUrl(db, id, imageUrl)
 
+	// Get the account from the database
 	Acc, err := database.GetAccountByUsername(db, username)
 	if err != nil {
 		fmt.Println("Error getting account by username:", err)
@@ -315,7 +316,6 @@ func PfpWithImageForm(w http.ResponseWriter, r *http.Request) {
 
 	// Get the username and id from the form data
 	username := r.Form.Get("username")
-	fmt.Println(username)
 	id := r.Form.Get("userId")
 
 	// Get the profile picture file from the form data
@@ -326,15 +326,24 @@ func PfpWithImageForm(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	database.SaveFile("./assets/img/pfp/"+strconv.Itoa(database.CountFiles("./assets/img/pfp"))+".png", file)
+	// Save the profile picture file to the server
+	database.SaveFile("./assets/img/pfp/"+id+".png", file)
 
 	db, err := database.ConnectDB("database.db")
 	if err != nil {
 		return
 	}
 	defer db.Close()
-	database.ChangeImageUrl(db, id, "./assets/img/pfp/"+strconv.Itoa(database.CountFiles("./assets/img/pfp"))+".png")
 
+	// Change the image url in the database
+	imageUrl := "./assets/img/pfp/" + id + ".png"
+	err = database.ChangeImageUrl(db, id, imageUrl)
+	if err != nil {
+		fmt.Println("Error changing image url:", err)
+		return
+	}
+
+	// Get the account from the database
 	Acc, err := database.GetAccountByUsername(db, username)
 	if err != nil {
 		fmt.Println("Error getting account by username:", err)

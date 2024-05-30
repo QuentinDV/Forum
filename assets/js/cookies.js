@@ -24,7 +24,6 @@ var id = accountValues[0][1];
 var email = accountValues[1];
 var password = accountValues[2];
 var username = accountValues[3];
-console.log(username);
 var imageUrl = accountValues[4];
 var isBan = accountValues[5] === 'true';
 var isModerator = accountValues[6] === 'true';
@@ -41,3 +40,20 @@ document.getElementById("creationDateSpan").innerText = creationDate;
 // Find the img element by its ID and assign the image URL
 var profilePicture = document.getElementById("profilePicture");
 profilePicture.src = imageUrl;
+
+// Find the img element by its ID and assign the image URL
+document.addEventListener('DOMContentLoaded', (event) => {
+    document.querySelector('input[name="userId"]').value = document.getElementById('idSpan').innerText;
+});
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    document.querySelector('input[name="username"]').value = document.getElementById('usernameSpan').innerText;
+});
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    document.getElementById('usernameInput').value = document.getElementById('usernameSpan').innerText;
+});
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    document.getElementById('userId').value = document.getElementById('idSpan').innerText;
+});
