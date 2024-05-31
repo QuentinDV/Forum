@@ -73,6 +73,8 @@ func LoginForm(w http.ResponseWriter, r *http.Request) {
 	}
 	identif := r.Form.Get("identif")
 	password := r.Form.Get("pswrd")
+	fmt.Println("identif:", identif)
+	fmt.Println("password:", password)
 
 	Acc, logInError, err := database.RecoverAccount(identif, password)
 	if err != nil {
@@ -273,7 +275,6 @@ func PfpWithUrlForm(w http.ResponseWriter, r *http.Request) {
 	id := r.Form.Get("userId")
 	imageUrl := r.Form.Get("imageUrl")
 	username := r.Form.Get("username")
-	fmt.Println(username)
 
 	// Change the image url in the database
 	db, err := database.ConnectDB("database.db")
@@ -350,6 +351,57 @@ func PfpWithImageForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Update the cookies
+	// Create a new cookie for the account
+	accountCookie := &http.Cookie{
+		Name: "account",
+		// The value of the cookie is a string that contains the account's information separated by "|"
+		Value: fmt.Sprintf("%s|%s|%s|%s|%s|%t|%t|%t|%s", Acc.Id, Acc.Email, Acc.Password, Acc.Username, Acc.ImageUrl, Acc.IsBan, Acc.IsModerator, Acc.IsAdmin, Acc.CreationDate),
+		Path:  "/",
+	}
+
+	// Set the cookie
+	http.SetCookie(w, accountCookie)
+
+	// Redirect to the home page
+	http.Redirect(w, r, "/userprofile", http.StatusSeeOther)
+}
+
+func ChangePwForm(w http.ResponseWriter, r *http.Request) {
+	// Parse the form data
+	err := r.ParseForm()
+	if err != nil {
+		// If there is an error, return an internal server error response
+		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
+		return
+	}
+
+	// Get the username, email, and password from the form data
+	id := r.Form.Get("userId2")
+	username := r.Form.Get("username2")
+	fmt.Println("username:", username)
+	fmt.Println("id:", id)
+
+	oldpassword := r.Form.Get("oldPw")
+	newpassword := r.Form.Get("newPw")
+
+	fmt.Println("oldpassword:", oldpassword)
+	fmt.Println("newpassword:", newpassword)
+
+	// Change the image url in the database
+	db, err := database.ConnectDB("database.db")
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	database.ChangePassword(db, id, username, oldpassword, newpassword)
+
+	// Get the account from the database
+	Acc, err := database.GetAccountByUsername(db, username)
+	if err != nil {
+		fmt.Println("Error getting account by username:", err)
+		return
+	}
 	// Update the cookies
 	// Create a new cookie for the account
 	accountCookie := &http.Cookie{

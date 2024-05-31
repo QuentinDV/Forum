@@ -3,6 +3,7 @@ package database
 // Importing necessary packages
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -88,9 +89,34 @@ func ChangeData(db *sql.DB, id string, username string, imageUrl string) error {
 	return err
 }
 
-func ChangePassword(db *sql.DB, id string, password string) error {
-	_, err := db.Exec("UPDATE accounts SET password = ? WHERE id = ?", password, id)
+func ChangePassword(db *sql.DB, id string, username string, oldPassword string, newPassword string) error {
+	var password string
+	err := db.QueryRow("SELECT password FROM accounts WHERE id = ?", id).Scan(&password)
+	if err != nil {
+		return err
+	}
+
+	if !checkPassword(password, oldPassword) {
+		return errors.New("invalid old password")
+	}
+
+	newPassword, err = hashPasswordBcrypt(newPassword)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec("UPDATE accounts SET password = ? WHERE id = ?", newPassword, id)
 	return err
+}
+
+func ShowPassword(db *sql.DB, id string) (string, error) {
+	var password string
+	err := db.QueryRow("SELECT password FROM accounts WHERE id = ?", id).Scan(&password)
+	if err != nil {
+		return "", err
+	}
+
+	return password, nil
 }
 
 func ChangeImageUrl(db *sql.DB, id string, imageUrl string) error {

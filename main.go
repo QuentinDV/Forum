@@ -29,6 +29,7 @@ func main() {
 
 	http.HandleFunc("/PfpUrlform", web.PfpWithUrlForm)
 	http.HandleFunc("/PfpImageForm", web.PfpWithImageForm)
+	http.HandleFunc("/ChangePwForm", web.ChangePwForm)
 
 	// Elements
 	http.Handle("/assets/css/", http.StripPrefix("/assets/css/", http.FileServer(http.Dir("./assets/css"))))
