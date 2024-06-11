@@ -109,6 +109,17 @@ func ChangePassword(db *sql.DB, id string, username string, oldPassword string, 
 	return err
 }
 
+func ChangePWFORCED(db *sql.DB, id string, newPassword string) error {
+	newPassword, err := hashPasswordBcrypt(newPassword)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec("UPDATE accounts SET password = ? WHERE id = ?", newPassword, id)
+	return err
+
+}
+
 func ShowPassword(db *sql.DB, id string) (string, error) {
 	var password string
 	err := db.QueryRow("SELECT password FROM accounts WHERE id = ?", id).Scan(&password)

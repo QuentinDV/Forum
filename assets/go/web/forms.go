@@ -76,20 +76,27 @@ func LoginForm(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("identif:", identif)
 	fmt.Println("password:", password)
 
-	Acc, logInError, err := database.RecoverAccount(identif, password)
+	Acc, LogInError, err := database.RecoverAccount(identif, password)
+	fmt.Println("LogInError:", LogInError)
 	if err != nil {
-		// Handle the error
 		return
 	}
+	db, err := database.ConnectDB("database.db")
+	if err != nil {
+		return
+	}
+	defer db.Close()
 
 	// If the account found in the database is the same as the empty account,
 	// execute the home template with the login error
-	if Acc == account {
-		tmpl := template.Must(template.ParseFiles("assets/html/home.html"))
-		tmpl.Execute(w, logInError)
-		return
-	}
+	// if Acc == account {
+	// 	tmpl := template.Must(template.ParseFiles("assets/html/home.html"))
+	// 	tmpl.Execute(w, logInError)
+	// 	return
+	// }
 
+	fmt.Println("account:", account)
+	fmt.Println("Acc:", Acc)
 	// Update the cookies
 	// Create a new cookie for the account
 	accountCookie := &http.Cookie{
@@ -103,7 +110,7 @@ func LoginForm(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, accountCookie)
 
 	// Redirect to the home page
-	http.Redirect(w, r, "/home", http.StatusSeeOther)
+	http.Redirect(w, r, "/home", http.StatusFound)
 }
 
 // LogOutForm is a function that handles the logout form submission.
@@ -122,8 +129,11 @@ func LogOutForm(w http.ResponseWriter, r *http.Request) {
 	// Set the cookie
 	http.SetCookie(w, accountCookie)
 
-	// Redirect to the home page
-	http.Redirect(w, r, "/home", http.StatusSeeOther)
+	// Get the URL of the previous page from the Referer header
+	previousPage := r.Header.Get("Referer")
+
+	// Redirect to the previous page
+	http.Redirect(w, r, previousPage, http.StatusSeeOther)
 }
 
 func BanForm(w http.ResponseWriter, r *http.Request) {

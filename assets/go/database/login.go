@@ -74,7 +74,7 @@ func GetAccountByUsername(db *sql.DB, username string) (Account, error) {
 	return account, err
 }
 
-// checkPassword function checks if the provided password matches the hashed password from the database.
+// // checkPassword function checks if the provided password matches the hashed password from the database.
 func checkPassword(password, hashedPassword string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	return err == nil

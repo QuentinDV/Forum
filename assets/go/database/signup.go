@@ -60,7 +60,7 @@ func CreateAccount(email, password, username string, IsModerator bool, isAdmin b
 		return account, SignUpError{EmailError: false, UsernameError: true}, nil
 	}
 
-	newpassword, err := hashPasswordBcrypt(password)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return account, SignUpError{}, err
 	}
@@ -68,7 +68,7 @@ func CreateAccount(email, password, username string, IsModerator bool, isAdmin b
 	newAccount := Account{
 		Id:           newID,
 		Email:        email,
-		Password:     newpassword,
+		Password:     string(hashedPassword),
 		Username:     username,
 		ImageUrl:     "https://i.pinimg.com/474x/63/bc/94/63bc9469cae29b897565a08f0647db3c.jpg",
 		IsModerator:  IsModerator,
