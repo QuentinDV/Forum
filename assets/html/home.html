@@ -16,6 +16,18 @@
     
     <button class="settings" id="openMenu">Settings</button>
     <button onclick="location.href='/userprofile'">User Profile</button>
+
+    
+    <form action="/userprofileform" method="post">
+        <input type="hidden" id="OtherUsername" name="OtherUsername" value="QuentinDV">
+        <input type="submit" value="My Profile">
+    </form>
+
+    <form action="/userprofileform" method="post">
+        <input type="hidden" id="OtherUsername" name="OtherUsername" value="OwandjiD">
+        <input type="submit" value="User Profile">
+    </form>
+
     <div id="menu" class="menu-hidden" style="display: none;">
         <ul>
             <div login>
@@ -54,5 +66,6 @@
     <script src="/assets/js/login.js"></script>
     <script src="/assets/js/settings.js"></script>
     <script src="/assets/js/cookies.js"></script>
+    <script src="/assets/js/home.js"></script>
 
 </html>

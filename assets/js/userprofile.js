@@ -1,5 +1,3 @@
-
-
 // Find the img element by its ID and assign the image URL
 document.addEventListener('DOMContentLoaded', (event) => {
     document.getElementById('username').value = window.username;

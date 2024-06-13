@@ -21,12 +21,6 @@ func Categories(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "assets/html/categories.html")
 }
 
-// Categories page of the forum.
-func UserProfile(w http.ResponseWriter, r *http.Request) {
-	// Serve the categories page
-	http.ServeFile(w, r, "assets/html/userprofile.html")
-}
-
 // LogIn page of the forum.
 func LogIn(w http.ResponseWriter, r *http.Request) {
 	// Serve the login page
@@ -57,4 +51,22 @@ func Admin(w http.ResponseWriter, r *http.Request) {
 	// Serve the admin page
 	tmpl := template.Must(template.ParseFiles("assets/html/admin.html"))
 	tmpl.Execute(w, allAcc)
+}
+
+// Categories page of the forum.
+func UserProfile(w http.ResponseWriter, r *http.Request) {
+	// Serve the user profile page
+	http.ServeFile(w, r, "assets/html/userprofile.html")
+}
+
+// Profile page of the forum.
+func OtherUserProfile(w http.ResponseWriter, r *http.Request) {
+	// Serve the other user profile page
+	http.ServeFile(w, r, "assets/html/otheruserprofile.html")
+}
+
+// 404 page of the forum.
+func NotFound(w http.ResponseWriter, r *http.Request) {
+	// Serve the 404 page
+	http.ServeFile(w, r, "assets/html/404.html")
 }

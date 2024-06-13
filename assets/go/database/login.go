@@ -19,7 +19,7 @@ func RecoverAccount(identif, password string) (Account, LogInError, error) {
 	var emptyaccount Account
 	var account Account
 	// Connexion à la base de données
-	db, err := ConnectDB("database.db")
+	db, err := ConnectUserDB("database.db")
 	if err != nil {
 		return emptyaccount, LogInError{}, err
 	}

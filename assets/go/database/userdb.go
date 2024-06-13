@@ -22,13 +22,13 @@ type Account struct {
 	CreationDate string
 }
 
-// ConnectDB function creates a new connection to the SQLite database
-func ConnectDB(dbPath string) (*sql.DB, error) {
+// ConnectUserDB function creates a new connection to the SQLite database
+func ConnectUserDB(dbPath string) (*sql.DB, error) {
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		return nil, err
 	}
-	// Créer la table accounts si elle n'existe pas déjà
+	// Creating the accounts table if it does not already exist
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS accounts (
         id TEXT PRIMARY KEY,
         email TEXT UNIQUE NOT NULL,
@@ -189,4 +189,28 @@ func CountFiles(directory string) int {
 		fmt.Println("Error reading directory:", err)
 	}
 	return len(files)
+}
+
+// GetAccount function retrieves an account from the database by ID.
+// It takes a database connection and an account ID as input.
+// It returns an account and an error if any.
+func GetAccount(db *sql.DB, id string) (Account, error) {
+	var account Account
+	err := db.QueryRow("SELECT id, email, password, username, ImageUrl, isBan, isModerator, isAdmin, CreationDate FROM accounts WHERE id = ?", id).Scan(&account.Id, &account.Email, &account.Password, &account.Username, &account.ImageUrl, &account.IsBan, &account.IsModerator, &account.IsAdmin, &account.CreationDate)
+	if err != nil {
+		return Account{}, err
+	}
+	return account, nil
+}
+
+// GetAccountByUsername function retrieves an account from the database by username.
+// It takes a database connection and a username as input.
+// It returns an account and an error if any.
+func GetUserProfileByUsername(db *sql.DB, username string) (Account, error) {
+	var account Account
+	err := db.QueryRow("SELECT id, email, password, username, ImageUrl, isBan, isModerator, isAdmin, CreationDate FROM accounts WHERE username = ?", username).Scan(&account.Id, &account.Email, &account.Password, &account.Username, &account.ImageUrl, &account.IsBan, &account.IsModerator, &account.IsAdmin, &account.CreationDate)
+	if err != nil {
+		return Account{}, err
+	}
+	return account, nil
 }
