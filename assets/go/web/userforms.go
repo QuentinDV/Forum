@@ -6,7 +6,6 @@ import (
 	"html/template"
 	"net/http"
 	"strings"
-	"time"
 )
 
 type OtherUserProfileData struct {
@@ -265,8 +264,8 @@ func UserProfileForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	AccUsername := r.Form.Get("OtherUsername")
-	fmt.Println("Otherusername:", AccUsername)
+	AccUsername := r.Form.Get("AccUsername")
+	fmt.Println("AccUsername:", AccUsername)
 
 	ConnectedAccount := RetrieveAccountfromCookie(r)
 	fmt.Println("Username:", ConnectedAccount.Username)
@@ -277,17 +276,7 @@ func UserProfileForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if ConnectedAccount.Username == AccUsername {
-		categoriesdb, err := database.ConnectCategoriesDB("database.db")
-		if err != nil {
-			return
-		}
-		defer categoriesdb.Close()
-		err = database.InsertCategory(categoriesdb, database.Category{Title: "Video Games", Description: "Video Games in General", ImageUrl: "https://media1.giphy.com/media/3oEjHYlwvUK5p9AIbm/giphy.gif?cid=6c09b9524j6keeuo57nnwcf4q3gtje4k0rkjpy94fujx8vkv&ep=v1_gifs_search&rid=giphy.gif&ct=g", Tags: []string{"videogames"}, AccountID: "QuentinDV", CreationDate: time.Now().Format("2006-01-02 15:04:05")})
-		if err != nil {
-			fmt.Println("Error inserting category:", err)
-		}
 		http.Redirect(w, r, "/userprofile", http.StatusSeeOther)
-
 		return
 	}
 
@@ -329,10 +318,8 @@ func UserProfileForm(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Error getting liked posts:", err)
 		return
 	}
-	fmt.Println("favoritePostsIDs:", favoritePostsIDs)
+	// fmt.Println("favoritePostsIDs:", favoritePostsIDs)
 	var likesPosts []database.Post
-
-	fmt.Println(len(favoritePostsIDs))
 
 	for i := 1; i < len(favoritePostsIDs); i++ {
 		post, err := database.GetPost(db, favoritePostsIDs[i])
@@ -349,7 +336,7 @@ func UserProfileForm(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Error getting disliked posts:", err)
 		return
 	}
-	fmt.Println("dislikedPostsIDs:", dislikedPostsIDs)
+	// fmt.Println("dislikedPostsIDs:", dislikedPostsIDs)
 	var dislikesPosts []database.Post
 
 	for i := 1; i < len(dislikedPostsIDs); i++ {
@@ -361,7 +348,6 @@ func UserProfileForm(w http.ResponseWriter, r *http.Request) {
 		dislikesPosts = append(dislikesPosts, post)
 	}
 
-
 	// Create a new UserProfileData struct
 	userProfileData := OtherUserProfileData{
 		Username:           Acc.Username,
@@ -371,7 +357,7 @@ func UserProfileForm(w http.ResponseWriter, r *http.Request) {
 		LikedPosts:         likesPosts,
 		DisLikedPosts:      dislikesPosts,
 	}
-	fmt.Println("userProfileData:", userProfileData)
+	// fmt.Println("userProfileData:", userProfileData)
 
 	// Execute the user profile template with the UserProfileData struct
 	tmpl := template.Must(template.ParseFiles("assets/html/otheruserprofile.html"))

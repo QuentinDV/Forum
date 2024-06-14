@@ -112,6 +112,8 @@ func AddSubscribedCategory(db *sql.DB, AccountID string, categoryID string) erro
 		}
 	}
 
+	IncrementSubscriber(db, categoryID)
+
 	// Add categoryID to SubscribedCategories
 	userData.SubscribedCategories = append(userData.SubscribedCategories, categoryID)
 	return UpdateUserData(db, userData)
@@ -124,6 +126,7 @@ func RemoveSubscribedCategory(db *sql.DB, AccountID string, categoryID string) e
 	}
 	for i, id := range userData.SubscribedCategories {
 		if id == categoryID {
+			DecrementSubscriber(db, categoryID)
 			userData.SubscribedCategories = append(userData.SubscribedCategories[:i], userData.SubscribedCategories[i+1:]...)
 			break
 		}
@@ -144,6 +147,8 @@ func AddLikedPost(db *sql.DB, AccountID string, postID string) error {
 		}
 	}
 
+	AddLiketoDB(db, postID)
+
 	// Add postID to LikedPosts
 	userData.LikedPosts = append(userData.LikedPosts, postID)
 	return UpdateUserData(db, userData)
@@ -156,6 +161,7 @@ func RemoveLikedPost(db *sql.DB, AccountID string, postID string) error {
 	}
 	for i, id := range userData.LikedPosts {
 		if id == postID {
+			RemoveLiketoDB(db, postID)
 			userData.LikedPosts = append(userData.LikedPosts[:i], userData.LikedPosts[i+1:]...)
 			break
 		}
@@ -176,6 +182,8 @@ func AddDisLikedPost(db *sql.DB, AccountID string, postID string) error {
 		}
 	}
 
+	AddDisliketoDB(db, postID)
+
 	// Add postID to DisLikedPosts
 	userData.DisLikedPosts = append(userData.DisLikedPosts, postID)
 	return UpdateUserData(db, userData)
@@ -188,6 +196,7 @@ func RemoveDisLikedPost(db *sql.DB, AccountID string, postID string) error {
 	}
 	for i, id := range userData.DisLikedPosts {
 		if id == postID {
+			RemoveDisliketoDB(db, postID)
 			userData.DisLikedPosts = append(userData.DisLikedPosts[:i], userData.DisLikedPosts[i+1:]...)
 			break
 		}
