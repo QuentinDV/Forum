@@ -24,7 +24,7 @@
             </form>
 
             <form action="/user/{{.AccountUsername}}" method="post">
-                <img id="profilePicture" alt="Account Image" width="40px" src="{{.AccountImageUrl}}">
+                <img id="profilePicture" alt="Account Image" width="40px" src="../../{{.AccountImageUrl}}">
                 <input type="submit" value="{{.AccountUsername}}">
             </form>
 
@@ -45,6 +45,7 @@
                 <span>Clicks: {{.View}}</span>
             </div>
             <span>Posted on: {{.CreationDate}}</span>
+            <a href="/post/{{.PostID}}"><img src="https://cdn-icons-png.flaticon.com/512/0/871.png" alt="More Images" width="40px"></a>
         </div>
         {{end}}
     </div>

@@ -86,7 +86,7 @@ func setupHTTPHandlers() {
 
 	http.HandleFunc("/user/", web.UserProfileHandler)
 	http.HandleFunc("/category/", web.CategoryPageHandler)
-	http.HandleFunc("/posts/", web.PostPageHandler)
+	http.HandleFunc("/post/", web.PostPageHandler)
 	http.HandleFunc("/createcategory", web.CreateCategory)
 
 	// Forms
@@ -96,10 +96,10 @@ func setupHTTPHandlers() {
 	http.HandleFunc("/logoutform", web.LogOutForm)
 
 	http.HandleFunc("/userprofileform", web.UserProfileForm)
-	http.HandleFunc("/categoryform", web.CategoryForm)
 	http.HandleFunc("/createcategoryform", web.CreateCategoryForm)
 	http.HandleFunc("/likeform", web.LikeForm)
 	http.HandleFunc("/dislikeform", web.DislikeForm)
+	http.HandleFunc("/addviewform", web.AddViewForm)
 
 	http.HandleFunc("/banUserform", web.BanForm)
 	http.HandleFunc("/deleteUserform", web.DeleteAccountForm)

@@ -6,6 +6,35 @@
     <title>{{.Title}}</title>
 </head>
 <body>
-    
+    <button onclick="location.href='/home'">Home</button>
+    <div class="post">
+        <form action="/category/{{.CategoryID}}" method="post">
+            <img id="profilePicture" alt="Profile Picture" width="40px" src="{{.CategoryImageUrl}}">
+            <input type="submit" value="{{.CategoryName}}">
+        </form>
+
+        <form action="/user/{{.AccountUsername}}" method="post">
+            <img id="profilePicture" alt="Account Image" width="40px" src="../../{{.AccountImageUrl}}">
+            <input type="submit" value="{{.AccountUsername}}">
+        </form>
+
+        <h2>{{.Title}}</h2>
+        <p>{{.Content}}</p>
+        {{if ne .ImageUrl ""}}
+        <img src="{{.ImageUrl}}" alt="Post Image">
+        {{end}}
+        <div class="post-info">
+            <form action="/likeform" method="post">
+                <input type="hidden" id="LikeID" name="LikeID" value="{{.PostID}}">
+                <input type="submit" value="Likes :{{.Likes}}">
+            </form>
+            <form action="/dislikeform" method="post">
+                <input type="hidden" id="DislikeID" name="DislikeID" value="{{.PostID}}">
+                <input type="submit" value="Dislikes :{{.Dislikes}}">
+            </form>
+            <span>Clicks: {{.View}}</span>
+        </div>
+        <span>Posted on: {{.CreationDate}}</span>
+    </div>
 </body>
 </html>

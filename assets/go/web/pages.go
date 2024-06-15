@@ -30,6 +30,10 @@ type CreateCategoryData struct {
 	ExistingTags []string
 }
 
+type CreatePostData struct {
+	CategoryTitles []string
+}
+
 // Home is the main page of the forum.
 func Home(w http.ResponseWriter, r *http.Request) {
 	ConnectedAccount := RetrieveAccountfromCookie(r)
@@ -87,12 +91,18 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	// }
 
 	// Get the top posts
-	// topPosts, err := database.GetTopPosts(db)
-	// if err != nil {
-	// 	fmt.Println("Error getting top posts:", err)
-	// 	http.Redirect(w, r, "/error", http.StatusSeeOther)
-	// 	return
-	// }
+	topPosts, err := database.GetAllPosts(db)
+	if err != nil {
+		fmt.Println("Error getting top posts:", err)
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
+		return
+	}
+	topPosts, err = database.DescendingPostsSortingByLikes(topPosts)
+	if err != nil {
+		fmt.Println("Error sorting posts by likes:", err)
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
+		return
+	}
 
 	// Create a new HomeData struct
 	HomeData := HomeData{
@@ -100,6 +110,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		FavoritesCategories: favoriteCategories,
 		AllCategories:       allCategories,
 		AllPosts:            allPosts,
+		TopPosts:            topPosts[:5],
 	}
 
 	// Execute the home template with the HomeData struct
@@ -190,6 +201,45 @@ func CreateCategory(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, data)
 }
 
+// Handler to render the create post page
+func CreatePostHome(w http.ResponseWriter, r *http.Request) {
+	// Open the database
+	db, err := database.ConnectUserDB("db/database.db")
+	if err != nil {
+		fmt.Println("Error connecting to database:", err)
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
+		return
+	}
+	defer db.Close()
+
+	// Get all category titles from the database
+	allCategories, err := database.GetAllCategories(db)
+	if err != nil {
+		fmt.Println("Error getting all categories:", err)
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
+		return
+	}
+
+	// Extract category titles
+	var categoryTitles []string
+	for _, category := range allCategories {
+		categoryTitles = append(categoryTitles, category.Title)
+	}
+
+	// Prepare data for the template
+	data := CreatePostData{
+		CategoryTitles: categoryTitles,
+	}
+
+	// Render the create category page
+	tmpl := template.Must(template.ParseFiles("assets/html/categorycreation.html"))
+	err = tmpl.Execute(w, data)
+	if err != nil {
+		fmt.Println("Error executing template:", err)
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
+	}
+}
+
 // 404 page of the forum.
 func NotFound(w http.ResponseWriter, r *http.Request) {
 	// Serve the 404 page
@@ -253,7 +303,6 @@ func CategoryPageHandler(w http.ResponseWriter, r *http.Request) {
 func PostPageHandler(w http.ResponseWriter, r *http.Request) {
 	// Extrait l'ID du post de l'URL
 	PostID := r.URL.Path[len("/post/"):]
-	fmt.Println("PostID", PostID)
 
 	// Vérifiez que l'ID du post n'est pas vide et ne commence pas par "assets/img/pfp/"
 	if PostID == "" || strings.HasPrefix(PostID, "assets/img/pfp/") {

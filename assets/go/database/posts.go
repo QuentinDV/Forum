@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"sort"
 	"time"
 )
 
@@ -260,4 +261,24 @@ func IncrementNumberOfResponsetoDB(db *sql.DB, postID string) error {
 func DecrementNumberOfResponsetoDB(db *sql.DB, postID string) error {
 	_, err := db.Exec("UPDATE posts SET NumberofResponse = NumberofResponse - 1 WHERE postID = ?", postID)
 	return err
+}
+
+// Function to sort posts by the number of likes
+func DescendingPostsSortingByLikes(posts []Post) ([]Post, error) {
+	// Sort the posts by the number of likes in descending order
+	sort.Slice(posts, func(i, j int) bool {
+		return posts[i].Likes > posts[j].Likes
+	})
+
+	return posts, nil
+}
+
+// Function to sort posts by the number of likes in ascending order
+func AscendingPostsSortingByLikes(posts []Post) ([]Post, error) {
+	// Sort the posts by the number of likes in ascending order
+	sort.Slice(posts, func(i, j int) bool {
+		return posts[i].Likes < posts[j].Likes
+	})
+
+	return posts, nil
 }
