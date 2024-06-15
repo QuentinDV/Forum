@@ -3,43 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log In</title>
+    <title>Forum</title>
+    <link rel="stylesheet" href="/assets/css/home.css">
     <link rel="stylesheet" href="/assets/css/login.css">
-</head>
-<body>
-    <div login>
-        <ul id="menu">
-            <div class="form-structor">
-                <div class="signup">
-                    <form id="register" action="/signupform" method="post">
-                        <h2 class="form-title" id="signup"><span>or</span>Sign up</h2>
-                        <div class="form-holder">
-                            <input autocomplete="off" type="text" class="input" name="username" placeholder="Username" required/>
-                            <input autocomplete="off" type="email" class="input" name="email" placeholder="Email" required />
-                            <input autocomplete="off" type="password" class="input" name="pswrd" placeholder="Password" required />
-                        </div>
-                        <button class="submit-btn">Sign up</button>
-                    </form>
-                </div>
-                <div class="login slide-up">
-                    <form id="login" action="/loginform" method="post">
-                        <div class="center">
-                            <h2 class="form-title" id="login"><span>or</span>Log in</h2>
-                            <div class="form-holder">
-                                <input autocomplete="off" type="text" class="input" name="identif" placeholder="Email or Username" required />
-                                <input autocomplete="off" type="password" class="input" name="pswrd" placeholder="Password" required />
-                            </div>
-                            <button class="submit-btn">Log in</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-    </div>
-    
-    <form id="login" action="/guestform" method="post">
-        <button class="submit-btn">Connect as a Guest</button>
-    </form>
+    <link rel="stylesheet" href="/assets/css/caroussel.css">
+    <link rel="stylesheet" href="/assets/css/categories.css">
+</head> 
 
-</body>
-<script src="/assets/js/login.js"></script>
+    <div class="navbar">
+            <div> <h1> HOME </h1> </div>
+             <div class="navbars">
+                <h1> NOTIFS </h1>  
+                <h1 class="settings" id="openMenu">LOGIN</h1> 
+                <img id="profilePicture" alt="Profile Picture" width="px">
+             </div> 
+             
+                 
+    </div>
+    <div class="grid">
+        <div class="gauche">
+            <a class="Cate ">CATEGORIZZ :p </a>
+            <main>
+                <div class="frame">
+                    <div class="frame__title-wrap">
+                </div>
+                <nav class="menu">
+                    <div class="menu__item">
+                        <a class="menu__item-link">VIDEO GAME</a>
+                        <img class="menu__item-img" src="https://media0.giphy.com/media/ECvlptev6UZCGeSikQ/200.gif" alt="Some image"/>
+                        <div class="marquee">
+                            <div class="marquee__inner" aria-hidden="true">
+                                <span>VIDEO GAME</span>
+                                <span>VIDEO GAME</span>
+                                <span>VIDEO GAME</span>
+                                <span>VIDEO GAME</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu__item">
+                        <a class="menu__item-link">MANGA/ANIME</a>
+                        <img class="menu__item-img" src="https://www.icegif.com/wp-content/uploads/2023/11/icegif-559.gif" alt="Manga image"/>
+                        <div class="marquee">
+                            <div class="marquee__inner" aria-hidden="true">
+                                <span>MANGA/ANIME</span>
+                                <span>MANGA/ANIME</span>s
+                                <span>MANGA/ANIME</span>
+                                <span>MANGA/ANIME</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu__item">
+                        <a class="menu__item-link">MUSIQUES</a>
+                        <img class="menu__item-img" src="https://i0.wp.com/grungecake.com/wp-content/uploads/2023/10/tyla-water-grungecake-thumbnail.gif?fit=520%2C312&ssl=1" alt="Some image"/>
+                        <div class="marquee">
+                            <div class="marquee__inner" aria-hidden="true">
+                                <span>MUSIQUES</span>
+                                <span>MUSIQUES</span>
+                                <span>MUSIQUES</span>
+                                <span>MUSIQUES</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu__item">
+                        <a class="menu__item-link">ANIMAUX</a>
+                        <img class="menu__item-img" src="img/4.jpg" alt="Some image"/>
+                        <div class="marquee">
+                            <div class="marquee__inner" aria-hidden="true">
+                                <span>ANIMAUX</span>
+                                <span>ANIMAUX</span>
+                                <span>ANIMAUX</span>
+                                <span>ANIMAUX</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu__item">
+                        <a class="menu__item-link">SKIBIDI</a>
+                        <img class="menu__item-img" src="img/5.jpg" alt="Some image"/>
+                        <div class="marquee">
+                            <div class="marquee__inner" aria-hidden="true">
+                                <span>SKIBIDI</span>
+                                <span>SKIBIDI</span>
+                                <span>SKIBIDI</span>
+                                <span>SKIBIDI</span>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+</head>
+
+            </main>
+
+        </div>
+              
+        <div class="mid">
+            <h1 class="Cate "> FOR YOU </h1>
+        </div>
+
+
+
+        <div class="droite">
+            <h1 class="Cate "> TOP POSTS </h1>
+            <div>
+
+              </div>  
+            </div> 
+    </div>
+</div> 
+
+<body class="demo-1">
+    
+        
+
+
+    
+
+
+
+</body>    
+ <div id="menu" class="menu-hidden" style="display: none;">
+        <ul>
+            <div login>
+                <ul id="menu">
+                    <div class="form-structor">
+                        <div class="signup">
+                            <form id="register" action="/signupform" method="post">
+                                <h2 class="form-title" id="signup"><span>or</span>Sign up</h2>
+                                <div class="form-holder">
+                                    <input autocomplete="off" type="text" class="input" name="username" placeholder="Username" required/>
+                                    <input autocomplete="off" type="email" class="input" name="email" placeholder="Email" required />
+                                    <input autocomplete="off" type="password" class="input" name="pswrd" placeholder="Password" required />
+                                </div>
+                                <button class="submit-btn">Sign up</button>
+                            </form>
+                        </div>
+                        <form id="login" action="/loginform" method="post">
+                            <div class="login slide-up">
+                                <div class="center">
+                                    <h2 class="form-title" id="login"><span>or</span>Log in</h2>
+                                    <div class="form-holder">
+                                        <input autocomplete="off" type="text" class="input" name="identif" placeholder="Email or Username" required />
+                                        <input autocomplete="off" type="password" class="input" name="pswrd" placeholder="Password" required />
+                                    </div>
+                                    <button class="submit-btn">Log in</button>
+                                
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+        </ul>
+    </div> 
+    <script src="/assets/js/"></script>
+    <script src="/assets/js/login.js"></script>
+    <script src="/assets/js/settings.js"></script>
+    <script src="/assets/js/cookies.js"></script>
+
 </html>
