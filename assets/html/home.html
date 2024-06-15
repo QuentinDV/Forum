@@ -30,7 +30,7 @@
                 </div>
                 <nav class="menu">
                     {{range .FavoritesCategories}}
-                    <a href="/category/{{.Id}}" class="menu__item">
+                    <a href="/category/{{.CategoryID}}" class="menu__item">
                         <div>
                             <span class="menu__item-link">{{.Title}}</span>
                             <img class="menu__item-img" src="{{.ImageUrl}}" alt="Image for {{.Title}}"/>
@@ -55,7 +55,7 @@
                 </div>
                 <nav class="menu">
                     {{range .AllCategories}}
-                    <a href="/category/{{.Id}}" class="menu__item">
+                    <a href="/category/{{.CategoryID}}" class="menu__item">
                         <div>
                             <span class="menu__item-link">{{.Title}}</span>
                             <img class="menu__item-img" src="{{.ImageUrl}}" alt="Image for {{.Title}}"/>
@@ -98,11 +98,11 @@
                     {{end}}
                     <div class="post-info">
                         <form action="/likeform" method="post">
-                            <input type="hidden" id="LikeID" name="LikeID" value="{{.Id}}">
+                            <input type="hidden" id="LikeID" name="LikeID" value="{{.PostID}}">
                             <input type="submit" value="Likes :{{.Likes}}">
                         </form>
                         <form action="/dislikeform" method="post">
-                            <input type="hidden" id="DislikeID" name="DislikeID" value="{{.Id}}">
+                            <input type="hidden" id="DislikeID" name="DislikeID" value="{{.PostID}}">
                             <input type="submit" value="Dislikes :{{.Dislikes}}">
                         </form>
                         <span>Clicks: {{.View}}</span>

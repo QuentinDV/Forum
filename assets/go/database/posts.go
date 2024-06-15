@@ -7,13 +7,14 @@ import (
 )
 
 type Post struct {
-	Id               string
+	PostID           string
 	Title            string
 	Content          string
 	ImageUrl         string
 	Likes            int
 	Dislikes         int
 	View             int
+	NumberofResponse int
 	CategoryID       string
 	CategoryName     string
 	CategoryImageUrl string
@@ -115,7 +116,7 @@ func GetAllPosts(db *sql.DB) ([]Post, error) {
 	posts := []Post{}
 	for rows.Next() {
 		var post Post
-		err := rows.Scan(&post.Id, &post.Title, &post.Content, &post.ImageUrl, &post.Likes, &post.Dislikes, &post.View, &post.CategoryID, &post.CategoryName, &post.CategoryImageUrl, &post.AccountID, &post.AccountUsername, &post.AccountImageUrl, &post.CreationDate)
+		err := rows.Scan(&post.PostID, &post.Title, &post.Content, &post.ImageUrl, &post.Likes, &post.Dislikes, &post.View, &post.CategoryID, &post.CategoryName, &post.CategoryImageUrl, &post.AccountID, &post.AccountUsername, &post.AccountImageUrl, &post.CreationDate)
 		if err != nil {
 			return nil, err
 		}
@@ -134,7 +135,7 @@ func GetPost(db *sql.DB, id string) (Post, error) {
 		WHERE p.postID = ?
 	`, id)
 	var post Post
-	err := row.Scan(&post.Id, &post.Title, &post.Content, &post.ImageUrl, &post.Likes, &post.Dislikes, &post.View, &post.CategoryID, &post.CategoryName, &post.CategoryImageUrl, &post.AccountID, &post.AccountUsername, &post.AccountImageUrl, &post.CreationDate)
+	err := row.Scan(&post.PostID, &post.Title, &post.Content, &post.ImageUrl, &post.Likes, &post.Dislikes, &post.View, &post.CategoryID, &post.CategoryName, &post.CategoryImageUrl, &post.AccountID, &post.AccountUsername, &post.AccountImageUrl, &post.CreationDate)
 	if err != nil {
 		return Post{}, err
 	}
@@ -158,7 +159,7 @@ func GetPostsByCategory(db *sql.DB, categoryID string) ([]Post, error) {
 	posts := []Post{}
 	for rows.Next() {
 		var post Post
-		err := rows.Scan(&post.Id, &post.Title, &post.Content, &post.ImageUrl, &post.Likes, &post.Dislikes, &post.View, &post.CategoryID, &post.CategoryName, &post.CategoryImageUrl, &post.AccountID, &post.AccountUsername, &post.AccountImageUrl, &post.CreationDate)
+		err := rows.Scan(&post.PostID, &post.Title, &post.Content, &post.ImageUrl, &post.Likes, &post.Dislikes, &post.View, &post.CategoryID, &post.CategoryName, &post.CategoryImageUrl, &post.AccountID, &post.AccountUsername, &post.AccountImageUrl, &post.CreationDate)
 		if err != nil {
 			return nil, err
 		}
@@ -184,7 +185,7 @@ func GetPostsByCreator(db *sql.DB, AccountID string) ([]Post, error) {
 	posts := []Post{}
 	for rows.Next() {
 		var post Post
-		err := rows.Scan(&post.Id, &post.Title, &post.Content, &post.ImageUrl, &post.Likes, &post.Dislikes, &post.View, &post.CategoryID, &post.CategoryName, &post.CategoryImageUrl, &post.AccountID, &post.AccountUsername, &post.AccountImageUrl, &post.CreationDate)
+		err := rows.Scan(&post.PostID, &post.Title, &post.Content, &post.ImageUrl, &post.Likes, &post.Dislikes, &post.View, &post.CategoryID, &post.CategoryName, &post.CategoryImageUrl, &post.AccountID, &post.AccountUsername, &post.AccountImageUrl, &post.CreationDate)
 		if err != nil {
 			return nil, err
 		}
@@ -210,7 +211,7 @@ func GetPostsByTitle(db *sql.DB, title string) ([]Post, error) {
 	posts := []Post{}
 	for rows.Next() {
 		var post Post
-		err := rows.Scan(&post.Id, &post.Title, &post.Content, &post.ImageUrl, &post.Likes, &post.Dislikes, &post.View, &post.CategoryID, &post.CategoryName, &post.CategoryImageUrl, &post.AccountID, &post.AccountUsername, &post.AccountImageUrl, &post.CreationDate)
+		err := rows.Scan(&post.PostID, &post.Title, &post.Content, &post.ImageUrl, &post.Likes, &post.Dislikes, &post.View, &post.CategoryID, &post.CategoryName, &post.CategoryImageUrl, &post.AccountID, &post.AccountUsername, &post.AccountImageUrl, &post.CreationDate)
 		if err != nil {
 			return nil, err
 		}
@@ -246,5 +247,17 @@ func RemoveDisliketoDB(db *sql.DB, postID string) error {
 // IncrementView function increments the number of views of a post.
 func IncrementViewtoDB(db *sql.DB, postID string) error {
 	_, err := db.Exec("UPDATE posts SET view = view + 1 WHERE postID = ?", postID)
+	return err
+}
+
+// IncrementNumberOfResponse function increments the number of responses of a post.
+func IncrementNumberOfResponsetoDB(db *sql.DB, postID string) error {
+	_, err := db.Exec("UPDATE posts SET NumberofResponse = NumberofResponse + 1 WHERE postID = ?", postID)
+	return err
+}
+
+// DecrementNumberOfResponse function decrements the number of responses of a post.
+func DecrementNumberOfResponsetoDB(db *sql.DB, postID string) error {
+	_, err := db.Exec("UPDATE posts SET NumberofResponse = NumberofResponse - 1 WHERE postID = ?", postID)
 	return err
 }

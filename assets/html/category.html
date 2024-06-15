@@ -35,11 +35,11 @@
             {{end}}
             <div class="post-info">
                 <form action="/likeform" method="post">
-                    <input type="hidden" id="LikeID" name="LikeID" value="{{.Id}}">
+                    <input type="hidden" id="LikeID" name="LikeID" value="{{.PostID}}">
                     <input type="submit" value="Likes :{{.Likes}}">
                 </form>
                 <form action="/dislikeform" method="post">
-                    <input type="hidden" id="DislikeID" name="DislikeID" value="{{.Id}}">
+                    <input type="hidden" id="DislikeID" name="DislikeID" value="{{.PostID}}">
                     <input type="submit" value="Dislikes :{{.Dislikes}}">
                 </form>
                 <span>Clicks: {{.View}}</span>

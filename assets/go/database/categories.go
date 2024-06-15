@@ -8,7 +8,7 @@ import (
 
 // Category struct represents a category in the system
 type Category struct {
-	Id            string
+	CategoryID    string
 	Title         string
 	Description   string
 	ImageUrl      string
@@ -86,7 +86,7 @@ func GetAllCategories(db *sql.DB) ([]Category, error) {
 	for rows.Next() {
 		var category Category
 		var tagsStr string
-		err := rows.Scan(&category.Id, &category.Title, &category.Description, &category.ImageUrl, &category.NomberOfPosts, &category.Subscriber, &tagsStr, &category.AccountID, &category.CreationDate)
+		err := rows.Scan(&category.CategoryID, &category.Title, &category.Description, &category.ImageUrl, &category.NomberOfPosts, &category.Subscriber, &tagsStr, &category.AccountID, &category.CreationDate)
 		if err != nil {
 			return nil, err
 		}
@@ -101,7 +101,7 @@ func GetCategorybyID(db *sql.DB, id string) (Category, error) {
 	row := db.QueryRow("SELECT * FROM categories WHERE CategoryId = ?", id)
 	var category Category
 	var tagsStr string
-	err := row.Scan(&category.Id, &category.Title, &category.Description, &category.ImageUrl, &category.NomberOfPosts, &category.Subscriber, &tagsStr, &category.AccountID, &category.CreationDate)
+	err := row.Scan(&category.CategoryID, &category.Title, &category.Description, &category.ImageUrl, &category.NomberOfPosts, &category.Subscriber, &tagsStr, &category.AccountID, &category.CreationDate)
 	if err != nil {
 		return Category{}, err
 	}
@@ -121,7 +121,7 @@ func GetCategoriesByCreator(db *sql.DB, AccountID string) ([]Category, error) {
 	for rows.Next() {
 		var category Category
 		var tagsStr string
-		err := rows.Scan(&category.Id, &category.Title, &category.Description, &category.ImageUrl, &category.NomberOfPosts, &category.Subscriber, &tagsStr, &category.AccountID, &category.CreationDate)
+		err := rows.Scan(&category.CategoryID, &category.Title, &category.Description, &category.ImageUrl, &category.NomberOfPosts, &category.Subscriber, &tagsStr, &category.AccountID, &category.CreationDate)
 		if err != nil {
 			return nil, err
 		}
@@ -143,7 +143,7 @@ func GetCategoriesByTag(db *sql.DB, tag string) ([]Category, error) {
 	for rows.Next() {
 		var category Category
 		var tagsStr string
-		err := rows.Scan(&category.Id, &category.Title, &category.Description, &category.ImageUrl, &category.NomberOfPosts, &category.Subscriber, &tagsStr, &category.AccountID, &category.CreationDate)
+		err := rows.Scan(&category.CategoryID, &category.Title, &category.Description, &category.ImageUrl, &category.NomberOfPosts, &category.Subscriber, &tagsStr, &category.AccountID, &category.CreationDate)
 		if err != nil {
 			return nil, err
 		}
@@ -165,7 +165,7 @@ func GetCategoriesByTitle(db *sql.DB, title string) ([]Category, error) {
 	for rows.Next() {
 		var category Category
 		var tagsStr string
-		err := rows.Scan(&category.Id, &category.Title, &category.Description, &category.ImageUrl, &category.NomberOfPosts, &category.Subscriber, &tagsStr, &category.AccountID, &category.CreationDate)
+		err := rows.Scan(&category.CategoryID, &category.Title, &category.Description, &category.ImageUrl, &category.NomberOfPosts, &category.Subscriber, &tagsStr, &category.AccountID, &category.CreationDate)
 		if err != nil {
 			return nil, err
 		}
@@ -232,6 +232,6 @@ func DecrementSubscriber(db *sql.DB, categoryID string) error {
 func ModifyCategory(db *sql.DB, category Category) error {
 	tagsStr := strings.Join(category.Tags, ",") // Join tags with a comma
 	_, err := db.Exec("UPDATE categories SET title = ?, description = ?, ImageUrl = ?, tags = ? WHERE CategoryId = ?",
-		category.Title, category.Description, category.ImageUrl, tagsStr, category.Id)
+		category.Title, category.Description, category.ImageUrl, tagsStr, category.CategoryID)
 	return err
 }

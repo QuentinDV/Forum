@@ -168,7 +168,6 @@ func NotFound(w http.ResponseWriter, r *http.Request) {
 func CategoryPageHandler(w http.ResponseWriter, r *http.Request) {
 	// Extrait l'ID de la catégorie de l'URL
 	CategoryID := r.URL.Path[len("/category/"):]
-	fmt.Println("CategoryID", CategoryID)
 
 	// Vérifiez que l'ID de la catégorie n'est pas vide et ne commence pas par "assets/img/pfp/"
 	if CategoryID == "" || strings.HasPrefix(CategoryID, "assets/img/pfp/") {
@@ -193,7 +192,7 @@ func CategoryPageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Récupère les posts associés à la catégorie
-	posts, err := database.GetPostsByCategory(db, category.Id)
+	posts, err := database.GetPostsByCategory(db, category.CategoryID)
 	if err != nil {
 		fmt.Println("Error getting posts by category ID:", err)
 		http.Redirect(w, r, "/error", http.StatusSeeOther)
@@ -223,6 +222,12 @@ func PostPageHandler(w http.ResponseWriter, r *http.Request) {
 	// Extrait l'ID du post de l'URL
 	PostID := r.URL.Path[len("/post/"):]
 	fmt.Println("PostID", PostID)
+
+	// Vérifiez que l'ID du post n'est pas vide et ne commence pas par "assets/img/pfp/"
+	if PostID == "" || strings.HasPrefix(PostID, "assets/img/pfp/") {
+		http.NotFound(w, r)
+		return
+	}
 
 	db, err := database.ConnectUserDB("db/database.db")
 	if err != nil {
