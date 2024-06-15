@@ -1,0 +1,18 @@
+#posts {
+    background-color: beige;
+    padding: 20px; /* Optional: add padding to the container */
+}
+
+.post {
+    margin-bottom: 20px; /* Adjust the margin value to create the desired gap */
+    padding: 10px; /* Optional: add padding to the posts */
+    border: 1px solid #ccc; /* Optional: add border to each post */
+    background-color: white; /* Optional: set background color for posts */
+    border-radius: 5px; /* Optional: add rounded corners */
+}
+
+/* Optional: add styles for the image */
+.post img {
+    max-width: 100%; /* Ensure the image fits within the post */
+    height: auto; /* Maintain the aspect ratio of the image */
+}

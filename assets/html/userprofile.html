@@ -9,19 +9,8 @@
 <body>
     <button onclick="location.href='/home'">Home</button>
     <img id="profilePicture" alt="Profile Picture" width="400px">
-
-    <form action="/PfpUrlform" method="post">
-        <input type="hidden" name="userId">
-        <input type="hidden" name="username">
-        <label for="imageUrl">Image URL:</label><br>
-        <input type="text" id="imageUrl" name="imageUrl" placeholder="Image Link"><br>
-        <input type="submit" value="Submit">
-    </form>
-
     
     <form action="/PfpImageForm" method="post" enctype="multipart/form-data">
-        <input type="hidden" id="userId" name="userId">
-        <input type="hidden" id="username" name="username">
         <input type="file" id="profilePicture" name="profilePicture" accept="image/*">
         <input type="submit" value="Upload Image" name="submit">
     </form>
@@ -39,8 +28,8 @@
     <p>Username: <span id="usernameSpan"></span></p>
     <p>Email: <span id="emailSpan"></span></p>
     <p>Creation Date: <span id="creationDateSpan"></span></p>
+
 </body>
 <script src="/assets/js/cookies.js"></script>
-<script src="/assets/js/userprofile.js"></script>
 
 </html>

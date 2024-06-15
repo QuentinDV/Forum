@@ -22,7 +22,7 @@ type SignUpError struct {
 // It returns the created account, any sign up error and error if any.
 func CreateAccount(email, password, username string, IsModerator bool, isAdmin bool) (Account, SignUpError, error) {
 	var account Account
-	db, err := ConnectDB("database.db")
+	db, err := ConnectUserDB("database.db")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,7 +33,7 @@ func CreateAccount(email, password, username string, IsModerator bool, isAdmin b
 	err = row.Scan(&lastID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			lastID = "0"
+			lastID = "-1"
 		} else {
 			return account, SignUpError{}, err
 		}
@@ -82,6 +82,17 @@ func CreateAccount(email, password, username string, IsModerator bool, isAdmin b
 		log.Fatal(err)
 	}
 
+	userdb, err := ConnectUserDataDB("database.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer userdb.Close()
+	NewUserData := UserData{newID, []string{}, []string{}, []string{}, []string{}}
+	err = InsertUserData(userdb, NewUserData)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	return newAccount, SignUpError{}, nil
 }
 
@@ -114,7 +125,7 @@ func IsUsernameTaken(db *sql.DB, username string) (bool, error) {
 // incrementID function increments the last ID.
 // It takes the last ID as input and returns the incremented ID.
 func incrementID(lastID string) string {
-	var id int
+	var id = -1
 	_, err := fmt.Sscanf(lastID, "%d", &id)
 	if err != nil {
 		log.Fatal(err)

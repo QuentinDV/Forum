@@ -90,42 +90,16 @@
                     </div>
                 </nav>
 </head>
-
-            </main>
-
-        </div>
-              
-        <div class="mid">
-            <h1 class="Cate "> FOR YOU </h1>
-        </div>
-
-
-
-        <div class="droite">
-            <h1 class="Cate "> TOP POSTS </h1>
-            <div>
-            <div class="gallery">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Emmanuel_Macron_%28cropped%29.jpg" alt="the beach">
-                <img src="https://pbs.twimg.com/media/Fs8Qk34XoAAvUnV.jpg:large" alt="a girl doing kayak">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Emmanuel_Macron_%28cropped%29.jpg" alt="a small boat in the sea">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7G9f8F2XvXgdb8q5ItmsfbGUhDG4OeITknj6Jy8JXwA798w6ae8_HXJoM3NkS6kreUWY&usqp=CAU.jpg" alt="a mountain">
-                <img src="https://images.midilibre.fr/api/v1/images/view/642e8896f44dfc484d3af52a/original/image.jpg" alt="a forest">
-              </div>  
-            </div> 
-    </div>
-</div> 
-
-<body class="demo-1">
+<body>
+    <!-- Insérer les valeurs des cookies dans les éléments HTML -->
+    <p>Username: <span id="usernameSpan"></span></p>
+    <p>Email: <span id="emailSpan"></span></p>
+    <p>Creation Date: <span id="creationDateSpan"></span></p>
+    <img id="profilePicture" alt="Profile Picture" width="400px">
     
-        
-
-
-    
-
-
-
-</body>    
- <div id="menu" class="menu-hidden" style="display: none;">
+    <button class="settings" id="openMenu">Settings</button>
+    <button onclick="location.href='/userprofile'">User Profile</button>
+    <div id="menu" class="menu-hidden" style="display: none;">
         <ul>
             <div login>
                 <ul id="menu">
@@ -162,5 +136,6 @@
     <script src="/assets/js/login.js"></script>
     <script src="/assets/js/settings.js"></script>
     <script src="/assets/js/cookies.js"></script>
+    <script src="/assets/js/home.js"></script>
 
 </html>
