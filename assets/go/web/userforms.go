@@ -88,7 +88,7 @@ func LoginForm(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	db, err := database.ConnectUserDB("database.db")
+	db, err := database.ConnectUserDB("db/database.db")
 	if err != nil {
 		return
 	}
@@ -124,7 +124,16 @@ func LoginForm(w http.ResponseWriter, r *http.Request) {
 // It resets the account cookie to a default "Guest" account.
 func LogOutForm(w http.ResponseWriter, r *http.Request) {
 	// Initialize a default "Guest" account
-	var Acc = database.Account{Id: "0", Username: "Guest", ImageUrl: "https://i.pinimg.com/474x/63/bc/94/63bc9469cae29b897565a08f0647db3c.jpg"}
+	db, err := database.ConnectUserDB("db/database.db")
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	Acc, err := database.GetAccountbyID(db, "0")
+	if err != nil {
+		fmt.Println("Error getting account by ID:", err)
+		return
+	}
 
 	// Create a new cookie for the account
 	accountCookie := &http.Cookie{
@@ -165,7 +174,7 @@ func PfpWithImageForm(w http.ResponseWriter, r *http.Request) {
 	// Save the profile picture file to the server
 	database.SaveFile("./assets/img/pfp/"+ConnectedAccount.Id+".png", file)
 
-	db, err := database.ConnectUserDB("database.db")
+	db, err := database.ConnectUserDB("db/database.db")
 	if err != nil {
 		return
 	}
@@ -182,7 +191,7 @@ func PfpWithImageForm(w http.ResponseWriter, r *http.Request) {
 	// Get the account from the database
 	Acc, err := database.GetAccountbyID(db, ConnectedAccount.Id)
 	if err != nil {
-		fmt.Println("Error getting account by username:", err)
+		fmt.Println("Error getting account by ID:", err)
 		return
 	}
 
@@ -220,7 +229,7 @@ func ChangePwForm(w http.ResponseWriter, r *http.Request) {
 	// fmt.Println("newpassword:", newpassword)
 
 	// Change the image url in the database
-	db, err := database.ConnectUserDB("database.db")
+	db, err := database.ConnectUserDB("db/database.db")
 	if err != nil {
 		return
 	}
@@ -270,11 +279,11 @@ func UserProfileForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if ConnectedAccount.Username == AccUsername {
-		http.Redirect(w, r, "/userprofile", http.StatusSeeOther)
+		http.Redirect(w, r, "/myprofile", http.StatusSeeOther)
 		return
 	}
 
-	db, err := database.ConnectUserDB("database.db")
+	db, err := database.ConnectUserDB("db/database.db")
 	if err != nil {
 		return
 	}
@@ -294,11 +303,11 @@ func UserProfileForm(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Error getting subscribed categories:", err)
 		return
 	}
-	fmt.Println("subscribedCategories:", subscribedCategoriesIDs)
+	// fmt.Println("subscribedCategories:", subscribedCategoriesIDs)
 	var subscribedCategories []database.Category
 
 	for i := 1; i < len(subscribedCategoriesIDs); i++ {
-		post, err := database.GetCategory(db, subscribedCategoriesIDs[i])
+		post, err := database.GetCategorybyID(db, subscribedCategoriesIDs[i])
 		if err != nil {
 			fmt.Println("Error getting post:", err)
 			return
@@ -354,7 +363,7 @@ func UserProfileForm(w http.ResponseWriter, r *http.Request) {
 	// fmt.Println("userProfileData:", userProfileData)
 
 	// Execute the user profile template with the UserProfileData struct
-	tmpl := template.Must(template.ParseFiles("assets/html/otheruserprofile.html"))
+	tmpl := template.Must(template.ParseFiles("assets/html/userprofile.html"))
 	tmpl.Execute(w, userProfileData)
 }
 

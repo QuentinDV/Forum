@@ -203,6 +203,23 @@ func GetAccountbyID(db *sql.DB, id string) (Account, error) {
 	return account, nil
 }
 
+// GetAccountByEmail function retrieves an account from the database using the provided email.
+func GetAccountByEmail(db *sql.DB, email string) (Account, error) {
+	var account Account
+	row := db.QueryRow("SELECT * FROM accounts WHERE email = ?", email)
+	err := row.Scan(&account.Id, &account.Email, &account.Password, &account.Username, &account.ImageUrl, &account.IsBan, &account.IsModerator, &account.IsAdmin, &account.CreationDate)
+	return account, err
+}
+
+// GetAccountByUsername function retrieves an account from the database using the provided username.
+func GetAccountByUsername(db *sql.DB, username string) (Account, error) {
+	var account Account
+	fmt.Println("username:", username)
+	row := db.QueryRow("SELECT * FROM accounts WHERE username = ?", username)
+	err := row.Scan(&account.Id, &account.Email, &account.Password, &account.Username, &account.ImageUrl, &account.IsBan, &account.IsModerator, &account.IsAdmin, &account.CreationDate)
+	return account, err
+}
+
 // GetAccountByUsername function retrieves an account from the database by username.
 // It takes a database connection and a username as input.
 // It returns an account and an error if any.

@@ -267,3 +267,31 @@ func GetSavedPosts(db *sql.DB, AccountID string) ([]string, error) {
 	}
 	return userData.SavedPosts, nil
 }
+
+//IsThisPostLiked function checks if a post is liked by a user
+func IsThisPostLiked(db *sql.DB, AccountID string, postID string) bool {
+	userData, err := GetUserData(db, AccountID)
+	if err != nil {
+		return false
+	}
+	for _, id := range userData.LikedPosts {
+		if id == postID {
+			return true
+		}
+	}
+	return false
+}
+
+//IsThisPostDisliked function checks if a post is disliked by a user
+func IsThisPostDisliked(db *sql.DB, AccountID string, postID string) bool {
+	userData, err := GetUserData(db, AccountID)
+	if err != nil {
+		return false
+	}
+	for _, id := range userData.DisLikedPosts {
+		if id == postID {
+			return true
+		}
+	}
+	return false
+}

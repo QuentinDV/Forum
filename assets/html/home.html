@@ -6,29 +6,135 @@
     <title>Forum</title>
     <link rel="stylesheet" href="/assets/css/home.css">
     <link rel="stylesheet" href="/assets/css/login.css">
-</head>
-<body>
-    <!-- Insérer les valeurs des cookies dans les éléments HTML -->
-    <p>Username: <span id="usernameSpan"></span></p>
-    <p>Email: <span id="emailSpan"></span></p>
-    <p>Creation Date: <span id="creationDateSpan"></span></p>
-    <img id="profilePicture" alt="Profile Picture" width="400px">
+    <link rel="stylesheet" href="/assets/css/caroussel.css">
+    <link rel="stylesheet" href="/assets/css/categories.css">
+    <link rel="stylesheet" href="/assets/css/posts.css">
+</head> 
+
+    <div class="navbar">
+            <div> <h1> HOME </h1> </div>
+             <div class="navbars">
+                <h1 class="settings" id="openMenu">LOGIN</h1> 
+                <button onclick="location.href='/myprofile'">{{.ConnectedAccount.Username}}</button>
+                <img id="profilePicture" alt="Profile Picture" width="px" src="{{.ConnectedAccount.ImageUrl}}">
+             </div> 
+             
+                 
+    </div>
+    <div class="grid">
+        <div class="gauche">
+            <a class="Cate ">FAVORITES CATEGORIES </a>
+            <main>
+                <div class="frame">
+                    <div class="frame__title-wrap">
+                </div>
+                <nav class="menu">
+                    {{range .FavoritesCategories}}
+                    <a href="/category/{{.Id}}" class="menu__item">
+                        <div>
+                            <span class="menu__item-link">{{.Title}}</span>
+                            <img class="menu__item-img" src="{{.ImageUrl}}" alt="Image for {{.Title}}"/>
+                            <div class="marquee">
+                                <div class="marquee__inner" aria-hidden="true">
+                                    <span>{{.Title}}</span>
+                                    <span>{{.Title}}</span>
+                                    <span>{{.Title}}</span>
+                                    <span>{{.Title}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    {{end}}
+                </nav>
+            </main>
+            
+            <a class="Cate ">ALL CATEGORIES</a>
+            <main>
+                <div class="frame">
+                    <div class="frame__title-wrap">
+                </div>
+                <nav class="menu">
+                    {{range .AllCategories}}
+                    <a href="/category/{{.Id}}" class="menu__item">
+                        <div>
+                            <span class="menu__item-link">{{.Title}}</span>
+                            <img class="menu__item-img" src="{{.ImageUrl}}" alt="Image for {{.Title}}"/>
+                            <div class="marquee">
+                                <div class="marquee__inner" aria-hidden="true">
+                                    <span>{{.Title}}</span>
+                                    <span>{{.Title}}</span>
+                                    <span>{{.Title}}</span>
+                                    <span>{{.Title}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    {{end}}
+                </nav>
+
+
+            </main>
+        </div>
+              
+        <div class="mid">
+            <h1 class="Cate "> FOR YOU </h1>
+            <div id="posts" style="background-color: beige;">
+                {{range .AllPosts}}
+                <div class="post">
+                    <form action="/category/{{.CategoryID}}" method="post">
+                        <img id="profilePicture" alt="Profile Picture" width="40px" src="{{.CategoryImageUrl}}">
+                        <input type="submit" value="{{.CategoryName}}">
+                    </form>
+        
+                    <form action="/user/{{.AccountUsername}}" method="post">
+                        <img id="profilePicture" alt="Account Image" width="40px" src="{{.AccountImageUrl}}">
+                        <input type="submit" value="{{.AccountUsername}}">
+                    </form>
+        
+                    <h2>{{.Title}}</h2>
+                    <p>{{.Content}}</p>
+                    {{if ne .ImageUrl ""}}
+                    <img src="{{.ImageUrl}}" alt="Post Image">
+                    {{end}}
+                    <div class="post-info">
+                        <form action="/likeform" method="post">
+                            <input type="hidden" id="LikeID" name="LikeID" value="{{.Id}}">
+                            <input type="submit" value="Likes :{{.Likes}}">
+                        </form>
+                        <form action="/dislikeform" method="post">
+                            <input type="hidden" id="DislikeID" name="DislikeID" value="{{.Id}}">
+                            <input type="submit" value="Dislikes :{{.Dislikes}}">
+                        </form>
+                        <span>Clicks: {{.View}}</span>
+                    </div>
+                    <span>Posted on: {{.CreationDate}}</span>
+                </div>
+                {{end}}
+            </div>
+        </div>
+
+
+
+        <div class="droite">
+            <h1 class="Cate "> TOP POSTS </h1>
+            <div>
+
+              </div>  
+            </div> 
+    </div>
+</div> 
+
+<body class="demo-1">
     
-    <button class="settings" id="openMenu">Settings</button>
-    <button onclick="location.href='/userprofile'">User Profile</button>
+        
+
 
     
-    <form action="/user/QuentinDV" method="post">
-        <input type="hidden" id="AccUsername" name="AccUsername" value="QuentinDV">
-        <input type="submit" value="My Profile">
-    </form>
 
-    <form action="/user/OwandjiD" method="post">
-        <input type="hidden" id="AccUsername" name="AccUsername" value="OwandjiD">
-        <input type="submit" value="User Profile">
-    </form>
 
-    <div id="menu" class="menu-hidden" style="display: none;">
+
+</body>    
+ <div id="menu" class="menu-hidden" style="display: none;">
         <ul>
             <div login>
                 <ul id="menu">
@@ -61,11 +167,8 @@
                 </div>
         </ul>
     </div> 
-
-</body>
+    <script src="/assets/js/"></script>
     <script src="/assets/js/login.js"></script>
     <script src="/assets/js/settings.js"></script>
-    <script src="/assets/js/cookies.js"></script>
-    <script src="/assets/js/home.js"></script>
 
 </html>

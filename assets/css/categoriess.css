@@ -5,10 +5,10 @@
 }
 
 :root {
-	
+	font-size: 15px;
 }
 
-/* body {
+body {
 	margin: 0;
 	--color-text: #111;
 	--color-bg: #f8ecde;
@@ -19,21 +19,20 @@
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	font-family: sofia-pro, sans-serif;
-} */
+}
 
 /* Grainy texture animation by Geoff Graham https://css-tricks.com/snippets/css/animated-grainy-texture/ */
 
 main::before {
-	 /* animation: grain 8s steps(10) infinite; 
-	 background-image: url(../img/noise.png);  */
-	/* content: '';
+	animation: grain 8s steps(10) infinite;
+	background-image: url(../img/noise.png);
+	content: '';
 	height: 300%;
 	left: -50%;
 	opacity: 0.6;
 	position: fixed;
 	top: -100%;
-	width: 300%; */
-	
+	width: 300%;
 }
 
 @keyframes grain {
@@ -62,8 +61,11 @@ a:focus {
 }
 
 .frame {
-display: flex;
-justify-content: center;
+	padding: 3rem 5vw;
+	text-align: center;
+	position: relative;
+	z-index: 1000;
+	line-height: 1;
 }
 
 .frame__title {
@@ -91,27 +93,21 @@ justify-content: center;
 }
 
 .menu {
-
-	
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	padding: 10vh 0 25vh;
 	--marquee-width: 100vw;
 	--offset: 20vw;
 	--move-initial: calc(-25% + var(--offset));
 	--move-final: calc(-50% + var(--offset));
-	--item-font-size: 100px;
-
-
-    --marquee-width: 300px;
-	--offset: 20vw;
-	--move-initial: calc(-25% + var(--offset));
-	--move-final: calc(-50% + var(--offset));
-	--item-font-size: 40px;
-
-
-} 
+	--item-font-size: 10vw;
+	counter-reset: menu;
+}
 
 .menu__item {
-    display: flex;
-    justify-content: center;
 	cursor: default;
 	position: relative;
 	padding: 0 5vw;
@@ -130,13 +126,14 @@ justify-content: center;
 }
 
 .menu__item-link::before {
-	all: initial;
+	/* all: initial;
 	font-family: sofia-pro, sans-serif;
-
-	position: absolute;
+	counter-increment: menu;
+	content:  counter(menu);
+	/* position: absolute; 
 	bottom: 60%;
 	left: 0;
-	pointer-events: none;
+	/* pointer-events: none;  */
 }
 
 .menu__item-link:hover {
@@ -148,7 +145,7 @@ justify-content: center;
 	pointer-events: none;
 	position: absolute;
 	height: 50vh;
-	max-height: 100px;
+	max-height: 400px;
 	opacity: 0;
 	left: 100%;
 	top: 50%;
@@ -190,9 +187,9 @@ justify-content: center;
 	transition-duration: 0.4s;
 }
 
-/* .marquee span {
-	text-align:right;
-} */
+.marquee span {
+	text-align: center;
+}
 
 .menu__item-link,
 .marquee span {
@@ -207,7 +204,6 @@ justify-content: center;
 	font-style: italic;
 }
 
-/* animation  */
 @keyframes marquee {
 	0% {
 		transform: translate3d(var(--move-initial), 0, 0);
@@ -218,7 +214,7 @@ justify-content: center;
 	}
 }
 
-/* @media screen and (min-width: 53em) {
+@media screen and (min-width: 53em) {
 	.frame {
 		text-align: left;
 		display: grid;
@@ -251,4 +247,4 @@ justify-content: center;
 	.frame a {
 		pointer-events: auto;
 	}
-} */
+}

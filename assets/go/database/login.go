@@ -2,7 +2,6 @@ package database
 
 // Importing necessary packages
 import (
-	"database/sql"
 	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -19,7 +18,7 @@ func RecoverAccount(identif, password string) (Account, LogInError, error) {
 	var emptyaccount Account
 	var account Account
 	// Connexion à la base de données
-	db, err := ConnectUserDB("database.db")
+	db, err := ConnectUserDB("db/database.db")
 	if err != nil {
 		return emptyaccount, LogInError{}, err
 	}
@@ -56,22 +55,6 @@ func RecoverAccount(identif, password string) (Account, LogInError, error) {
 // IsEmail function checks if the provided identifier is an email.
 func IsEmail(identif string) bool {
 	return strings.Contains(identif, "@")
-}
-
-// GetAccountByEmail function retrieves an account from the database using the provided email.
-func GetAccountByEmail(db *sql.DB, email string) (Account, error) {
-	var account Account
-	row := db.QueryRow("SELECT * FROM accounts WHERE email = ?", email)
-	err := row.Scan(&account.Id, &account.Email, &account.Password, &account.Username, &account.ImageUrl, &account.IsBan, &account.IsModerator, &account.IsAdmin, &account.CreationDate)
-	return account, err
-}
-
-// GetAccountByUsername function retrieves an account from the database using the provided username.
-func GetAccountByUsername(db *sql.DB, username string) (Account, error) {
-	var account Account
-	row := db.QueryRow("SELECT * FROM accounts WHERE username = ?", username)
-	err := row.Scan(&account.Id, &account.Email, &account.Password, &account.Username, &account.ImageUrl, &account.IsBan, &account.IsModerator, &account.IsAdmin, &account.CreationDate)
-	return account, err
 }
 
 // // checkPassword function checks if the provided password matches the hashed password from the database.

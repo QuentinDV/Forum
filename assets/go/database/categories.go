@@ -97,7 +97,7 @@ func GetAllCategories(db *sql.DB) ([]Category, error) {
 }
 
 // GetCategory function retrieves a category from the database.
-func GetCategory(db *sql.DB, id string) (Category, error) {
+func GetCategorybyID(db *sql.DB, id string) (Category, error) {
 	row := db.QueryRow("SELECT * FROM categories WHERE CategoryId = ?", id)
 	var category Category
 	var tagsStr string
@@ -177,7 +177,7 @@ func GetCategoriesByTitle(db *sql.DB, title string) ([]Category, error) {
 
 // AddTagToCategory function adds a tag to a category.
 func AddTagToCategory(db *sql.DB, categoryID string, tag string) error {
-	category, err := GetCategory(db, categoryID)
+	category, err := GetCategorybyID(db, categoryID)
 	if err != nil {
 		return err
 	}
@@ -189,7 +189,7 @@ func AddTagToCategory(db *sql.DB, categoryID string, tag string) error {
 
 // RemoveTagFromCategory function removes a tag from a category.
 func RemoveTagFromCategory(db *sql.DB, categoryID string, tag string) error {
-	category, err := GetCategory(db, categoryID)
+	category, err := GetCategorybyID(db, categoryID)
 	if err != nil {
 		return err
 	}

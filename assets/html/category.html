@@ -3,9 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{.Title}}</title>
+    <title>{{.Category.Title}}</title>
+    <link rel="stylesheet" href="/assets/css/posts.css">
+    <link rel="icon" href="{{.Category.ImageUrl}}" type="image/x-icon">
 </head>
 <body>
-    
+    <button onclick="location.href='/home'">Home</button>
+    <div>
+        <img id="CategoryImage" alt="Category Image" width="100px" src="{{.Category.ImageUrl}}">
+        <h1>{{.Category.Title}}</h1>
+    </div>  
+    <h2>{{.Category.Description}}</h2>
+
+    <div id="posts" style="background-color: beige;">
+        {{range .Posts}}
+        <div class="post">
+            <form action="/category/{{.CategoryID}}" method="post">
+                <img id="profilePicture" alt="Profile Picture" width="40px" src="{{.CategoryImageUrl}}">
+                <input type="submit" value="{{.CategoryName}}">
+            </form>
+
+            <form action="/user/{{.AccountUsername}}" method="post">
+                <img id="profilePicture" alt="Account Image" width="40px" src="{{.AccountImageUrl}}">
+                <input type="submit" value="{{.AccountUsername}}">
+            </form>
+
+            <h2>{{.Title}}</h2>
+            <p>{{.Content}}</p>
+            {{if ne .ImageUrl ""}}
+            <img src="{{.ImageUrl}}" alt="Post Image">
+            {{end}}
+            <div class="post-info">
+                <form action="/likeform" method="post">
+                    <input type="hidden" id="LikeID" name="LikeID" value="{{.Id}}">
+                    <input type="submit" value="Likes :{{.Likes}}">
+                </form>
+                <form action="/dislikeform" method="post">
+                    <input type="hidden" id="DislikeID" name="DislikeID" value="{{.Id}}">
+                    <input type="submit" value="Dislikes :{{.Dislikes}}">
+                </form>
+                <span>Clicks: {{.View}}</span>
+            </div>
+            <span>Posted on: {{.CreationDate}}</span>
+        </div>
+        {{end}}
+    </div>
 </body>
 </html>

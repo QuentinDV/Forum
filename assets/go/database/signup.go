@@ -22,7 +22,7 @@ type SignUpError struct {
 // It returns the created account, any sign up error and error if any.
 func CreateAccount(email, password, username string, IsModerator bool, isAdmin bool) (Account, SignUpError, error) {
 	var account Account
-	db, err := ConnectUserDB("database.db")
+	db, err := ConnectUserDB("db/database.db")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -82,7 +82,7 @@ func CreateAccount(email, password, username string, IsModerator bool, isAdmin b
 		log.Fatal(err)
 	}
 
-	userdb, err := ConnectUserDataDB("database.db")
+	userdb, err := ConnectUserDataDB("db/database.db")
 	if err != nil {
 		log.Fatal(err)
 	}

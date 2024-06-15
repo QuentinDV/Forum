@@ -23,7 +23,7 @@ func BanForm(w http.ResponseWriter, r *http.Request) {
 
 	if username != "QuentinDV" && username != "OwandjiD" && username != "Guest" {
 		if banstatus == "true" {
-			db, err := database.ConnectUserDB("database.db")
+			db, err := database.ConnectUserDB("db/database.db")
 			if err != nil {
 				return
 			}
@@ -31,7 +31,7 @@ func BanForm(w http.ResponseWriter, r *http.Request) {
 			database.UnBanAccount(db, id)
 
 		} else {
-			db, err := database.ConnectUserDB("database.db")
+			db, err := database.ConnectUserDB("db/database.db")
 			if err != nil {
 				return
 			}
@@ -60,7 +60,7 @@ func ModeratorForm(w http.ResponseWriter, r *http.Request) {
 
 	if username != "QuentinDV" && username != "OwandjiD" && username != "Guest" {
 		if moderator == "true" {
-			db, err := database.ConnectUserDB("database.db")
+			db, err := database.ConnectUserDB("db/database.db")
 			if err != nil {
 				return
 			}
@@ -68,7 +68,7 @@ func ModeratorForm(w http.ResponseWriter, r *http.Request) {
 			database.DemoteFromModerator(db, id)
 
 		} else {
-			db, err := database.ConnectUserDB("database.db")
+			db, err := database.ConnectUserDB("db/database.db")
 			if err != nil {
 				return
 			}
@@ -97,14 +97,14 @@ func AdminForm(w http.ResponseWriter, r *http.Request) {
 
 	if username != "QuentinDV" && username != "OwandjiD" && username != "Guest" {
 		if admin == "true" {
-			db, err := database.ConnectUserDB("database.db")
+			db, err := database.ConnectUserDB("db/database.db")
 			if err != nil {
 				return
 			}
 			defer db.Close()
 			database.DemoteFromAdmin(db, id)
 		} else {
-			db, err := database.ConnectUserDB("database.db")
+			db, err := database.ConnectUserDB("db/database.db")
 			if err != nil {
 				return
 			}
@@ -131,7 +131,7 @@ func DeleteAccountForm(w http.ResponseWriter, r *http.Request) {
 	username := r.Form.Get("username")
 
 	if username != "QuentinDV" && username != "OwandjiD" && username != "Guest" {
-		db, err := database.ConnectUserDB("database.db")
+		db, err := database.ConnectUserDB("db/database.db")
 		if err != nil {
 			return
 		}
@@ -139,7 +139,7 @@ func DeleteAccountForm(w http.ResponseWriter, r *http.Request) {
 		database.DeleteAccount(db, id)
 	}
 
-	userdb, err := database.ConnectUserDataDB("database.db")
+	userdb, err := database.ConnectUserDataDB("db/database.db")
 	if err != nil {
 		log.Fatal(err)
 	}
