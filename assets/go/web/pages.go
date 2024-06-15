@@ -26,6 +26,10 @@ type CategoryData struct {
 	Posts    []database.Post
 }
 
+type CreateCategoryData struct {
+	ExistingTags []string
+}
+
 // Home is the main page of the forum.
 func Home(w http.ResponseWriter, r *http.Request) {
 	ConnectedAccount := RetrieveAccountfromCookie(r)
@@ -156,6 +160,34 @@ func UserProfile(w http.ResponseWriter, r *http.Request) {
 func OtherUserProfile(w http.ResponseWriter, r *http.Request) {
 	// Serve the other user profile page
 	http.ServeFile(w, r, "assets/html/userprofile.html")
+}
+
+// CreateCategory page of the forum.
+func CreateCategory(w http.ResponseWriter, r *http.Request) {
+	// Open the database
+	db, err := database.ConnectUserDB("db/database.db")
+	if err != nil {
+		fmt.Println("Error connecting to database:", err)
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
+		return
+	}
+	defer db.Close()
+
+	// Get all tags from the database
+	allTag, err := database.GetAllTags(db)
+	if err != nil {
+		fmt.Println("Error getting all tags:", err)
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
+		return
+	}
+
+	data := CreateCategoryData{
+		ExistingTags: allTag,
+	}
+
+	// Serve the create category page
+	tmpl := template.Must(template.ParseFiles("assets/html/categorycreation.html"))
+	tmpl.Execute(w, data)
 }
 
 // 404 page of the forum.

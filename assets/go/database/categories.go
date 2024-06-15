@@ -68,6 +68,17 @@ func InsertCategory(db *sql.DB, category Category) error {
 	return err
 }
 
+// CreateCategory function creates a new category in the database.
+func CreateCategory(db *sql.DB, title string, description string, imageUrl string, tags []string, accountID string) error {
+	Category := Category{
+		Title:       title,
+		Description: description,
+		ImageUrl:    imageUrl,
+		Tags:        tags,
+		AccountID:   accountID}
+	return InsertCategory(db, Category)
+}
+
 // DeleteCategory function deletes a category from the database.
 func DeleteCategory(db *sql.DB, id string) error {
 	_, err := db.Exec("DELETE FROM categories WHERE CategoryId = ?", id)
@@ -153,26 +164,29 @@ func GetCategoriesByTag(db *sql.DB, tag string) ([]Category, error) {
 	return categories, nil
 }
 
-// GetCategoriesByTitle function retrieves all categories with a specific title.
-func GetCategoriesByTitle(db *sql.DB, title string) ([]Category, error) {
-	rows, err := db.Query("SELECT * FROM categories WHERE title LIKE ?", "%"+title+"%")
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
+// GetCategoryByTitle function retrieves a category by its title.
+func GetCategoryByTitle(db *sql.DB, title string) (Category, error) {
+    var category Category
+    var tagsStr string
 
-	var categories []Category
-	for rows.Next() {
-		var category Category
-		var tagsStr string
-		err := rows.Scan(&category.CategoryID, &category.Title, &category.Description, &category.ImageUrl, &category.NomberOfPosts, &category.Subscriber, &tagsStr, &category.AccountID, &category.CreationDate)
-		if err != nil {
-			return nil, err
-		}
-		category.Tags = strings.Split(tagsStr, ",") // Split tags by comma
-		categories = append(categories, category)
-	}
-	return categories, nil
+    err := db.QueryRow("SELECT * FROM categories WHERE title LIKE ?", "%"+title+"%").Scan(
+        &category.CategoryID,
+        &category.Title,
+        &category.Description,
+        &category.ImageUrl,
+        &category.NomberOfPosts,
+        &category.Subscriber,
+        &tagsStr,
+        &category.AccountID,
+        &category.CreationDate,
+    )
+    if err != nil {
+        return Category{}, err
+    }
+
+    category.Tags = strings.Split(tagsStr, ",") // Split tags by comma
+
+    return category, nil
 }
 
 // AddTagToCategory function adds a tag to a category.
@@ -202,6 +216,26 @@ func RemoveTagFromCategory(db *sql.DB, categoryID string, tag string) error {
 	tagsStr := strings.Join(category.Tags, ",") // Join tags with a comma
 	_, err = db.Exec("UPDATE categories SET tags = ? WHERE CategoryId = ?", tagsStr, categoryID)
 	return err
+}
+
+// GetAllTags function retrieves all tags from the database.
+func GetAllTags(db *sql.DB) ([]string, error) {
+	rows, err := db.Query("SELECT tags FROM categories")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var tags []string
+	for rows.Next() {
+		var tagsStr string
+		err := rows.Scan(&tagsStr)
+		if err != nil {
+			return nil, err
+		}
+		tags = append(tags, strings.Split(tagsStr, ",")...) // Split tags by comma
+	}
+	return tags, nil
 }
 
 // IncrementNumberOfPosts function increments the number of posts in a category.

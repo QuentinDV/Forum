@@ -23,6 +23,22 @@
     </div>
     <div class="grid">
         <div class="gauche">
+            <main>
+                <button onclick="location.href='/createcategory'">CREATE A NEW CATEGORY</button>
+
+                <div id="categoryPopup" class="popup">
+                    <div class="popup-content">
+                        <span class="close">&times;</span>
+                        <h2>Create a New Category</h2>
+                        <form id="categoryForm">
+                            <label for="categoryName">Category Name:</label>
+                            <input type="text" id="categoryName" name="categoryName" required>
+                            <button type="submit">Create</button>
+                        </form>
+                    </div>
+                </div>
+            </main>
+            
             <a class="Cate ">FAVORITES CATEGORIES </a>
             <main>
                 <div class="frame">
@@ -36,6 +52,8 @@
                             <img class="menu__item-img" src="{{.ImageUrl}}" alt="Image for {{.Title}}"/>
                             <div class="marquee">
                                 <div class="marquee__inner" aria-hidden="true">
+                                    <span>{{.Title}}</span>
+                                    <span>{{.Title}}</span>
                                     <span>{{.Title}}</span>
                                     <span>{{.Title}}</span>
                                     <span>{{.Title}}</span>
@@ -65,15 +83,16 @@
                                     <span>{{.Title}}</span>
                                     <span>{{.Title}}</span>
                                     <span>{{.Title}}</span>
+                                    <span>{{.Title}}</span>
+                                    <span>{{.Title}}</span>
                                 </div>
                             </div>
                         </div>
                     </a>
                     {{end}}
                 </nav>
-
-
             </main>
+
         </div>
               
         <div class="mid">

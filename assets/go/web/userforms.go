@@ -268,10 +268,8 @@ func UserProfileForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	AccUsername := r.Form.Get("AccUsername")
-	fmt.Println("AccUsername:", AccUsername)
 
 	ConnectedAccount := RetrieveAccountfromCookie(r)
-	fmt.Println("Username:", ConnectedAccount.Username)
 
 	if ConnectedAccount.Username == "Guest" {
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
@@ -393,4 +391,77 @@ func RetrieveAccountfromCookie(r *http.Request) database.Account {
 	}
 
 	return account
+}
+
+func CreateCategoryForm(w http.ResponseWriter, r *http.Request) {
+
+	// Parse the form data
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
+		return
+	}
+
+	// Retrieve form values
+	title := r.Form.Get("categoryName")
+	description := r.Form.Get("description")
+	imageUrl := r.Form.Get("imageUrl")
+	existingTags := r.Form["existingTags[]"]
+	newTags := r.Form.Get("newTags")
+
+	// Process existing tags (if any selected)
+	var tags []string
+	if len(existingTags) > 0 {
+		tags = existingTags
+	}
+
+	// Process new tags entered by the user
+	if newTags != "" {
+		newTagsSlice := strings.Split(newTags, ",")
+		for _, tag := range newTagsSlice {
+			trimmedTag := strings.TrimSpace(tag)
+			if trimmedTag != "" {
+				tags = append(tags, trimmedTag)
+			}
+		}
+	}
+
+	// Example: Retrieve account ID from cookie
+	accountID := RetrieveAccountfromCookie(r).Id
+
+	// Print to console (for debugging)
+	fmt.Println("title:", title)
+	fmt.Println("description:", description)
+	fmt.Println("imageUrl:", imageUrl)
+	fmt.Println("tags:", tags)
+	fmt.Println("accountID:", accountID)
+
+	// Create the category in the database
+	db, err := database.ConnectCategoriesDB("db/database.db")
+	if err != nil {
+		return
+	}
+	defer db.Close()
+
+	err = database.CreateCategory(db, title, description, imageUrl, tags, accountID)
+	if err != nil {
+		fmt.Println("Error creating category:", err)
+		return
+	}
+
+	Category, err := database.GetCategoryByTitle(db, title)
+	if err != nil {
+		fmt.Println("Error getting category by title:", err)
+		return
+	}
+
+	// Add the account to the subscribed category
+	err = database.AddSubscribedCategory(db, accountID, Category.CategoryID)
+	if err != nil {
+		fmt.Println("Error adding subscribed category:", err)
+		return
+	}
+
+	// Redirect to the home page
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
