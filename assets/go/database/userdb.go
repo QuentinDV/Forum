@@ -194,7 +194,7 @@ func CountFiles(directory string) int {
 // GetAccount function retrieves an account from the database by ID.
 // It takes a database connection and an account ID as input.
 // It returns an account and an error if any.
-func GetAccount(db *sql.DB, id string) (Account, error) {
+func GetAccountbyID(db *sql.DB, id string) (Account, error) {
 	var account Account
 	err := db.QueryRow("SELECT id, email, password, username, ImageUrl, isBan, isModerator, isAdmin, CreationDate FROM accounts WHERE id = ?", id).Scan(&account.Id, &account.Email, &account.Password, &account.Username, &account.ImageUrl, &account.IsBan, &account.IsModerator, &account.IsAdmin, &account.CreationDate)
 	if err != nil {

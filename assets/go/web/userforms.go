@@ -152,9 +152,7 @@ func PfpWithImageForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get the username and id from the form data
-	username := r.Form.Get("username")
-	id := r.Form.Get("userId")
+	ConnectedAccount := RetrieveAccountfromCookie(r)
 
 	// Get the profile picture file from the form data
 	file, _, err := r.FormFile("profilePicture")
@@ -165,7 +163,7 @@ func PfpWithImageForm(w http.ResponseWriter, r *http.Request) {
 	defer file.Close()
 
 	// Save the profile picture file to the server
-	database.SaveFile("./assets/img/pfp/"+id+".png", file)
+	database.SaveFile("./assets/img/pfp/"+ConnectedAccount.Id+".png", file)
 
 	db, err := database.ConnectUserDB("database.db")
 	if err != nil {
@@ -174,15 +172,15 @@ func PfpWithImageForm(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	// Change the image url in the database
-	imageUrl := "./assets/img/pfp/" + id + ".png"
-	err = database.ChangeImageUrl(db, id, imageUrl)
+	imageUrl := "./assets/img/pfp/" + ConnectedAccount.Id + ".png"
+	err = database.ChangeImageUrl(db, ConnectedAccount.Id, imageUrl)
 	if err != nil {
 		fmt.Println("Error changing image url:", err)
 		return
 	}
 
 	// Get the account from the database
-	Acc, err := database.GetAccountByUsername(db, username)
+	Acc, err := database.GetAccountbyID(db, ConnectedAccount.Id)
 	if err != nil {
 		fmt.Println("Error getting account by username:", err)
 		return
@@ -213,17 +211,13 @@ func ChangePwForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get the username, email, and password from the form data
-	id := r.Form.Get("userId2")
-	username := r.Form.Get("username2")
-	fmt.Println("username:", username)
-	fmt.Println("id:", id)
+	ConnectedAccount := RetrieveAccountfromCookie(r)
 
 	oldpassword := r.Form.Get("oldPw")
 	newpassword := r.Form.Get("newPw")
 
-	fmt.Println("oldpassword:", oldpassword)
-	fmt.Println("newpassword:", newpassword)
+	// fmt.Println("oldpassword:", oldpassword)
+	// fmt.Println("newpassword:", newpassword)
 
 	// Change the image url in the database
 	db, err := database.ConnectUserDB("database.db")
@@ -231,10 +225,10 @@ func ChangePwForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer db.Close()
-	database.ChangePassword(db, id, username, oldpassword, newpassword)
+	database.ChangePassword(db, ConnectedAccount.Id, ConnectedAccount.Username, oldpassword, newpassword)
 
 	// Get the account from the database
-	Acc, err := database.GetAccountByUsername(db, username)
+	Acc, err := database.GetAccountByUsername(db, ConnectedAccount.Username)
 	if err != nil {
 		fmt.Println("Error getting account by username:", err)
 		return
