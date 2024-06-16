@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | Saved Posts</title>
+    <link rel="stylesheet" href="/assets/css/posts.css">
+</head>
+<body>
+    {{if eq .ConnectedAccount.ImageUrl "https://i.pinimg.com/474x/63/bc/94/63bc9469cae29b897565a08f0647db3c.jpg"}}
+        <img id="profilePicture" alt="Profile Picture" width="400px" src="{{.ConnectedAccount.ImageUrl}}">
+    {{else}}
+        <img id="profilePicture" alt="Profile Picture" width="400px" src="../../{{.ConnectedAccount.ImageUrl}}">
+    {{end}}
+    
+    <h1>{{.ConnectedAccount.Username}}</h1>
+    <h2>Subscribed Categories : {{.NumberofSubscribedCategories}}</h2>
+    <h2>Sign up : {{.ConnectedAccount.CreationDate}}</h2>
+
+    <div>
+        <button onclick="location.href='/home'">Home</button>
+        <button onclick="location.href='/myprofile'">Posts</button>
+        <button onclick="location.href='/myprofile/liked'">Liked</button>
+        <button onclick="location.href='/myprofile/disliked'">Disliked</button>
+        <button onclick="location.href='/myprofile/comments'">Comments</button>
+        <button onclick="location.href='/myprofile/savedposts'">Saved Posts</button>
+        <button onclick="location.href='/myprofile/account'">Manage Account</button>
+    </div>
+
+    <h1>Posts :</h1>
+    <div id="posts" style="background-color: beige;">
+        {{range .SavedPosts}}
+        <div class="post">
+            <form action="/category/{{.CategoryID}}" method="post">
+                <img id="profilePicture" alt="Profile Picture" width="40px" src="{{.CategoryImageUrl}}">
+                <input type="submit" value="{{.CategoryName}}">
+            </form>
+
+            <form action="/user/{{.AccountUsername}}" method="post">
+                <img id="profilePicture" alt="Account Image" width="40px" src="{{.AccountImageUrl}}">
+                <input type="submit" value="{{.AccountUsername}}">
+            </form>
+
+            <h2>{{.Title}}</h2>
+            <p>{{.Content}}</p>
+            {{if ne .ImageUrl ""}}
+            <img src="{{.ImageUrl}}" alt="Post Image">
+            {{end}}
+            <div class="post-info">
+                <form action="/likeform" method="post">
+                    <input type="hidden" id="LikeID" name="LikeID" value="{{.PostID}}">
+                    <input type="submit" value="Likes :{{.Likes}}">
+                </form>
+                <form action="/dislikeform" method="post">
+                    <input type="hidden" id="DislikeID" name="DislikeID" value="{{.PostID}}">
+                    <input type="submit" value="Dislikes :{{.Dislikes}}">
+                </form>
+            </div>
+            <span>Posted on: {{.CreationDate}}</span>
+            <div>
+                <span><img src="assets/img/icon/view.png" alt="view icon" width="80px"> {{.View}}</span>
+            </div>
+            <form action="/addviewform" method="post">
+                <input type="hidden" id="PostID" name="PostID" value="{{.PostID}}">
+                <input type="image" src="assets/img/icon/more.png" alt="More of this Post" width="40px">
+            </form>
+        </div>
+        {{end}}
+    </div>
+
+</body>
+</html>

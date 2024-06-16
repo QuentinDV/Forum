@@ -8,15 +8,6 @@ import (
 	"strings"
 )
 
-type OtherUserProfileData struct {
-	Username           string
-	ImageUrl           string
-	CreationDate       string
-	SubscribedCategory []database.Category
-	LikedPosts         []database.Post
-	DisLikedPosts      []database.Post
-}
-
 // SignUpForm is a function that handles the sign up form submission.
 // It parses the form data, creates a new account in the database,
 // and updates the cookies.
@@ -71,7 +62,7 @@ func SignUpForm(w http.ResponseWriter, r *http.Request) {
 // and updates the cookies.
 func LoginForm(w http.ResponseWriter, r *http.Request) {
 	// Initialize an empty account
-	var account database.Account
+	// var account database.Account
 
 	// Parse the form data
 	err := r.ParseForm()
@@ -102,8 +93,8 @@ func LoginForm(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 
-	fmt.Println("account:", account)
-	fmt.Println("Acc:", Acc)
+	// fmt.Println("account:", account)
+	// fmt.Println("Acc:", Acc)
 	// Update the cookies
 	// Create a new cookie for the account
 	accountCookie := &http.Cookie{
@@ -208,7 +199,7 @@ func PfpWithImageForm(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, accountCookie)
 
 	// Redirect to the home page
-	http.Redirect(w, r, "/userprofile", http.StatusSeeOther)
+	http.Redirect(w, r, "/myprofile/account", http.StatusSeeOther)
 }
 
 func ChangePwForm(w http.ResponseWriter, r *http.Request) {
@@ -256,113 +247,6 @@ func ChangePwForm(w http.ResponseWriter, r *http.Request) {
 
 	// Redirect to the home page
 	http.Redirect(w, r, "/userprofile", http.StatusSeeOther)
-}
-
-func UserProfileForm(w http.ResponseWriter, r *http.Request) {
-	// Parse the form data
-	err := r.ParseForm()
-	if err != nil {
-		// If there is an error, return an internal server error response
-		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
-		return
-	}
-
-	AccUsername := r.Form.Get("AccUsername")
-
-	ConnectedAccount := RetrieveAccountfromCookie(r)
-
-	if ConnectedAccount.Username == "Guest" {
-		http.Redirect(w, r, "/home", http.StatusSeeOther)
-		return
-	}
-
-	if ConnectedAccount.Username == AccUsername {
-		http.Redirect(w, r, "/myprofile", http.StatusSeeOther)
-		return
-	}
-
-	db, err := database.ConnectUserDB("db/database.db")
-	if err != nil {
-		return
-	}
-	defer db.Close()
-
-	// Get the account from the database
-	Acc, err := database.GetAccountByUsername(db, AccUsername)
-	if err != nil {
-		fmt.Println("Error getting account by username:", err)
-		http.Redirect(w, r, "/notfound", http.StatusSeeOther)
-		return
-	}
-
-	// Get the subscribed categories of the account
-	subscribedCategoriesIDs, err := database.GetSubscribedCategories(db, Acc.Id)
-	if err != nil {
-		fmt.Println("Error getting subscribed categories:", err)
-		return
-	}
-	// fmt.Println("subscribedCategories:", subscribedCategoriesIDs)
-	var subscribedCategories []database.Category
-
-	for i := 1; i < len(subscribedCategoriesIDs); i++ {
-		post, err := database.GetCategorybyID(db, subscribedCategoriesIDs[i])
-		if err != nil {
-			fmt.Println("Error getting post:", err)
-			return
-		}
-		subscribedCategories = append(subscribedCategories, post)
-	}
-
-	// Get the favorite posts of the account
-	favoritePostsIDs, err := database.GetLikedPosts(db, Acc.Id)
-	if err != nil {
-		fmt.Println("Error getting liked posts:", err)
-		return
-	}
-	// fmt.Println("favoritePostsIDs:", favoritePostsIDs)
-	var likesPosts []database.Post
-
-	for i := 1; i < len(favoritePostsIDs); i++ {
-		post, err := database.GetPost(db, favoritePostsIDs[i])
-		if err != nil {
-			fmt.Println("Error getting post:", err)
-			return
-		}
-		likesPosts = append(likesPosts, post)
-	}
-
-	// Get the disliked posts of the account
-	dislikedPostsIDs, err := database.GetDisLikedPosts(db, Acc.Id)
-	if err != nil {
-		fmt.Println("Error getting disliked posts:", err)
-		return
-	}
-	// fmt.Println("dislikedPostsIDs:", dislikedPostsIDs)
-	var dislikesPosts []database.Post
-
-	for i := 1; i < len(dislikedPostsIDs); i++ {
-		post, err := database.GetPost(db, dislikedPostsIDs[i])
-		if err != nil {
-			fmt.Println("Error getting post:", err)
-			return
-		}
-		dislikesPosts = append(dislikesPosts, post)
-	}
-
-	// Create a new UserProfileData struct
-	userProfileData := OtherUserProfileData{
-		Username:           Acc.Username,
-		ImageUrl:           Acc.ImageUrl,
-		CreationDate:       Acc.CreationDate,
-		SubscribedCategory: subscribedCategories,
-		LikedPosts:         likesPosts,
-		DisLikedPosts:      dislikesPosts,
-	}
-	// fmt.Println("userProfileData:", userProfileData)
-
-	// Execute the user profile template with the UserProfileData struct
-	tmpl := template.Must(template.ParseFiles("assets/html/userprofile.html"))
-	tmpl.Execute(w, userProfileData)
 }
 
 func RetrieveAccountfromCookie(r *http.Request) database.Account {

@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 	"strings"
 )
 
@@ -11,6 +10,8 @@ type UserData struct {
 	SubscribedCategories []string
 	LikedPosts           []string
 	DisLikedPosts        []string
+	LikedComments        []string
+	DislikedComments     []string
 	SavedPosts           []string
 }
 
@@ -25,8 +26,11 @@ func ConnectUserDataDB(dbPath string) (*sql.DB, error) {
 		SubscribedCategories TEXT,
 		LikedPosts TEXT,
 		DisLikedPosts TEXT,
+		LikedComments TEXT,
+		DislikedComments TEXT,
 		SavedPosts TEXT
 	)`)
+
 	if err != nil {
 		return nil, err
 	}
@@ -34,21 +38,22 @@ func ConnectUserDataDB(dbPath string) (*sql.DB, error) {
 }
 
 func InsertUserData(db *sql.DB, userData UserData) error {
-	fmt.Println(len(userData.SubscribedCategories))
 	SubCategories := strings.Join(userData.SubscribedCategories, ",")
 	LikedPosts := strings.Join(userData.LikedPosts, ",")
 	DisLikedPosts := strings.Join(userData.DisLikedPosts, ",")
+	LikedComments := strings.Join(userData.LikedComments, ",")
+	DislikedComments := strings.Join(userData.DislikedComments, ",")
 	SavedPosts := strings.Join(userData.SavedPosts, ",")
-	_, err := db.Exec("INSERT INTO userdata (AccountID, SubscribedCategories, LikedPosts, DisLikedPosts, SavedPosts) VALUES (?, ?, ?, ?, ?)",
-		userData.AccountID, SubCategories, LikedPosts, DisLikedPosts, SavedPosts)
+	_, err := db.Exec("INSERT INTO userdata (AccountID, SubscribedCategories, LikedPosts, DisLikedPosts, LikedComments, DislikedComments, SavedPosts) VALUES (?, ?, ?, ?, ?, ?, ?)",
+		userData.AccountID, SubCategories, LikedPosts, DisLikedPosts, LikedComments, DislikedComments, SavedPosts)
 	return err
 }
 
 func GetUserData(db *sql.DB, AccountID string) (UserData, error) {
 	var userData UserData
-	var subCategories, likedPosts, dislikedPosts, savedPosts string
-	row := db.QueryRow("SELECT AccountID, SubscribedCategories, LikedPosts, DisLikedPosts, SavedPosts FROM userdata WHERE AccountID = ?", AccountID)
-	err := row.Scan(&userData.AccountID, &subCategories, &likedPosts, &dislikedPosts, &savedPosts)
+	var subCategories, likedPosts, dislikedPosts, likedComments, dislikedComments, savedPosts string
+	row := db.QueryRow("SELECT AccountID, SubscribedCategories, LikedPosts, DisLikedPosts, LikedComments, DislikedComments, SavedPosts FROM userdata WHERE AccountID = ?", AccountID)
+	err := row.Scan(&userData.AccountID, &subCategories, &likedPosts, &dislikedPosts, &likedComments, &dislikedComments, &savedPosts)
 	if err != nil {
 		return userData, err
 	}
@@ -56,6 +61,8 @@ func GetUserData(db *sql.DB, AccountID string) (UserData, error) {
 	userData.SubscribedCategories = strings.Split(subCategories, ",")
 	userData.LikedPosts = strings.Split(likedPosts, ",")
 	userData.DisLikedPosts = strings.Split(dislikedPosts, ",")
+	userData.LikedComments = strings.Split(likedComments, ",")
+	userData.DislikedComments = strings.Split(dislikedComments, ",")
 	userData.SavedPosts = strings.Split(savedPosts, ",")
 
 	return userData, nil
@@ -65,9 +72,11 @@ func UpdateUserData(db *sql.DB, userData UserData) error {
 	SubCategories := strings.Join(userData.SubscribedCategories, ",")
 	LikedPosts := strings.Join(userData.LikedPosts, ",")
 	DisLikedPosts := strings.Join(userData.DisLikedPosts, ",")
+	LikedComments := strings.Join(userData.LikedComments, ",")
+	DislikedComments := strings.Join(userData.DislikedComments, ",")
 	SavedPosts := strings.Join(userData.SavedPosts, ",")
-	_, err := db.Exec("UPDATE userdata SET SubscribedCategories = ?, LikedPosts = ?, DisLikedPosts = ?, SavedPosts = ? WHERE AccountID = ?",
-		SubCategories, LikedPosts, DisLikedPosts, SavedPosts, userData.AccountID)
+	_, err := db.Exec("UPDATE userdata SET SubscribedCategories = ?, LikedPosts = ?, DisLikedPosts = ?, LikedComments = ?, DislikedComments = ?, SavedPosts = ? WHERE AccountID = ?",
+		SubCategories, LikedPosts, DisLikedPosts, LikedComments, DislikedComments, SavedPosts, userData.AccountID)
 	return err
 }
 
@@ -77,7 +86,7 @@ func DeleteUserData(db *sql.DB, AccountID string) error {
 }
 
 func GetAllUserData(db *sql.DB) ([]UserData, error) {
-	rows, err := db.Query("SELECT AccountID, SubscribedCategories, LikedPosts, DisLikedPosts, SavedPosts FROM userdata")
+	rows, err := db.Query("SELECT AccountID, SubscribedCategories, LikedPosts, DisLikedPosts, LikedComments, DislikedComments, SavedPosts FROM userdata")
 	if err != nil {
 		return nil, err
 	}
@@ -86,13 +95,15 @@ func GetAllUserData(db *sql.DB) ([]UserData, error) {
 	var userDatas []UserData
 	for rows.Next() {
 		var userData UserData
-		var subCategories, likedPosts, dislikedPosts, savedPosts string
-		if err := rows.Scan(&userData.AccountID, &subCategories, &likedPosts, &dislikedPosts, &savedPosts); err != nil {
+		var subCategories, likedPosts, dislikedPosts, likedComments, dislikedComments, savedPosts string
+		if err := rows.Scan(&userData.AccountID, &subCategories, &likedPosts, &dislikedPosts, &likedComments, &dislikedComments, &savedPosts); err != nil {
 			return nil, err
 		}
 		userData.SubscribedCategories = strings.Split(subCategories, ",")
 		userData.LikedPosts = strings.Split(likedPosts, ",")
 		userData.DisLikedPosts = strings.Split(dislikedPosts, ",")
+		userData.LikedComments = strings.Split(likedComments, ",")
+		userData.DislikedComments = strings.Split(dislikedComments, ",")
 		userData.SavedPosts = strings.Split(savedPosts, ",")
 		userDatas = append(userDatas, userData)
 	}
@@ -204,6 +215,70 @@ func RemoveDisLikedPost(db *sql.DB, AccountID string, postID string) error {
 	return UpdateUserData(db, userData)
 }
 
+func AddLikedComment(db *sql.DB, AccountID string, commentID string) error {
+	userData, err := GetUserData(db, AccountID)
+	if err != nil {
+		return err
+	}
+
+	// Check if commentID already exists
+	for _, id := range userData.LikedComments {
+		if id == commentID {
+			return nil // Liked comment already exists, do nothing
+		}
+	}
+
+	// Add commentID to LikedComments
+	userData.LikedComments = append(userData.LikedComments, commentID)
+	return UpdateUserData(db, userData)
+}
+
+func RemoveLikedComment(db *sql.DB, AccountID string, commentID string) error {
+	userData, err := GetUserData(db, AccountID)
+	if err != nil {
+		return err
+	}
+	for i, id := range userData.LikedComments {
+		if id == commentID {
+			userData.LikedComments = append(userData.LikedComments[:i], userData.LikedComments[i+1:]...)
+			break
+		}
+	}
+	return UpdateUserData(db, userData)
+}
+
+func AddDislikedComment(db *sql.DB, AccountID string, commentID string) error {
+	userData, err := GetUserData(db, AccountID)
+	if err != nil {
+		return err
+	}
+
+	// Check if commentID already exists
+	for _, id := range userData.DislikedComments {
+		if id == commentID {
+			return nil // Disliked comment already exists, do nothing
+		}
+	}
+
+	// Add commentID to DislikedComments
+	userData.DislikedComments = append(userData.DislikedComments, commentID)
+	return UpdateUserData(db, userData)
+}
+
+func RemoveDislikedComment(db *sql.DB, AccountID string, commentID string) error {
+	userData, err := GetUserData(db, AccountID)
+	if err != nil {
+		return err
+	}
+	for i, id := range userData.DislikedComments {
+		if id == commentID {
+			userData.DislikedComments = append(userData.DislikedComments[:i], userData.DislikedComments[i+1:]...)
+			break
+		}
+	}
+	return UpdateUserData(db, userData)
+}
+
 func AddSavedPost(db *sql.DB, AccountID string, postID string) error {
 	userData, err := GetUserData(db, AccountID)
 	if err != nil {
@@ -258,6 +333,22 @@ func GetDisLikedPosts(db *sql.DB, AccountID string) ([]string, error) {
 		return nil, err
 	}
 	return userData.DisLikedPosts, nil
+}
+
+func GetLikedComments(db *sql.DB, AccountID string) ([]string, error) {
+	userData, err := GetUserData(db, AccountID)
+	if err != nil {
+		return nil, err
+	}
+	return userData.LikedComments, nil
+}
+
+func GetDislikedComments(db *sql.DB, AccountID string) ([]string, error) {
+	userData, err := GetUserData(db, AccountID)
+	if err != nil {
+		return nil, err
+	}
+	return userData.DislikedComments, nil
 }
 
 func GetSavedPosts(db *sql.DB, AccountID string) ([]string, error) {
@@ -317,6 +408,34 @@ func IsThisCategorySubscribed(db *sql.DB, AccountID string, categoryID string) b
 	}
 	for _, id := range userData.SubscribedCategories {
 		if id == categoryID {
+			return true
+		}
+	}
+	return false
+}
+
+// isThisCommentLiked function checks if a comment is liked by a user
+func IsThisCommentLiked(db *sql.DB, AccountID string, commentID string) bool {
+	userData, err := GetUserData(db, AccountID)
+	if err != nil {
+		return false
+	}
+	for _, id := range userData.LikedComments {
+		if id == commentID {
+			return true
+		}
+	}
+	return false
+}
+
+// isThisCommentDisliked function checks if a comment is disliked by a user
+func IsThisCommentDisliked(db *sql.DB, AccountID string, commentID string) bool {
+	userData, err := GetUserData(db, AccountID)
+	if err != nil {
+		return false
+	}
+	for _, id := range userData.DislikedComments {
+		if id == commentID {
 			return true
 		}
 	}

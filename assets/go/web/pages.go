@@ -20,6 +20,27 @@ type HomeData struct {
 	TopPosts            []database.Post
 }
 
+type MyprofileData struct {
+	ConnectedAccount             database.Account
+	NumberofSubscribedCategories int
+	MyPosts                      []database.Post
+	LikedPosts                   []database.Post
+	DislikedPosts                []database.Post
+	MyComments                   []database.Comment
+	LikedComments                []database.Comment
+	DislikedComments             []database.Comment
+	SavedPosts                   []database.Post
+}
+
+type UserProfileData struct {
+	Username                     string
+	ImageUrl                     string
+	CreationDate                 string
+	NumberofSubscribedCategories int
+	LikedPosts                   []database.Post
+	DisLikedPosts                []database.Post
+}
+
 // CategoryData struct represents the data needed to render the category page
 type CategoryData struct {
 	Category     database.Category
@@ -105,13 +126,17 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if len(topPosts) > 5 {
+		topPosts = topPosts[:5]
+	}
+
 	// Create a new HomeData struct
 	HomeData := HomeData{
 		ConnectedAccount:    ConnectedAccount,
 		FavoritesCategories: favoriteCategories,
 		AllCategories:       allCategories,
 		AllPosts:            allPosts,
-		TopPosts:            topPosts[:5],
+		TopPosts:            topPosts,
 	}
 
 	// Execute the home template with the HomeData struct
@@ -160,12 +185,6 @@ func Admin(w http.ResponseWriter, r *http.Request) {
 	// Serve the admin page
 	tmpl := template.Must(template.ParseFiles("assets/html/admin.html"))
 	tmpl.Execute(w, allAcc)
-}
-
-// Categories page of the forum.
-func UserProfile(w http.ResponseWriter, r *http.Request) {
-	// Serve the user profile page
-	http.ServeFile(w, r, "assets/html/myprofile.html")
 }
 
 // Profile page of the forum.
@@ -370,16 +389,6 @@ func UserProfileHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Error getting subscribed categories:", err)
 		return
 	}
-	var subscribedCategories []database.Category
-
-	for i := 1; i < len(subscribedCategoriesIDs); i++ {
-		post, err := database.GetCategorybyID(db, subscribedCategoriesIDs[i])
-		if err != nil {
-			fmt.Println("Error getting post:", err)
-			return
-		}
-		subscribedCategories = append(subscribedCategories, post)
-	}
 
 	// Get the favorite posts of the account
 	favoritePostsIDs, err := database.GetLikedPosts(db, Acc.Id)
@@ -416,17 +425,263 @@ func UserProfileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create a new UserProfileData struct
-	userProfileData := OtherUserProfileData{
-		Username:           Acc.Username,
-		ImageUrl:           Acc.ImageUrl,
-		CreationDate:       Acc.CreationDate,
-		SubscribedCategory: subscribedCategories,
-		LikedPosts:         likesPosts,
-		DisLikedPosts:      dislikesPosts,
+	userProfileData := UserProfileData{
+		Username:                     Acc.Username,
+		ImageUrl:                     Acc.ImageUrl,
+		CreationDate:                 Acc.CreationDate,
+		NumberofSubscribedCategories: len(subscribedCategoriesIDs) - 1,
+		LikedPosts:                   likesPosts,
+		DisLikedPosts:                dislikesPosts,
 	}
 
 	// Execute the user profile template with the UserProfileData struct
 	tmpl := template.Must(template.ParseFiles("assets/html/userprofile.html"))
 	tmpl.Execute(w, userProfileData)
 
+}
+
+func MyProfile(w http.ResponseWriter, r *http.Request) {
+	// Open the database
+	db, err := sql.Open("sqlite3", "db/database.db")
+	if err != nil {
+		fmt.Println("Error opening database:", err)
+		return
+	}
+
+	// Retrieve connected account
+	ConnectedAcc := RetrieveAccountfromCookie(r)
+
+	// Determine which page to display based on the URL path
+	path := r.URL.Path
+
+	switch path {
+	case "/myprofile":
+		handleProfileMainPage(w, db, ConnectedAcc)
+	case "/myprofile/liked":
+		handleLikedPostsPage(w, db, ConnectedAcc)
+	case "/myprofile/disliked":
+		handleDislikedPostsPage(w, db, ConnectedAcc)
+	case "/myprofile/comments":
+		handleCommentsPage(w, db, ConnectedAcc)
+	case "/myprofile/savedposts":
+		handleSavedPostsPage(w, db, ConnectedAcc)
+	case "/myprofile/account":
+		handleAccountPage(w, db, ConnectedAcc)
+	default:
+		http.NotFound(w, r)
+	}
+}
+func handleProfileMainPage(w http.ResponseWriter, db *sql.DB, acc database.Account) {
+	// Get the favorite categories of the account
+	NumberofSubscribedCategories, err := database.GetSubscribedCategories(db, acc.Id)
+	if err != nil {
+		fmt.Println("Error getting subscribed categories:", err)
+		return
+	}
+
+	// get all posts of the account
+	AccountPosts, err := database.GetPostsByCreator(db, acc.Id)
+	if err != nil {
+		fmt.Println("Error getting posts by creator:", err)
+		return
+	}
+
+	// Create a new MyprofileData struct
+	data := MyprofileData{
+		ConnectedAccount:             acc,
+		NumberofSubscribedCategories: len(NumberofSubscribedCategories) - 1,
+		MyPosts:                      AccountPosts,
+	}
+
+	// Serve the main profile page template
+	tmpl := template.Must(template.ParseFiles("assets/html/myprofile/main.html"))
+	tmpl.Execute(w, data)
+}
+
+func handleLikedPostsPage(w http.ResponseWriter, db *sql.DB, acc database.Account) {
+	// Get the favorite posts of the account
+	favoritePostsIDs, err := database.GetLikedPosts(db, acc.Id)
+	if err != nil {
+		fmt.Println("Error getting liked posts:", err)
+		return
+	}
+	var likesPosts []database.Post
+
+	for i := 1; i < len(favoritePostsIDs); i++ {
+		post, err := database.GetPost(db, favoritePostsIDs[i])
+		if err != nil {
+			fmt.Println("Error getting post:", err)
+			return
+		}
+		likesPosts = append(likesPosts, post)
+	}
+
+	// Get the favorite comments of the account
+	likedCommentsIDs, err := database.GetLikedComments(db, acc.Id)
+	if err != nil {
+		fmt.Println("Error getting liked comments:", err)
+		return
+	}
+	var likesComments []database.Comment
+
+	for i := 1; i < len(likedCommentsIDs); i++ {
+
+		comment, err := database.GetComment(db, likedCommentsIDs[i])
+		if err != nil {
+			fmt.Println("Error getting comment:", err)
+			return
+		}
+		likesComments = append(likesComments, comment)
+	}
+
+	// Get the favorite categories of the account
+	NumberofSubscribedCategories, err := database.GetSubscribedCategories(db, acc.Id)
+	if err != nil {
+		fmt.Println("Error getting subscribed categories:", err)
+		return
+	}
+
+	data := MyprofileData{
+		ConnectedAccount:             acc,
+		NumberofSubscribedCategories: len(NumberofSubscribedCategories) - 1,
+		LikedPosts:                   likesPosts,
+		LikedComments:                likesComments,
+	}
+
+	tmpl := template.Must(template.ParseFiles("assets/html/myprofile/liked.html"))
+	tmpl.Execute(w, data)
+}
+
+func handleDislikedPostsPage(w http.ResponseWriter, db *sql.DB, acc database.Account) {
+	// Get the disliked posts of the account
+	dislikedPostsIDs, err := database.GetDisLikedPosts(db, acc.Id)
+	if err != nil {
+		fmt.Println("Error getting disliked posts:", err)
+		return
+	}
+	var dislikesPosts []database.Post
+
+	for i := 1; i < len(dislikedPostsIDs); i++ {
+		post, err := database.GetPost(db, dislikedPostsIDs[i])
+		if err != nil {
+			fmt.Println("Error getting post:", err)
+			return
+		}
+		dislikesPosts = append(dislikesPosts, post)
+	}
+
+	// Get the disliked comments of the account
+	dislikedCommentsIDs, err := database.GetDislikedComments(db, acc.Id)
+	if err != nil {
+		fmt.Println("Error getting disliked comments:", err)
+		return
+	}
+	var dislikesComments []database.Comment
+
+	for i := 1; i < len(dislikedCommentsIDs); i++ {
+		comment, err := database.GetComment(db, dislikedCommentsIDs[i])
+		if err != nil {
+			fmt.Println("Error getting comment:", err)
+			return
+		}
+		dislikesComments = append(dislikesComments, comment)
+	}
+
+	// Get the favorite categories of the account
+	NumberofSubscribedCategories, err := database.GetSubscribedCategories(db, acc.Id)
+	if err != nil {
+		fmt.Println("Error getting subscribed categories:", err)
+		return
+	}
+
+	data := MyprofileData{
+		ConnectedAccount:             acc,
+		NumberofSubscribedCategories: len(NumberofSubscribedCategories) - 1,
+		DislikedPosts:                dislikesPosts,
+		DislikedComments:             dislikesComments,
+	}
+
+	// Serve the disliked posts page template
+	tmpl := template.Must(template.ParseFiles("assets/html/myprofile/disliked.html"))
+	tmpl.Execute(w, data)
+}
+
+func handleCommentsPage(w http.ResponseWriter, db *sql.DB, acc database.Account) {
+	// Get the favorite categories of the account
+	NumberofSubscribedCategories, err := database.GetSubscribedCategories(db, acc.Id)
+	if err != nil {
+		fmt.Println("Error getting subscribed categories:", err)
+		return
+	}
+
+	// get all posts of the account
+	comments, err := database.GetCommentsByAccount(db, acc.Id)
+	if err != nil {
+		fmt.Println("Error getting posts by creator:", err)
+		return
+	}
+
+	data := MyprofileData{
+		ConnectedAccount:             acc,
+		NumberofSubscribedCategories: len(NumberofSubscribedCategories) - 1,
+		MyComments:                   comments,
+	}
+
+	// Serve the comments page template
+	tmpl := template.Must(template.ParseFiles("assets/html/myprofile/comments.html"))
+	tmpl.Execute(w, data)
+}
+
+func handleSavedPostsPage(w http.ResponseWriter, db *sql.DB, acc database.Account) {
+	// Load and prepare data specific to the saved posts page
+	SavedPostsIDs, err := database.GetSavedPosts(db, acc.Id)
+	if err != nil {
+		fmt.Println("Error getting disliked posts:", err)
+		return
+	}
+	var SavedPosts []database.Post
+
+	for i := 1; i < len(SavedPostsIDs); i++ {
+		post, err := database.GetPost(db, SavedPostsIDs[i])
+		if err != nil {
+			fmt.Println("Error getting post:", err)
+			return
+		}
+		SavedPosts = append(SavedPosts, post)
+	}
+
+	// Get the favorite categories of the account
+	NumberofSubscribedCategories, err := database.GetSubscribedCategories(db, acc.Id)
+	if err != nil {
+		fmt.Println("Error getting subscribed categories:", err)
+		return
+	}
+
+	data := MyprofileData{
+		ConnectedAccount:             acc,
+		NumberofSubscribedCategories: len(NumberofSubscribedCategories) - 1,
+		SavedPosts:                   SavedPosts,
+	}
+
+	// Serve the saved posts page template
+	tmpl := template.Must(template.ParseFiles("assets/html/myprofile/saved.html"))
+	tmpl.Execute(w, data)
+}
+
+func handleAccountPage(w http.ResponseWriter, db *sql.DB, acc database.Account) {
+	// Load and prepare data specific to the account settings page
+	// Get the favorite categories of the account
+	NumberofSubscribedCategories, err := database.GetSubscribedCategories(db, acc.Id)
+	if err != nil {
+		fmt.Println("Error getting subscribed categories:", err)
+		return
+	}
+
+	data := MyprofileData{
+		ConnectedAccount:             acc,
+		NumberofSubscribedCategories: len(NumberofSubscribedCategories) - 1,
+	}
+	// Serve the account settings page template
+	tmpl := template.Must(template.ParseFiles("assets/html/myprofile/account.html"))
+	tmpl.Execute(w, data)
 }

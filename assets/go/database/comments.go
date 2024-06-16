@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type Comments struct {
+type Comment struct {
 	PostID          string
 	CommentID       string
 	Content         string
@@ -33,8 +33,7 @@ func ConnectCommentsDB(dbPath string) (*sql.DB, error) {
 		likes INTEGER DEFAULT 0,
 		dislikes INTEGER DEFAULT 0,
 		AccountID TEXT NOT NULL,
-		creationDate TEXT NOT NULL,
-		FOREIGN KEY (AccountID) REFERENCES accounts(id)
+		creationDate TEXT NOT NULL
 	)`)
 	if err != nil {
 		return nil, err
@@ -43,7 +42,7 @@ func ConnectCommentsDB(dbPath string) (*sql.DB, error) {
 }
 
 // InsertComment function inserts a new comment into the database.
-func InsertComment(db *sql.DB, comment Comments) error {
+func InsertComment(db *sql.DB, comment Comment) error {
 	// Get the last comment ID
 	row := db.QueryRow("SELECT commentID FROM comments ORDER BY commentID DESC LIMIT 1")
 	var lastID string
@@ -70,7 +69,7 @@ func InsertComment(db *sql.DB, comment Comments) error {
 
 // CreateComment function creates a new comment in the database.
 func CreateComment(db *sql.DB, postID, content, imageUrl string, Acc Account) error {
-	comment := Comments{
+	comment := Comment{
 		PostID:       postID,
 		Content:      content,
 		ImageUrl:     imageUrl,
@@ -85,7 +84,7 @@ func CreateComment(db *sql.DB, postID, content, imageUrl string, Acc Account) er
 }
 
 // GetAllComments function returns all the comments from the database.
-func GetAllComments(db *sql.DB, postID string) ([]Comments, error) {
+func GetAllComments(db *sql.DB, postID string) ([]Comment, error) {
 	rows, err := db.Query(`
 		SELECT c.postID, c.commentID, c.content, c.imageUrl, c.likes, c.dislikes, c.AccountID, a.username as accountUsername, a.ImageUrl as accountImageUrl, c.creationDate
 		FROM comments c
@@ -97,9 +96,50 @@ func GetAllComments(db *sql.DB, postID string) ([]Comments, error) {
 	}
 	defer rows.Close()
 
-	comments := []Comments{}
+	comments := []Comment{}
 	for rows.Next() {
-		var comment Comments
+		var comment Comment
+		err := rows.Scan(&comment.PostID, &comment.CommentID, &comment.Content, &comment.ImageUrl, &comment.Likes, &comment.Dislikes, &comment.AccountID, &comment.AccountUsername, &comment.AccountImageUrl, &comment.CreationDate)
+		if err != nil {
+			return nil, err
+		}
+		comments = append(comments, comment)
+	}
+	return comments, nil
+}
+
+// GetComment function returns a comment from the database.
+func GetComment(db *sql.DB, commentID string) (Comment, error) {
+	row := db.QueryRow(`
+		SELECT c.postID, c.commentID, c.content, c.imageUrl, c.likes, c.dislikes, c.AccountID, a.username as accountUsername, a.ImageUrl as accountImageUrl, c.creationDate
+		FROM comments c
+		JOIN accounts a ON c.AccountID = a.id
+		WHERE c.commentID = ?
+	`, commentID)
+	var comment Comment
+	err := row.Scan(&comment.PostID, &comment.CommentID, &comment.Content, &comment.ImageUrl, &comment.Likes, &comment.Dislikes, &comment.AccountID, &comment.AccountUsername, &comment.AccountImageUrl, &comment.CreationDate)
+	if err != nil {
+		return Comment{}, err
+	}
+	return comment, nil
+}
+
+// GetCommentsByAccount function returns all the comments from a specific account.
+func GetCommentsByAccount(db *sql.DB, accountID string) ([]Comment, error) {
+	rows, err := db.Query(`
+		SELECT c.postID, c.commentID, c.content, c.imageUrl, c.likes, c.dislikes, c.AccountID, a.username as accountUsername, a.ImageUrl as accountImageUrl, c.creationDate
+		FROM comments c
+		JOIN accounts a ON c.AccountID = a.id
+		WHERE c.AccountID = ?
+	`, accountID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	comments := []Comment{}
+	for rows.Next() {
+		var comment Comment
 		err := rows.Scan(&comment.PostID, &comment.CommentID, &comment.Content, &comment.ImageUrl, &comment.Likes, &comment.Dislikes, &comment.AccountID, &comment.AccountUsername, &comment.AccountImageUrl, &comment.CreationDate)
 		if err != nil {
 			return nil, err

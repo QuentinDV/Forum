@@ -12,6 +12,7 @@
 
     <img id="profilePicture" alt="Profile Picture" width="400px" src="{{.ImageUrl}}">
     <p>{{.Username}}</p>
+    <p>Subscribed Categories : {{.NumberofSubscribedCategories}}</p>
     <p>Sign up : {{.CreationDate}}</p>
 
     <h1>Likes Posts</h1>
@@ -25,7 +26,7 @@
             </form>
 
             <form action="/user/{{.AccountUsername}}" method="post">
-                <img id="profilePicture" alt="Account Image" width="40px" src="{{.AccountImageUrl}}">
+                <img id="profilePicture" alt="Account Image" width="40px" src="../../{{.AccountImageUrl}}">
                 <input type="submit" value="{{.AccountUsername}}">
             </form>
 
@@ -61,7 +62,7 @@
             </form>
 
             <form action="/user/{{.AccountUsername}}" method="post">
-                <img id="profilePicture" alt="Account Image" width="40px" src="{{.AccountImageUrl}}">
+                <img id="profilePicture" alt="Account Image" width="40px" src="../../{{.AccountImageUrl}}">
                 <input type="submit" value="{{.AccountUsername}}">
             </form>
 

@@ -87,7 +87,7 @@ func CreateAccount(email, password, username string, IsModerator bool, isAdmin b
 		log.Fatal(err)
 	}
 	defer userdb.Close()
-	NewUserData := UserData{newID, []string{}, []string{}, []string{}, []string{}}
+	NewUserData := UserData{newID, []string{}, []string{}, []string{}, []string{}, []string{}, []string{}}
 	err = InsertUserData(userdb, NewUserData)
 	if err != nil {
 		log.Fatal(err)

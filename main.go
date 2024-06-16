@@ -17,8 +17,8 @@ func main() {
 
 	database.ConnectCategoriesDB("db/database.db")
 	database.ConnectUserDataDB("db/database.db")
-	database.ConnectCategoriesDB("db/database.db")
 	database.ConnectPostDB("db/database.db")
+	database.ConnectCommentsDB("db/database.db")
 
 	// Définition des gestionnaires de routes HTTP
 	setupHTTPHandlers()
@@ -34,8 +34,14 @@ func setupHTTPHandlers() {
 	http.HandleFunc("/categories", web.Categories)
 	http.HandleFunc("/signup", web.SignUp)
 	http.HandleFunc("/admin", web.Admin)
-	http.HandleFunc("/myprofile", web.UserProfile)
 	http.HandleFunc("/notfound", web.NotFound)
+
+	http.HandleFunc("/myprofile", web.MyProfile)
+	http.HandleFunc("/myprofile/liked", web.MyProfile)
+	http.HandleFunc("/myprofile/disliked", web.MyProfile)
+	http.HandleFunc("/myprofile/comments", web.MyProfile)
+	http.HandleFunc("/myprofile/savedposts", web.MyProfile)
+	http.HandleFunc("/myprofile/account", web.MyProfile)
 
 	http.HandleFunc("/user/", web.UserProfileHandler)
 	http.HandleFunc("/category/", web.CategoryPageHandler)
@@ -48,7 +54,6 @@ func setupHTTPHandlers() {
 	http.HandleFunc("/guestform", web.LogOutForm)
 	http.HandleFunc("/logoutform", web.LogOutForm)
 
-	http.HandleFunc("/userprofileform", web.UserProfileForm)
 	http.HandleFunc("/createcategoryform", web.CreateCategoryForm)
 	http.HandleFunc("/likeform", web.LikeForm)
 	http.HandleFunc("/dislikeform", web.DislikeForm)
