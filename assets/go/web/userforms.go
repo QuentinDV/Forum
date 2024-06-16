@@ -199,7 +199,7 @@ func PfpWithImageForm(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, accountCookie)
 
 	// Redirect to the home page
-	http.Redirect(w, r, "/myprofile/account", http.StatusSeeOther)
+	http.Redirect(w, r, "/userprofile/account", http.StatusSeeOther)
 }
 
 func ChangePwForm(w http.ResponseWriter, r *http.Request) {

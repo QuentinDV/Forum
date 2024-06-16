@@ -21,7 +21,11 @@ type HomeData struct {
 }
 
 type MyprofileData struct {
-	ConnectedAccount             database.Account
+	Username                     string
+	ImageUrl                     string
+	CreationDate                 string
+	Email                        string
+	IsSameAccount                bool
 	NumberofSubscribedCategories int
 	MyPosts                      []database.Post
 	LikedPosts                   []database.Post
@@ -182,16 +186,20 @@ func Admin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Retrieve connected account
+	ConnectedAcc := RetrieveAccountfromCookie(r)
+
+	// Check if the user is the same as the connected account
+	if !ConnectedAcc.IsAdmin {
+		http.Redirect(w, r, "/notfound", http.StatusSeeOther)
+		return
+	}
+
 	// Serve the admin page
 	tmpl := template.Must(template.ParseFiles("assets/html/admin.html"))
 	tmpl.Execute(w, allAcc)
 }
 
-// Profile page of the forum.
-func OtherUserProfile(w http.ResponseWriter, r *http.Request) {
-	// Serve the other user profile page
-	http.ServeFile(w, r, "assets/html/userprofile.html")
-}
 
 // CreateCategory page of the forum.
 func CreateCategory(w http.ResponseWriter, r *http.Request) {
@@ -356,88 +364,87 @@ func PostPageHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, post)
 }
 
-// UserProfileHandler handles the user profile page.
+// UserProfileHandler handles the user profile page and its subpages.
 func UserProfileHandler(w http.ResponseWriter, r *http.Request) {
-	// Extrait le username de l'URL
-	AccUsername := r.URL.Path[len("/user/"):]
+	path := r.URL.Path
+	parts := strings.Split(strings.TrimPrefix(path, "/user/"), "/")
 
-	// Vérifiez que le nom d'utilisateur n'est pas vide et ne commence pas par "assets/img/pfp/"
-	if AccUsername == "" || strings.HasPrefix(AccUsername, "assets/img/pfp/") {
+	if len(parts) == 0 {
 		http.NotFound(w, r)
 		return
 	}
 
-	// Ici, ajoutez la logique pour récupérer les données de l'utilisateur à partir de votre base de données
-	// userData := getUserDataFromDB(username)
+	username := parts[0]
+	page := ""
+	if len(parts) > 1 {
+		page = parts[1]
+	}
+
+	// Check if the username is valid
+	if username == "" || strings.HasPrefix(username, "assets") {
+		http.NotFound(w, r)
+		return
+	}
+
+	// Open the database connection
 	db, err := database.ConnectUserDB("db/database.db")
 	if err != nil {
+		fmt.Println("Error connecting to database:", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	defer db.Close()
 
+	// Retrieve connected account
+	ConnectedAcc := RetrieveAccountfromCookie(r)
+
+	// Check if the user is the same as the connected account
+	if username == ConnectedAcc.Username {
+		// Route to the appropriate handler based on the page
+		switch page {
+		case "":
+			handleProfileMainPage(w, r, db, ConnectedAcc)
+		case "liked":
+			handleLikedPostsPage(w, r, db, ConnectedAcc)
+		case "disliked":
+			handleDislikedPostsPage(w, r, db, ConnectedAcc)
+		case "comments":
+			handleCommentsPage(w, r, db, ConnectedAcc)
+		case "savedposts":
+			handleSavedPostsPage(w, r, db, ConnectedAcc)
+		case "account":
+			handleAccountPage(w, r, db, ConnectedAcc)
+		default:
+			http.NotFound(w, r)
+		}
+		return
+	}
+
 	// Get the account from the database
-	Acc, err := database.GetAccountByUsername(db, AccUsername)
+	Acc, err := database.GetAccountByUsername(db, username)
 	if err != nil {
-		fmt.Println("Error getting account by username zrzz:", err)
+		fmt.Println("Error getting account by username:", err)
 		http.Redirect(w, r, "/notfound", http.StatusSeeOther)
 		return
 	}
 
-	// Get the subscribed categories of the account
-	subscribedCategoriesIDs, err := database.GetSubscribedCategories(db, Acc.Id)
-	if err != nil {
-		fmt.Println("Error getting subscribed categories:", err)
-		return
+	// Route to the appropriate handler based on the page
+	switch page {
+	case "":
+		handleProfileMainPage(w, r, db, Acc)
+	case "liked":
+		handleLikedPostsPage(w, r, db, Acc)
+	case "disliked":
+		handleDislikedPostsPage(w, r, db, Acc)
+	case "comments":
+		handleCommentsPage(w, r, db, Acc)
+	case "savedposts":
+		handleSavedPostsPage(w, r, db, Acc)
+	case "account":
+		handleAccountPage(w, r, db, Acc)
+	default:
+		http.NotFound(w, r)
 	}
-
-	// Get the favorite posts of the account
-	favoritePostsIDs, err := database.GetLikedPosts(db, Acc.Id)
-	if err != nil {
-		fmt.Println("Error getting liked posts:", err)
-		return
-	}
-	var likesPosts []database.Post
-
-	for i := 1; i < len(favoritePostsIDs); i++ {
-		post, err := database.GetPost(db, favoritePostsIDs[i])
-		if err != nil {
-			fmt.Println("Error getting post:", err)
-			return
-		}
-		likesPosts = append(likesPosts, post)
-	}
-
-	// Get the disliked posts of the account
-	dislikedPostsIDs, err := database.GetDisLikedPosts(db, Acc.Id)
-	if err != nil {
-		fmt.Println("Error getting disliked posts:", err)
-		return
-	}
-	var dislikesPosts []database.Post
-
-	for i := 1; i < len(dislikedPostsIDs); i++ {
-		post, err := database.GetPost(db, dislikedPostsIDs[i])
-		if err != nil {
-			fmt.Println("Error getting post:", err)
-			return
-		}
-		dislikesPosts = append(dislikesPosts, post)
-	}
-
-	// Create a new UserProfileData struct
-	userProfileData := UserProfileData{
-		Username:                     Acc.Username,
-		ImageUrl:                     Acc.ImageUrl,
-		CreationDate:                 Acc.CreationDate,
-		NumberofSubscribedCategories: len(subscribedCategoriesIDs) - 1,
-		LikedPosts:                   likesPosts,
-		DisLikedPosts:                dislikesPosts,
-	}
-
-	// Execute the user profile template with the UserProfileData struct
-	tmpl := template.Must(template.ParseFiles("assets/html/userprofile.html"))
-	tmpl.Execute(w, userProfileData)
-
 }
 
 func MyProfile(w http.ResponseWriter, r *http.Request) {
@@ -453,25 +460,25 @@ func MyProfile(w http.ResponseWriter, r *http.Request) {
 
 	// Determine which page to display based on the URL path
 	path := r.URL.Path
-
 	switch path {
 	case "/myprofile":
-		handleProfileMainPage(w, db, ConnectedAcc)
-	case "/myprofile/liked":
-		handleLikedPostsPage(w, db, ConnectedAcc)
-	case "/myprofile/disliked":
-		handleDislikedPostsPage(w, db, ConnectedAcc)
-	case "/myprofile/comments":
-		handleCommentsPage(w, db, ConnectedAcc)
-	case "/myprofile/savedposts":
-		handleSavedPostsPage(w, db, ConnectedAcc)
-	case "/myprofile/account":
-		handleAccountPage(w, db, ConnectedAcc)
+		handleProfileMainPage(w, r, db, ConnectedAcc)
+	case "/userprofile/liked":
+		handleLikedPostsPage(w, r, db, ConnectedAcc)
+	case "/userprofile/disliked":
+		handleDislikedPostsPage(w, r, db, ConnectedAcc)
+	case "/userprofile/comments":
+		handleCommentsPage(w, r, db, ConnectedAcc)
+	case "/userprofile/savedposts":
+		handleSavedPostsPage(w, r, db, ConnectedAcc)
+	case "/userprofile/account":
+		handleAccountPage(w, r, db, ConnectedAcc)
 	default:
 		http.NotFound(w, r)
 	}
 }
-func handleProfileMainPage(w http.ResponseWriter, db *sql.DB, acc database.Account) {
+
+func handleProfileMainPage(w http.ResponseWriter, r *http.Request, db *sql.DB, acc database.Account) {
 	// Get the favorite categories of the account
 	NumberofSubscribedCategories, err := database.GetSubscribedCategories(db, acc.Id)
 	if err != nil {
@@ -486,19 +493,31 @@ func handleProfileMainPage(w http.ResponseWriter, db *sql.DB, acc database.Accou
 		return
 	}
 
+	// Retrieve connected account
+	ConnectedAcc := RetrieveAccountfromCookie(r)
+
+	// Check if the user is the same as the connected account
+	isSameAccount := false
+	if acc.Username == ConnectedAcc.Username {
+		isSameAccount = true
+	}
+
 	// Create a new MyprofileData struct
 	data := MyprofileData{
-		ConnectedAccount:             acc,
+		Username:                     acc.Username,
+		ImageUrl:                     acc.ImageUrl,
+		CreationDate:                 acc.CreationDate,
+		IsSameAccount:                isSameAccount,
 		NumberofSubscribedCategories: len(NumberofSubscribedCategories) - 1,
 		MyPosts:                      AccountPosts,
 	}
 
 	// Serve the main profile page template
-	tmpl := template.Must(template.ParseFiles("assets/html/myprofile/main.html"))
+	tmpl := template.Must(template.ParseFiles("assets/html/userprofile/main.html"))
 	tmpl.Execute(w, data)
 }
 
-func handleLikedPostsPage(w http.ResponseWriter, db *sql.DB, acc database.Account) {
+func handleLikedPostsPage(w http.ResponseWriter, r *http.Request, db *sql.DB, acc database.Account) {
 	// Get the favorite posts of the account
 	favoritePostsIDs, err := database.GetLikedPosts(db, acc.Id)
 	if err != nil {
@@ -541,18 +560,30 @@ func handleLikedPostsPage(w http.ResponseWriter, db *sql.DB, acc database.Accoun
 		return
 	}
 
+	// Retrieve connected account
+	ConnectedAcc := RetrieveAccountfromCookie(r)
+
+	// Check if the user is the same as the connected account
+	isSameAccount := false
+	if acc.Username == ConnectedAcc.Username {
+		isSameAccount = true
+	}
+
 	data := MyprofileData{
-		ConnectedAccount:             acc,
+		Username:                     acc.Username,
+		ImageUrl:                     acc.ImageUrl,
+		CreationDate:                 acc.CreationDate,
+		IsSameAccount:                isSameAccount,
 		NumberofSubscribedCategories: len(NumberofSubscribedCategories) - 1,
 		LikedPosts:                   likesPosts,
 		LikedComments:                likesComments,
 	}
 
-	tmpl := template.Must(template.ParseFiles("assets/html/myprofile/liked.html"))
+	tmpl := template.Must(template.ParseFiles("assets/html/userprofile/liked.html"))
 	tmpl.Execute(w, data)
 }
 
-func handleDislikedPostsPage(w http.ResponseWriter, db *sql.DB, acc database.Account) {
+func handleDislikedPostsPage(w http.ResponseWriter, r *http.Request, db *sql.DB, acc database.Account) {
 	// Get the disliked posts of the account
 	dislikedPostsIDs, err := database.GetDisLikedPosts(db, acc.Id)
 	if err != nil {
@@ -594,19 +625,31 @@ func handleDislikedPostsPage(w http.ResponseWriter, db *sql.DB, acc database.Acc
 		return
 	}
 
+	// Retrieve connected account
+	ConnectedAcc := RetrieveAccountfromCookie(r)
+
+	// Check if the user is the same as the connected account
+	isSameAccount := false
+	if acc.Username == ConnectedAcc.Username {
+		isSameAccount = true
+	}
+
 	data := MyprofileData{
-		ConnectedAccount:             acc,
+		Username:                     acc.Username,
+		ImageUrl:                     acc.ImageUrl,
+		CreationDate:                 acc.CreationDate,
+		IsSameAccount:                isSameAccount,
 		NumberofSubscribedCategories: len(NumberofSubscribedCategories) - 1,
 		DislikedPosts:                dislikesPosts,
 		DislikedComments:             dislikesComments,
 	}
 
 	// Serve the disliked posts page template
-	tmpl := template.Must(template.ParseFiles("assets/html/myprofile/disliked.html"))
+	tmpl := template.Must(template.ParseFiles("assets/html/userprofile/disliked.html"))
 	tmpl.Execute(w, data)
 }
 
-func handleCommentsPage(w http.ResponseWriter, db *sql.DB, acc database.Account) {
+func handleCommentsPage(w http.ResponseWriter, r *http.Request, db *sql.DB, acc database.Account) {
 	// Get the favorite categories of the account
 	NumberofSubscribedCategories, err := database.GetSubscribedCategories(db, acc.Id)
 	if err != nil {
@@ -621,18 +664,30 @@ func handleCommentsPage(w http.ResponseWriter, db *sql.DB, acc database.Account)
 		return
 	}
 
+	// Retrieve connected account
+	ConnectedAcc := RetrieveAccountfromCookie(r)
+
+	// Check if the user is the same as the connected account
+	isSameAccount := false
+	if acc.Username == ConnectedAcc.Username {
+		isSameAccount = true
+	}
+
 	data := MyprofileData{
-		ConnectedAccount:             acc,
+		Username:                     acc.Username,
+		ImageUrl:                     acc.ImageUrl,
+		CreationDate:                 acc.CreationDate,
+		IsSameAccount:                isSameAccount,
 		NumberofSubscribedCategories: len(NumberofSubscribedCategories) - 1,
 		MyComments:                   comments,
 	}
 
 	// Serve the comments page template
-	tmpl := template.Must(template.ParseFiles("assets/html/myprofile/comments.html"))
+	tmpl := template.Must(template.ParseFiles("assets/html/userprofile/comments.html"))
 	tmpl.Execute(w, data)
 }
 
-func handleSavedPostsPage(w http.ResponseWriter, db *sql.DB, acc database.Account) {
+func handleSavedPostsPage(w http.ResponseWriter, r *http.Request, db *sql.DB, acc database.Account) {
 	// Load and prepare data specific to the saved posts page
 	SavedPostsIDs, err := database.GetSavedPosts(db, acc.Id)
 	if err != nil {
@@ -657,18 +712,30 @@ func handleSavedPostsPage(w http.ResponseWriter, db *sql.DB, acc database.Accoun
 		return
 	}
 
+	// Retrieve connected account
+	ConnectedAcc := RetrieveAccountfromCookie(r)
+
+	// Check if the user is the same as the connected account
+	isSameAccount := false
+	if acc.Username == ConnectedAcc.Username {
+		isSameAccount = true
+	}
+
 	data := MyprofileData{
-		ConnectedAccount:             acc,
+		Username:                     acc.Username,
+		ImageUrl:                     acc.ImageUrl,
+		CreationDate:                 acc.CreationDate,
+		IsSameAccount:                isSameAccount,
 		NumberofSubscribedCategories: len(NumberofSubscribedCategories) - 1,
 		SavedPosts:                   SavedPosts,
 	}
 
 	// Serve the saved posts page template
-	tmpl := template.Must(template.ParseFiles("assets/html/myprofile/saved.html"))
+	tmpl := template.Must(template.ParseFiles("assets/html/userprofile/saved.html"))
 	tmpl.Execute(w, data)
 }
 
-func handleAccountPage(w http.ResponseWriter, db *sql.DB, acc database.Account) {
+func handleAccountPage(w http.ResponseWriter, r *http.Request, db *sql.DB, acc database.Account) {
 	// Load and prepare data specific to the account settings page
 	// Get the favorite categories of the account
 	NumberofSubscribedCategories, err := database.GetSubscribedCategories(db, acc.Id)
@@ -677,11 +744,27 @@ func handleAccountPage(w http.ResponseWriter, db *sql.DB, acc database.Account) 
 		return
 	}
 
+	// Retrieve connected account
+	ConnectedAcc := RetrieveAccountfromCookie(r)
+
+	// Check if the user is the same as the connected account
+	isSameAccount := false
+	if acc.Username == ConnectedAcc.Username {
+		isSameAccount = true
+	} else {
+		http.Redirect(w, r, "../../notfound", http.StatusSeeOther)
+		return
+	}
+
 	data := MyprofileData{
-		ConnectedAccount:             acc,
+		Username:                     acc.Username,
+		ImageUrl:                     acc.ImageUrl,
+		CreationDate:                 acc.CreationDate,
+		IsSameAccount:                isSameAccount,
+		Email:                        acc.Email,
 		NumberofSubscribedCategories: len(NumberofSubscribedCategories) - 1,
 	}
 	// Serve the account settings page template
-	tmpl := template.Must(template.ParseFiles("assets/html/myprofile/account.html"))
+	tmpl := template.Must(template.ParseFiles("assets/html/userprofile/account.html"))
 	tmpl.Execute(w, data)
 }
