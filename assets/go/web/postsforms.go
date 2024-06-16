@@ -79,6 +79,58 @@ func CreateCategoryForm(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
 
+// SubscribeCategoryForm handles subscribing and unsubscribing from a category.
+func SubscribeCategoryForm(w http.ResponseWriter, r *http.Request) {
+	// Parse the form data
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
+		return
+	}
+
+	// Retrieve form values
+	categoryID := r.Form.Get("categoryID")
+
+	// Retrieve account ID from cookie
+	accountID := RetrieveAccountfromCookie(r).Id
+
+	// Connect to the database
+	db, err := database.ConnectCategoriesDB("db/database.db")
+	if err != nil {
+		fmt.Println("Error connecting to the database:", err)
+		http.Error(w, "Database connection error", http.StatusInternalServerError)
+		return
+	}
+	defer db.Close()
+
+	// Check if the category is already subscribed
+	IsThisCategorySubscribed := database.IsThisCategorySubscribed(db, accountID, categoryID)
+	if IsThisCategorySubscribed {
+		// Remove the subscribed category if already subscribed
+		err = database.RemoveSubscribedCategory(db, accountID, categoryID)
+		if err != nil {
+			fmt.Println("Error removing subscribed category:", err)
+			http.Error(w, "Error removing subscribed category", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		// Add the account to the subscribed category
+		err = database.AddSubscribedCategory(db, accountID, categoryID)
+		if err != nil {
+			fmt.Println("Error adding subscribed category:", err)
+			http.Error(w, "Error adding subscribed category", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	// Redirect the user to the previous page
+	referer := r.Header.Get("Referer")
+	if referer == "" {
+		referer = "/" // Fallback URL if Referer header is not set
+	}
+	http.Redirect(w, r, referer, http.StatusSeeOther)
+}
+
 func LikeForm(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {

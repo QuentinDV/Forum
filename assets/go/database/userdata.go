@@ -268,7 +268,7 @@ func GetSavedPosts(db *sql.DB, AccountID string) ([]string, error) {
 	return userData.SavedPosts, nil
 }
 
-//IsThisPostLiked function checks if a post is liked by a user
+// IsThisPostLiked function checks if a post is liked by a user
 func IsThisPostLiked(db *sql.DB, AccountID string, postID string) bool {
 	userData, err := GetUserData(db, AccountID)
 	if err != nil {
@@ -282,7 +282,7 @@ func IsThisPostLiked(db *sql.DB, AccountID string, postID string) bool {
 	return false
 }
 
-//IsThisPostDisliked function checks if a post is disliked by a user
+// IsThisPostDisliked function checks if a post is disliked by a user
 func IsThisPostDisliked(db *sql.DB, AccountID string, postID string) bool {
 	userData, err := GetUserData(db, AccountID)
 	if err != nil {
@@ -290,6 +290,33 @@ func IsThisPostDisliked(db *sql.DB, AccountID string, postID string) bool {
 	}
 	for _, id := range userData.DisLikedPosts {
 		if id == postID {
+			return true
+		}
+	}
+	return false
+}
+
+// IsThisPostSaved function checks if a post is saved by a user
+func IsThisPostSaved(db *sql.DB, AccountID string, postID string) bool {
+	userData, err := GetUserData(db, AccountID)
+	if err != nil {
+		return false
+	}
+	for _, id := range userData.SavedPosts {
+		if id == postID {
+			return true
+		}
+	}
+	return false
+}
+
+func IsThisCategorySubscribed(db *sql.DB, AccountID string, categoryID string) bool {
+	userData, err := GetUserData(db, AccountID)
+	if err != nil {
+		return false
+	}
+	for _, id := range userData.SubscribedCategories {
+		if id == categoryID {
 			return true
 		}
 	}

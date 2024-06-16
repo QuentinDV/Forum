@@ -22,8 +22,9 @@ type HomeData struct {
 
 // CategoryData struct represents the data needed to render the category page
 type CategoryData struct {
-	Category database.Category
-	Posts    []database.Post
+	Category     database.Category
+	Posts        []database.Post
+	IsSubscribed bool
 }
 
 type CreateCategoryData struct {
@@ -273,6 +274,9 @@ func CategoryPageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Vérifie si l'utilisateur est abonné à la catégorie
+	isSubscribed := database.IsThisCategorySubscribed(db, RetrieveAccountfromCookie(r).Id, category.CategoryID)
+
 	// Récupère les posts associés à la catégorie
 	posts, err := database.GetPostsByCategory(db, category.CategoryID)
 	if err != nil {
@@ -282,11 +286,13 @@ func CategoryPageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	CategoryData := struct {
-		Category database.Category
-		Posts    []database.Post
+		Category     database.Category
+		Posts        []database.Post
+		IsSubscribed bool
 	}{
-		Category: category,
-		Posts:    posts,
+		Category:     category,
+		Posts:        posts,
+		IsSubscribed: isSubscribed,
 	}
 
 	// Execute the user profile template with the CategoryData struct

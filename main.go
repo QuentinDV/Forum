@@ -16,56 +16,9 @@ func main() {
 	database.CreateAccount("owandji.dieng@ynov.com", "Owandji123", "OwandjiD", true, true)
 
 	database.ConnectCategoriesDB("db/database.db")
-	userdatadb, _ := database.ConnectUserDataDB("db/database.db")
-	dbcategories, err := database.ConnectCategoriesDB("db/database.db")
-	if err != nil {
-		fmt.Println("Error connecting to the database:", err)
-	}
+	database.ConnectUserDataDB("db/database.db")
+	database.ConnectCategoriesDB("db/database.db")
 	database.ConnectPostDB("db/database.db")
-	if err != nil {
-		fmt.Println("Error connecting to the database:", err)
-	}
-
-	err = database.InsertCategory(dbcategories, database.Category{Title: "Video Games", Description: "Video Games in General", ImageUrl: "https://media1.giphy.com/media/3oEjHYlwvUK5p9AIbm/giphy.gif?cid=6c09b9524j6keeuo57nnwcf4q3gtje4k0rkjpy94fujx8vkv&ep=v1_gifs_search&rid=giphy.gif&ct=g", Tags: []string{"videogames"}, AccountID: "QuentinDV"})
-	if err != nil {
-		fmt.Println("Error inserting category:", err)
-	}
-	err = database.InsertCategory(dbcategories, database.Category{Title: "Animal", Description: "Animals in General", ImageUrl: "https://media0.giphy.com/media/uUs14eCA2SBgs/200w.gif", Tags: []string{"animal"}, AccountID: "QuentinDV"})
-	if err != nil {
-		fmt.Println("Error inserting category:", err)
-	}
-
-	// err = database.CreatePost(postdb, "Fortnite", "Fortnite is a battle royale game", "https://media.tenor.com/gjbq2A5lzDcAAAAM/fortnite-fortnite-dance.gif", "0", "1")
-	// if err != nil {
-	// 	fmt.Println("Error inserting Post:", err)
-	// }
-
-	// err = database.CreatePost(postdb, "Minecraft", "Minecraft is a cube game", "", "0", "1")
-	// if err != nil {
-	// 	fmt.Println("Error inserting Post:", err)
-	// }
-	// err = database.CreatePost(postdb, "Dogs", "Dogs are cute", "", "1", "1")
-	// if err != nil {
-	// 	fmt.Println("Error inserting Post:", err)
-	// }
-
-	database.AddSubscribedCategory(userdatadb, "2", "0")
-	database.AddSubscribedCategory(userdatadb, "2", "1")
-	// database.RemoveSubscribedCategory(userdatadb, "2", "0")
-
-	database.AddLikedPost(userdatadb, "2", "1")
-	database.AddLikedPost(userdatadb, "2", "2")
-	database.AddLikedPost(userdatadb, "2", "3")
-	database.AddLikedPost(userdatadb, "2", "4")
-	database.AddLikedPost(userdatadb, "2", "5")
-	database.AddLikedPost(userdatadb, "2", "6")
-
-	database.AddDisLikedPost(userdatadb, "2", "2")
-	database.AddDisLikedPost(userdatadb, "2", "1")
-	database.AddDisLikedPost(userdatadb, "2", "4")
-	database.AddDisLikedPost(userdatadb, "2", "3")
-	database.AddDisLikedPost(userdatadb, "2", "5")
-	database.AddDisLikedPost(userdatadb, "2", "6")
 
 	// Définition des gestionnaires de routes HTTP
 	setupHTTPHandlers()
@@ -100,6 +53,7 @@ func setupHTTPHandlers() {
 	http.HandleFunc("/likeform", web.LikeForm)
 	http.HandleFunc("/dislikeform", web.DislikeForm)
 	http.HandleFunc("/addviewform", web.AddViewForm)
+	http.HandleFunc("/subscribecategoryform", web.SubscribeCategoryForm)
 
 	http.HandleFunc("/banUserform", web.BanForm)
 	http.HandleFunc("/deleteUserform", web.DeleteAccountForm)
