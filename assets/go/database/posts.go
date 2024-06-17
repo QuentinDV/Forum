@@ -282,3 +282,24 @@ func AscendingPostsSortingByLikes(posts []Post) ([]Post, error) {
 
 	return posts, nil
 }
+
+// Generate a new post ID
+func GenerateNewPostID(db *sql.DB) string {
+	// Get the last post ID
+	row := db.QueryRow("SELECT postID FROM posts ORDER BY postID DESC LIMIT 1")
+	var lastID string
+	err := row.Scan(&lastID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// If there are no posts in the database, set the last ID to "0"
+			lastID = "-1"
+		} else {
+			// If there's another error, return an empty string (handle appropriately in the caller)
+			return ""
+		}
+	}
+
+	// Increment the last ID
+	newID := incrementID(lastID)
+	return newID
+}

@@ -36,13 +36,6 @@ func setupHTTPHandlers() {
 	http.HandleFunc("/admin", web.Admin)
 	http.HandleFunc("/notfound", web.NotFound)
 
-	http.HandleFunc("/myprofile", web.MyProfile)
-	http.HandleFunc("/myprofile/liked", web.MyProfile)
-	http.HandleFunc("/myprofile/disliked", web.MyProfile)
-	http.HandleFunc("/myprofile/comments", web.MyProfile)
-	http.HandleFunc("/myprofile/savedposts", web.MyProfile)
-	http.HandleFunc("/myprofile/account", web.MyProfile)
-
 	http.HandleFunc("/user/", web.UserProfileHandler)
 	http.HandleFunc("/category/", web.CategoryPageHandler)
 	http.HandleFunc("/post/", web.PostPageHandler)
@@ -54,11 +47,14 @@ func setupHTTPHandlers() {
 	http.HandleFunc("/guestform", web.LogOutForm)
 	http.HandleFunc("/logoutform", web.LogOutForm)
 
+	http.HandleFunc("/createpostform", web.CreatePostForm)
 	http.HandleFunc("/createcategoryform", web.CreateCategoryForm)
 	http.HandleFunc("/likeform", web.LikeForm)
 	http.HandleFunc("/dislikeform", web.DislikeForm)
 	http.HandleFunc("/addviewform", web.AddViewForm)
+	// http.HandleFunc("/savedpostform", web.SavePostForm)
 	http.HandleFunc("/subscribecategoryform", web.SubscribeCategoryForm)
+	http.HandleFunc("/deletepostform", web.DeletePostForm)
 
 	http.HandleFunc("/banUserform", web.BanForm)
 	http.HandleFunc("/deleteUserform", web.DeleteAccountForm)

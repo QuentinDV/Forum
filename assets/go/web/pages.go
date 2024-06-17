@@ -36,13 +36,11 @@ type MyprofileData struct {
 	SavedPosts                   []database.Post
 }
 
-type UserProfileData struct {
-	Username                     string
-	ImageUrl                     string
-	CreationDate                 string
-	NumberofSubscribedCategories int
-	LikedPosts                   []database.Post
-	DisLikedPosts                []database.Post
+type PostData struct {
+	IsAdmin     bool
+	IsModerator bool
+	IsSameUser  bool
+	Post        database.Post
 }
 
 // CategoryData struct represents the data needed to render the category page
@@ -200,7 +198,6 @@ func Admin(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, allAcc)
 }
 
-
 // CreateCategory page of the forum.
 func CreateCategory(w http.ResponseWriter, r *http.Request) {
 	// Open the database
@@ -225,7 +222,7 @@ func CreateCategory(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Serve the create category page
-	tmpl := template.Must(template.ParseFiles("assets/html/categorycreation.html"))
+	tmpl := template.Must(template.ParseFiles("assets/html/creation/categorycreation.html"))
 	tmpl.Execute(w, data)
 }
 
@@ -260,7 +257,7 @@ func CreatePostHome(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Render the create category page
-	tmpl := template.Must(template.ParseFiles("assets/html/categorycreation.html"))
+	tmpl := template.Must(template.ParseFiles("assets/html/creation/categorycreation.html"))
 	err = tmpl.Execute(w, data)
 	if err != nil {
 		fmt.Println("Error executing template:", err)
@@ -359,9 +356,16 @@ func PostPageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	data := PostData{
+		IsAdmin:     RetrieveAccountfromCookie(r).IsAdmin,
+		IsModerator: RetrieveAccountfromCookie(r).IsModerator,
+		IsSameUser:  post.AccountID == RetrieveAccountfromCookie(r).Id,
+		Post:        post,
+	}
+
 	// Execute the user profile template with the PostPageHandler struct
 	tmpl := template.Must(template.ParseFiles("assets/html/post.html"))
-	tmpl.Execute(w, post)
+	tmpl.Execute(w, data)
 }
 
 // UserProfileHandler handles the user profile page and its subpages.

@@ -29,7 +29,7 @@
         {{end}}
     </div>
 
-    <h1>Liked Posts :</h1>
+    <h1>Disiked Posts :</h1>
     <div id="posts" style="background-color: beige;">
         {{range .LikedPosts}}
         <div class="post">
@@ -46,7 +46,7 @@
             <h2>{{.Title}}</h2>
             <p>{{.Content}}</p>
             {{if ne .ImageUrl ""}}
-            <img src="{{.ImageUrl}}" alt="Post Image">
+            <img src="../../{{.ImageUrl}}" alt="Post Image" width="400px">
             {{end}}
             <div class="post-info">
                 <form action="/likeform" method="post">
@@ -59,6 +59,9 @@
                 </form>
             </div>
             <span>Posted on: {{.CreationDate}}</span>
+            <div>
+                <a href="/post/{{.PostID}}"><img src="../../assets/img/icon/comment.png" alt="Comment Icon" width="40px"> {{.NumberofResponse}}</a>
+            </div>
             <div>
                 <span><img src="assets/img/icon/view.png" alt="view icon" width="80px"> {{.View}}</span>
             </div>

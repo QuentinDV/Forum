@@ -3,38 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{.Title}}</title>
+    <title>{{.Post.Title}}</title>
 </head>
 <body>
     <button onclick="location.href='/home'">Home</button>
     <div class="post">
-        <form action="/category/{{.CategoryID}}" method="post">
-            <img id="profilePicture" alt="Profile Picture" width="40px" src="{{.CategoryImageUrl}}">
-            <input type="submit" value="{{.CategoryName}}">
+        <form action="/category/{{.Post.CategoryID}}" method="post">
+            <img id="profilePicture" alt="Profile Picture" width="40px" src="{{.Post.CategoryImageUrl}}">
+            <input type="submit" value="{{.Post.CategoryName}}">
         </form>
 
-        <form action="/user/{{.AccountUsername}}" method="post">
-            <img id="profilePicture" alt="Account Image" width="40px" src="../../{{.AccountImageUrl}}">
-            <input type="submit" value="{{.AccountUsername}}">
+        <form action="/user/{{.Post.AccountUsername}}" method="post">
+            <img id="profilePicture" alt="Account Image" width="40px" src="../../{{.Post.AccountImageUrl}}">
+            <input type="submit" value="{{.Post.AccountUsername}}">
         </form>
 
-        <h2>{{.Title}}</h2>
-        <p>{{.Content}}</p>
-        {{if ne .ImageUrl ""}}
-        <img src="{{.ImageUrl}}" alt="Post Image">
+        <h2>{{.Post.Title}}</h2>
+        <p>{{.Post.Content}}</p>
+        {{if ne .Post.ImageUrl ""}}
+        <img src="../../{{.Post.ImageUrl}}" alt="Post Image" width="400">
         {{end}}
         <div class="post-info">
             <form action="/likeform" method="post">
-                <input type="hidden" id="LikeID" name="LikeID" value="{{.PostID}}">
-                <input type="submit" value="Likes :{{.Likes}}">
+                <input type="hidden" id="LikeID" name="LikeID" value="{{.Post.PostID}}">
+                <input type="submit" value="Likes :{{.Post.Likes}}">
             </form>
             <form action="/dislikeform" method="post">
-                <input type="hidden" id="DislikeID" name="DislikeID" value="{{.PostID}}">
-                <input type="submit" value="Dislikes :{{.Dislikes}}">
+                <input type="hidden" id="DislikeID" name="DislikeID" value="{{.Post.PostID}}">
+                <input type="submit" value="Dislikes :{{.Post.Dislikes}}">
             </form>
-            <span>Clicks: {{.View}}</span>
+
+            {{if or .IsAdmin .IsModerator .IsSameUser}}
+            <form action="/deletepostform" method="post">
+                <input type="hidden" id="PostID" name="PostID" value="{{.Post.PostID}}">
+                <input type="image" src="../../assets/img/icon/bin.png" alt="More of this Post" width="40px">
+            </form>
+            {{end}}
+
+            <span>Clicks: {{.Post.View}}</span>
         </div>
-        <span>Posted on: {{.CreationDate}}</span>
+        <span>Posted on: {{.Post.CreationDate}}</span>
     </div>
 </body>
 </html>

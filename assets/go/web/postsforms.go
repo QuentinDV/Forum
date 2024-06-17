@@ -5,6 +5,7 @@ import (
 	"forum/assets/go/database"
 	"net/http"
 	"strings"
+	"time"
 )
 
 func CreateCategoryForm(w http.ResponseWriter, r *http.Request) {
@@ -229,50 +230,165 @@ func DislikeForm(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, referer, http.StatusSeeOther)
 }
 
-// CreatePostForm function handles the form submission for creating a new post
+// CreatePostForm handles the form submission for creating a new post
 func CreatePostForm(w http.ResponseWriter, r *http.Request) {
 	// Parse the form data
-	err := r.ParseForm()
+	err := r.ParseMultipartForm(4 << 20) // Set maxMemory parameter to 4MB
 	if err != nil {
 		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
 		return
 	}
 
+	// Retrieve the connected account from the cookie
+	ConnectedAccount := RetrieveAccountfromCookie(r)
+	if (ConnectedAccount == database.Account{}) {
+		http.Error(w, "Unable to retrieve account from cookie", http.StatusUnauthorized)
+		return
+	}
+
 	// Retrieve form values
-	title := r.Form.Get("postTitle")
-	content := r.Form.Get("postContent")
-	imageUrl := r.Form.Get("imageUrl")
-	categoryName := r.Form.Get("categoryName")
-
-	// Example: Retrieve account ID from cookie
-	accountID := RetrieveAccountfromCookie(r).Id
-
-	// Print to console (for debugging)
-	fmt.Println("title:", title)
-	fmt.Println("content:", content)
-	fmt.Println("imageUrl:", imageUrl)
-	fmt.Println("categoryName:", categoryName)
-	fmt.Println("accountID:", accountID)
+	title := r.FormValue("title")
+	content := r.FormValue("content")
+	categoryName := r.FormValue("categoryName")
 
 	// Create the post in the database
 	db, err := database.ConnectPostDB("db/database.db")
 	if err != nil {
+		http.Error(w, "Database connection error", http.StatusInternalServerError)
 		return
 	}
 	defer db.Close()
 
 	category, err := database.GetCategoryByTitle(db, categoryName)
 	if err != nil {
-		fmt.Println("Error getting category by title:", err)
+		http.Error(w, "Error retrieving category", http.StatusInternalServerError)
 		return
 	}
 
-	err = database.CreatePost(db, title, content, imageUrl, category.CategoryID, accountID)
+	// Generate a new post ID
+	postID := database.GenerateNewPostID(db)
+
+	// Get the profile picture file from the form data
+	file, _, err := r.FormFile("postimage")
+	var imageUrl string
+	if err == nil {
+		// File is present, save it
+		defer file.Close()
+		filePath := fmt.Sprintf("./assets/img/post/%s.png", postID)
+		imageUrl = fmt.Sprintf("./assets/img/post/%s.png", postID)
+		err = database.SaveFile(filePath, file)
+		if err != nil {
+			http.Error(w, "Error saving the file", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		// File is not present, set a default or empty URL
+		imageUrl = ""
+	}
+
+	// Insert the new post into the database
+	post := database.Post{
+		PostID:       postID,
+		Title:        title,
+		Content:      content,
+		ImageUrl:     imageUrl,
+		CategoryID:   category.CategoryID,
+		AccountID:    ConnectedAccount.Id,
+		CreationDate: time.Now().Format("2006-01-02 15:04:05"),
+	}
+
+	err = database.InsertPost(db, post)
 	if err != nil {
-		fmt.Println("Error creating post:", err)
+		http.Error(w, "Error creating post", http.StatusInternalServerError)
+		return
+	}
+
+	// Redirect the user to the previous page
+	referer := r.Header.Get("Referer")
+	if referer == "" {
+		referer = "/" // Fallback URL if Referer header is not set
+	}
+	http.Redirect(w, r, referer, http.StatusSeeOther)
+}
+
+func DeletePostForm(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
+		return
+	}
+
+	PostID := r.Form.Get("PostID")
+
+	db, err := database.ConnectPostDB("db/database.db")
+	if err != nil {
+		fmt.Println("Error connecting to the database:", err)
+		http.Error(w, "Database connection error", http.StatusInternalServerError)
+		return
+	}
+
+	allAcc, err := database.GetAllAccounts(db)
+	if err != nil {
+		fmt.Println("Error getting all accounts:", err)
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+
+	Comments, err := database.GetAllComments(db, PostID)
+	if err != nil {
+		fmt.Println("Error getting all comments:", err)
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+
+	for _, acc := range allAcc {
+		err = database.RemoveLikedPost(db, acc.Id, PostID)
+		if err != nil {
+			fmt.Println("Error removing liked post:", err)
+			http.Error(w, "Database error", http.StatusInternalServerError)
+			return
+		}
+
+		err = database.RemoveDisLikedPost(db, acc.Id, PostID)
+		if err != nil {
+			fmt.Println("Error removing disliked post:", err)
+			http.Error(w, "Database error", http.StatusInternalServerError)
+			return
+		}
+
+		err = database.RemoveSavedPost(db, acc.Id, PostID)
+		if err != nil {
+			fmt.Println("Error removing saved post:", err)
+			http.Error(w, "Database error", http.StatusInternalServerError)
+			return
+		}
+
+		for _, comment := range Comments {
+			err = database.RemoveLikedComment(db, acc.Id, comment.CommentID)
+			if err != nil {
+				fmt.Println("Error removing liked comment:", err)
+				http.Error(w, "Database error", http.StatusInternalServerError)
+				return
+			}
+
+			err = database.RemoveDislikedComment(db, acc.Id, comment.CommentID)
+			if err != nil {
+				fmt.Println("Error removing disliked comment:", err)
+				http.Error(w, "Database error", http.StatusInternalServerError)
+				return
+			}
+		}
+
+	}
+
+	err = database.DeletePost(db, PostID)
+	if err != nil {
+		fmt.Println("Error deleting post:", err)
+		http.Error(w, "Error deleting post", http.StatusInternalServerError)
 		return
 	}
 
 	// Redirect to the home page
-	http.Redirect(w, r, "/home", http.StatusSeeOther)
+	http.Redirect(w, r, "../../home", http.StatusSeeOther)
+
 }
