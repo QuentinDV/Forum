@@ -52,7 +52,7 @@ func setupHTTPHandlers() {
 	http.HandleFunc("/likeform", web.LikeForm)
 	http.HandleFunc("/dislikeform", web.DislikeForm)
 	http.HandleFunc("/addviewform", web.AddViewForm)
-	// http.HandleFunc("/savedpostform", web.SavePostForm)
+	http.HandleFunc("/savedpostform", web.SavePostForm)
 	http.HandleFunc("/subscribecategoryform", web.SubscribeCategoryForm)
 	http.HandleFunc("/deletepostform", web.DeletePostForm)
 

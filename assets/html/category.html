@@ -70,14 +70,19 @@
                     <input type="hidden" id="DislikeID" name="DislikeID" value="{{.PostID}}">
                     <input type="submit" value="Dislikes :{{.Dislikes}}">
                 </form>
-                <span>Clicks: {{.View}}</span>
             </div>
 
-            <span>Posted on: {{.CreationDate}}</span>
             <div>
+                <span><img src="../../assets/img/icon/view.png" alt="view icon" width="50px"> {{.View}}</span>
                 <a href="/post/{{.PostID}}"><img src="../../assets/img/icon/comment.png" alt="Comment Icon" width="40px"> {{.NumberofResponse}}</a>
             </div>
-            <a href="/post/{{.PostID}}"><img src="../../assets/img/icon/more.png" alt="More Icon" width="40px"></a>
+            <div>
+                <form action="/addviewform" method="post">
+                    <input type="hidden" id="PostID" name="PostID" value="{{.PostID}}">
+                    <input type="image" src="../../assets/img/icon/more.png" alt="More of this Post" width="40px">
+                </form>
+            </div>
+            <span>Posted on: {{.CreationDate}}</span>
         </div>
         {{end}}
     </div>

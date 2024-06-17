@@ -392,3 +392,45 @@ func DeletePostForm(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "../../home", http.StatusSeeOther)
 
 }
+
+func SavePostForm(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
+		return
+	}
+
+	ConnectedAccount := RetrieveAccountfromCookie(r)
+	PostID := r.Form.Get("PostID")
+
+	db, err := database.ConnectUserDataDB("db/database.db")
+	if err != nil {
+		fmt.Println("Error connecting to the database:", err)
+		http.Error(w, "Database connection error", http.StatusInternalServerError)
+		return
+	}
+
+	IsThisPostSaved := database.IsThisPostSaved(db, ConnectedAccount.Id, PostID)
+	if IsThisPostSaved {
+		err = database.RemoveSavedPost(db, ConnectedAccount.Id, PostID)
+		if err != nil {
+			fmt.Println("Error removing saved post:", err)
+			http.Error(w, "Database update error", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		err = database.AddSavedPost(db, ConnectedAccount.Id, PostID)
+		if err != nil {
+			fmt.Println("Error adding saved post:", err)
+			http.Error(w, "Database update error", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	// Redirect the user to the previous page
+	referer := r.Header.Get("Referer")
+	if referer == "" {
+		referer = "/" // Fallback URL if Referer header is not set
+	}
+	http.Redirect(w, r, referer, http.StatusSeeOther)
+}

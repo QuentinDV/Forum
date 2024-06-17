@@ -40,6 +40,7 @@ type PostData struct {
 	IsAdmin     bool
 	IsModerator bool
 	IsSameUser  bool
+	IsSaved     bool
 	Post        database.Post
 }
 
@@ -360,6 +361,7 @@ func PostPageHandler(w http.ResponseWriter, r *http.Request) {
 		IsAdmin:     RetrieveAccountfromCookie(r).IsAdmin,
 		IsModerator: RetrieveAccountfromCookie(r).IsModerator,
 		IsSameUser:  post.AccountID == RetrieveAccountfromCookie(r).Id,
+		IsSaved:     database.IsThisPostSaved(db, RetrieveAccountfromCookie(r).Id, post.PostID),
 		Post:        post,
 	}
 

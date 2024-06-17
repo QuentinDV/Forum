@@ -32,6 +32,18 @@
                 <input type="hidden" id="DislikeID" name="DislikeID" value="{{.Post.PostID}}">
                 <input type="submit" value="Dislikes :{{.Post.Dislikes}}">
             </form>
+            
+            {{if .IsSaved}}
+            <form action="/savedpostform" method="post">
+                <input type="hidden" id="PostID" name="PostID" value="{{.Post.PostID}}">
+                <input type="image" src="../../assets/img/icon/save.png" alt="More of this Post" width="40px">
+            </form>
+            {{else}}
+            <form action="/savedpostform" method="post">
+                <input type="hidden" id="PostID" name="PostID" value="{{.Post.PostID}}">
+                <input type="image" src="../../assets/img/icon/notsave.png" alt="More of this Post" width="40px">
+            </form>
+            {{end}}
 
             {{if or .IsAdmin .IsModerator .IsSameUser}}
             <form action="/deletepostform" method="post">

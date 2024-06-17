@@ -16,6 +16,7 @@ type Post struct {
 	Dislikes         int
 	View             int
 	NumberofResponse int
+	NumberofSave     int
 	CategoryID       string
 	CategoryName     string
 	CategoryImageUrl string
