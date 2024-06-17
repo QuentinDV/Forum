@@ -130,41 +130,49 @@ func ShowPassword(db *sql.DB, id string) (string, error) {
 	return password, nil
 }
 
+// ChangeImageUrl updates the image URL of a user account in the database.
 func ChangeImageUrl(db *sql.DB, id string, imageUrl string) error {
 	_, err := db.Exec("UPDATE accounts SET ImageUrl = ? WHERE id = ?", imageUrl, id)
 	return err
 }
 
+// BanAccount function bans an account in the database.
 func BanAccount(db *sql.DB, id string) error {
 	_, err := db.Exec("UPDATE accounts SET isBan = 1 WHERE id = ?", id)
 	return err
 }
 
+// UnBanAccount function unbans an account in the database.
 func UnBanAccount(db *sql.DB, id string) error {
 	_, err := db.Exec("UPDATE accounts SET isBan = 0 WHERE id = ?", id)
 	return err
 }
 
+// PromoteToModerator function promotes an account to moderator in the database.
 func PromoteToModerator(db *sql.DB, id string) error {
 	_, err := db.Exec("UPDATE accounts SET isModerator = 1 WHERE id = ?", id)
 	return err
 }
 
+// DemoteFromModerator function demotes an account from moderator in the database.
 func DemoteFromModerator(db *sql.DB, id string) error {
 	_, err := db.Exec("UPDATE accounts SET isModerator = 0 WHERE id = ?", id)
 	return err
 }
 
+// PromoteToAdmin function promotes an account to admin in the database.
 func PromoteToAdmin(db *sql.DB, id string) error {
 	_, err := db.Exec("UPDATE accounts SET isAdmin = 1 WHERE id = ?", id)
 	return err
 }
 
+// DemoteFromAdmin function demotes an account from admin in the database.
 func DemoteFromAdmin(db *sql.DB, id string) error {
 	_, err := db.Exec("UPDATE accounts SET isAdmin = 0 WHERE id = ?", id)
 	return err
 }
 
+// SaveFile function saves a file to the disk.
 func SaveFile(filename string, data io.Reader) error {
 	// Create the file
 	file, err := os.Create(filename)
@@ -230,4 +238,29 @@ func GetUserProfileByUsername(db *sql.DB, username string) (Account, error) {
 		return Account{}, err
 	}
 	return account, nil
+}
+
+// New function to copy the default profile picture
+func CopyDefaultProfilePicture(newID string) (string, error) {
+	sourcePath := "./assets/img/pfp/default.png"
+	destinationPath := "./assets/img/pfp/" + newID + ".png"
+
+	sourceFile, err := os.Open(sourcePath)
+	if err != nil {
+		return "", err
+	}
+	defer sourceFile.Close()
+
+	destinationFile, err := os.Create(destinationPath)
+	if err != nil {
+		return "", err
+	}
+	defer destinationFile.Close()
+
+	_, err = io.Copy(destinationFile, sourceFile)
+	if err != nil {
+		return "", err
+	}
+
+	return destinationPath, nil
 }

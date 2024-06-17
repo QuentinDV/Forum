@@ -5,6 +5,7 @@ import (
 	"forum/assets/go/database"
 	"html/template"
 	"net/http"
+	"path/filepath"
 	"strings"
 )
 
@@ -198,8 +199,12 @@ func PfpWithImageForm(w http.ResponseWriter, r *http.Request) {
 	// Set the cookie
 	http.SetCookie(w, accountCookie)
 
-	// Redirect to the home page
-	http.Redirect(w, r, "/userprofile/account", http.StatusSeeOther)
+	// Redirect the user to the previous page
+	referer := r.Header.Get("Referer")
+	if referer == "" {
+		referer = "/" // Fallback URL if Referer header is not set
+	}
+	http.Redirect(w, r, referer, http.StatusSeeOther)
 }
 
 func ChangePwForm(w http.ResponseWriter, r *http.Request) {
@@ -304,4 +309,68 @@ func AddViewForm(w http.ResponseWriter, r *http.Request) {
 
 	// Redirect to the post page
 	http.Redirect(w, r, "/post/"+postID, http.StatusSeeOther)
+}
+
+// Reset Pfp to default
+func ResetPfpForm(w http.ResponseWriter, r *http.Request) {
+	// Parse the form data
+	err := r.ParseForm()
+	if err != nil {
+		// If there is an error, return an internal server error response
+		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
+		return
+	}
+
+	// Get the user ID from the form data
+	userID := r.Form.Get("UserID")
+
+	db, err := database.ConnectUserDB("db/database.db")
+	if err != nil {
+		http.Error(w, "Database connection error", http.StatusInternalServerError)
+		return
+	}
+	defer db.Close()
+
+	imageUrl, err := database.CopyDefaultProfilePicture(userID)
+	if err != nil {
+		fmt.Println("Error copying default profile picture:", err)
+		http.Error(w, "Error copying default profile picture", http.StatusInternalServerError)
+		return
+	}
+
+	err = database.ChangeImageUrl(db, userID, imageUrl)
+	if err != nil {
+		fmt.Println("Error changing image URL:", err)
+		http.Error(w, "Error changing image URL", http.StatusInternalServerError)
+		return
+	}
+
+	// Check the referer header
+	referer := r.Header.Get("Referer")
+	if referer == "" {
+		referer = "/" // Fallback URL if Referer header is not set
+	}
+
+	// Set cookies if not on admin page
+	if filepath.Base(referer) != "admin" {
+		// Get the account from the database
+		acc, err := database.GetAccountbyID(db, userID)
+		if err != nil {
+			fmt.Println("Error getting account by username:", err)
+			return
+		}
+		// Create a new cookie for the account
+		accountCookie := &http.Cookie{
+			Name: "account",
+			// The value of the cookie is a string that contains the account's information separated by "|"
+			Value: fmt.Sprintf("%s|%s|%s|%s|%s|%t|%t|%t|%s", acc.Id, acc.Email, acc.Password, acc.Username, acc.ImageUrl, acc.IsBan, acc.IsModerator, acc.IsAdmin, acc.CreationDate),
+			Path:  "/",
+		}
+
+		// Set the cookie
+		http.SetCookie(w, accountCookie)
+	}
+
+	// Redirect the user to the previous page
+	http.Redirect(w, r, referer, http.StatusSeeOther)
 }

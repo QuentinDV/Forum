@@ -65,12 +65,17 @@ func CreateAccount(email, password, username string, IsModerator bool, isAdmin b
 		return account, SignUpError{}, err
 	}
 
+	imageUrl, err := CopyDefaultProfilePicture(newID)
+	if err != nil {
+		return account, SignUpError{}, err
+	}
+
 	newAccount := Account{
 		Id:           newID,
 		Email:        email,
 		Password:     string(hashedPassword),
 		Username:     username,
-		ImageUrl:     "https://i.pinimg.com/474x/63/bc/94/63bc9469cae29b897565a08f0647db3c.jpg",
+		ImageUrl:     imageUrl,
 		IsModerator:  IsModerator,
 		IsAdmin:      isAdmin,
 		IsBan:        false,

@@ -7,11 +7,7 @@
     <link rel="stylesheet" href="/assets/css/posts.css">
 </head>
 <body>
-    {{if eq .ImageUrl "https://i.pinimg.com/474x/63/bc/94/63bc9469cae29b897565a08f0647db3c.jpg"}}
-        <img id="profilePicture" alt="Profile Picture" width="400px" src="{{.ImageUrl}}">
-    {{else}}
-        <img id="profilePicture" alt="Profile Picture" width="400px" src="../../{{.ImageUrl}}">
-    {{end}}
+    <img id="profilePicture" alt="Profile Picture" width="400px" src="../../{{.ImageUrl}}">
     
     <h1>{{.Username}}</h1>
     <h2>Subscribed Categories : {{.NumberofSubscribedCategories}}</h2>
@@ -30,6 +26,10 @@
     </div>
 
     <h3>Email: {{.Email}}</h3>
+    <form action="/resetpfpform" method="post">
+        <input type="hidden" name="UserID" value="{{.ID}}">
+        <button id="submitreset" type="submit">Reset Pfp</button>
+    </form>
 
     <form action="/PfpImageForm" method="post" enctype="multipart/form-data">
         <input type="file" id="profilePicture" name="profilePicture" accept="image/*">

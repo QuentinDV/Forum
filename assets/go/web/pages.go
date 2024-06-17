@@ -20,11 +20,12 @@ type HomeData struct {
 	TopPosts            []database.Post
 }
 
-type MyprofileData struct {
+type UserProfile struct {
 	Username                     string
 	ImageUrl                     string
 	CreationDate                 string
 	Email                        string
+	ID                           string
 	IsSameAccount                bool
 	NumberofSubscribedCategories int
 	MyPosts                      []database.Post
@@ -508,8 +509,8 @@ func handleProfileMainPage(w http.ResponseWriter, r *http.Request, db *sql.DB, a
 		isSameAccount = true
 	}
 
-	// Create a new MyprofileData struct
-	data := MyprofileData{
+	// Create a new UserProfile struct
+	data := UserProfile{
 		Username:                     acc.Username,
 		ImageUrl:                     acc.ImageUrl,
 		CreationDate:                 acc.CreationDate,
@@ -575,7 +576,7 @@ func handleLikedPostsPage(w http.ResponseWriter, r *http.Request, db *sql.DB, ac
 		isSameAccount = true
 	}
 
-	data := MyprofileData{
+	data := UserProfile{
 		Username:                     acc.Username,
 		ImageUrl:                     acc.ImageUrl,
 		CreationDate:                 acc.CreationDate,
@@ -640,7 +641,7 @@ func handleDislikedPostsPage(w http.ResponseWriter, r *http.Request, db *sql.DB,
 		isSameAccount = true
 	}
 
-	data := MyprofileData{
+	data := UserProfile{
 		Username:                     acc.Username,
 		ImageUrl:                     acc.ImageUrl,
 		CreationDate:                 acc.CreationDate,
@@ -679,7 +680,7 @@ func handleCommentsPage(w http.ResponseWriter, r *http.Request, db *sql.DB, acc 
 		isSameAccount = true
 	}
 
-	data := MyprofileData{
+	data := UserProfile{
 		Username:                     acc.Username,
 		ImageUrl:                     acc.ImageUrl,
 		CreationDate:                 acc.CreationDate,
@@ -727,7 +728,7 @@ func handleSavedPostsPage(w http.ResponseWriter, r *http.Request, db *sql.DB, ac
 		isSameAccount = true
 	}
 
-	data := MyprofileData{
+	data := UserProfile{
 		Username:                     acc.Username,
 		ImageUrl:                     acc.ImageUrl,
 		CreationDate:                 acc.CreationDate,
@@ -762,10 +763,11 @@ func handleAccountPage(w http.ResponseWriter, r *http.Request, db *sql.DB, acc d
 		return
 	}
 
-	data := MyprofileData{
+	data := UserProfile{
 		Username:                     acc.Username,
 		ImageUrl:                     acc.ImageUrl,
 		CreationDate:                 acc.CreationDate,
+		ID:                           acc.Id,
 		IsSameAccount:                isSameAccount,
 		Email:                        acc.Email,
 		NumberofSubscribedCategories: len(NumberofSubscribedCategories) - 1,
