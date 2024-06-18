@@ -11,7 +11,7 @@ import (
 func main() {
 	// Creating the database
 	database.ConnectUserDB("db/database.db")
-	database.CreateAccount("", "", "Guest", true, true)
+	database.CreateAccount("", "", "Guest", false, false)
 	database.CreateAccount("quentin.dassivignon@ynov.com", "Quentin123", "QuentinDV", true, true)
 	database.CreateAccount("owandji.dieng@ynov.com", "Owandji123", "OwandjiD", true, true)
 
@@ -58,6 +58,7 @@ func setupHTTPHandlers() {
 	http.HandleFunc("/savedpostform", web.SavePostForm)
 	http.HandleFunc("/subscribecategoryform", web.SubscribeCategoryForm)
 	http.HandleFunc("/sortinghomeform", web.SortingHomePostsForm)
+	http.HandleFunc("/resethomesortingform", web.ResetHomeSortingForm)
 
 	http.HandleFunc("/banUserform", web.BanForm)
 	http.HandleFunc("/promoteToModeratorform", web.ModeratorForm)

@@ -14,6 +14,7 @@ import (
 type HomeData struct {
 	Username            string
 	ImageUrl            string
+	SortedBy            string
 	FavoritesCategories []database.Category
 	AllCategories       []database.Category
 	AllPosts            []database.Post
@@ -28,6 +29,7 @@ type UserProfile struct {
 	Email                        string
 	ID                           string
 	IsSameAccount                bool
+	IsAdmin                      bool
 	NumberofSubscribedCategories int
 	MyPosts                      []database.Post
 	LikedPosts                   []database.Post
@@ -144,6 +146,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	HomeData := HomeData{
 		Username:            ConnectedAccount.Username,
 		ImageUrl:            ConnectedAccount.ImageUrl,
+		SortedBy:            SortedBy,
 		FavoritesCategories: favoriteCategories,
 		AllCategories:       allCategories,
 		AllPosts:            allPosts,
@@ -612,6 +615,7 @@ func handleProfileMainPage(w http.ResponseWriter, r *http.Request, db *sql.DB, a
 		ImageUrl:                     acc.ImageUrl,
 		CreationDate:                 acc.CreationDate,
 		IsSameAccount:                isSameAccount,
+		IsAdmin:                      acc.IsAdmin,
 		NumberofSubscribedCategories: len(NumberofSubscribedCategories) - 1,
 		MyPosts:                      AccountPosts,
 	}
@@ -687,6 +691,7 @@ func handleLikedPostsPage(w http.ResponseWriter, r *http.Request, db *sql.DB, ac
 		ImageUrl:                     acc.ImageUrl,
 		CreationDate:                 acc.CreationDate,
 		IsSameAccount:                isSameAccount,
+		IsAdmin:                      acc.IsAdmin,
 		NumberofSubscribedCategories: len(NumberofSubscribedCategories) - 1,
 		LikedPosts:                   likesPosts,
 		LikedComments:                likesComments,
@@ -761,6 +766,7 @@ func handleDislikedPostsPage(w http.ResponseWriter, r *http.Request, db *sql.DB,
 		ImageUrl:                     acc.ImageUrl,
 		CreationDate:                 acc.CreationDate,
 		IsSameAccount:                isSameAccount,
+		IsAdmin:                      acc.IsAdmin,
 		NumberofSubscribedCategories: len(NumberofSubscribedCategories) - 1,
 		DislikedPosts:                dislikesPosts,
 		DislikedComments:             dislikesComments,
@@ -810,6 +816,7 @@ func handleCommentsPage(w http.ResponseWriter, r *http.Request, db *sql.DB, acc 
 		ImageUrl:                     acc.ImageUrl,
 		CreationDate:                 acc.CreationDate,
 		IsSameAccount:                isSameAccount,
+		IsAdmin:                      acc.IsAdmin,
 		NumberofSubscribedCategories: len(NumberofSubscribedCategories) - 1,
 		MyComments:                   comments,
 	}
@@ -867,6 +874,7 @@ func handleSavedPostsPage(w http.ResponseWriter, r *http.Request, db *sql.DB, ac
 		ImageUrl:                     acc.ImageUrl,
 		CreationDate:                 acc.CreationDate,
 		IsSameAccount:                isSameAccount,
+		IsAdmin:                      acc.IsAdmin,
 		NumberofSubscribedCategories: len(NumberofSubscribedCategories) - 1,
 		SavedPosts:                   SavedPosts,
 	}
@@ -912,6 +920,7 @@ func handleAccountPage(w http.ResponseWriter, r *http.Request, db *sql.DB, acc d
 		CreationDate:                 acc.CreationDate,
 		ID:                           acc.Id,
 		IsSameAccount:                isSameAccount,
+		IsAdmin:                      acc.IsAdmin,
 		Email:                        acc.Email,
 		NumberofSubscribedCategories: len(NumberofSubscribedCategories) - 1,
 	}

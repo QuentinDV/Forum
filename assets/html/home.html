@@ -182,10 +182,13 @@
         </div>
 
 
+        
 
         <div class="droite">
+            <h1>Actually Sort by : {{.SortedBy}}</h1>
             <form id="sortForm" action="/sortinghomeform" method="post">
                 <input type="hidden" id="iscategory" name="iscategory" value="false">
+                <label for="sortingMethod">Sort By:</label>
                 <button type="submit" id="sortingMethod" name="sortingMethod" value="By Date Descending">By Date Descending</button>
                 <button type="submit" id="sortingMethod" name="sortingMethod" value="By Date Ascending">By Date Ascending</button>
                 <button type="submit" id="sortingMethod" name="sortingMethod" value="By Likes Descending">By Likes Descending</button>
@@ -206,6 +209,10 @@
                     {{end}}
                 </select>
                 <button type="submit">Filter by Category</button>
+            </form>
+
+            <form action="/resethomesortingform" method="post">
+                <button type="submit">Reset Sorting</button>
             </form>
             
         </div> 

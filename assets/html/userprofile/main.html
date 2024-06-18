@@ -27,6 +27,9 @@
         {{if .IsSameAccount}}
         <button onclick="location.href='/user/{{.Username}}/account'">Manage Account</button>
         {{end}}
+        {{if .IsAdmin}}
+        <button onclick="location.href='/admin'">Admin Panel</button>
+        {{end}}
     </div>
 
     <h1>Posts :</h1>

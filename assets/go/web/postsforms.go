@@ -751,7 +751,10 @@ func SortingHomePostsForm(w http.ResponseWriter, r *http.Request) {
 }
 
 // ResetHOmeSorting resets the sorting method to the default value
-func ResetHOmeSorting() {
+func ResetHomeSortingForm(w http.ResponseWriter, r *http.Request) {
 	SortedBy = "By Date Descending"
 	CategoryName = ""
+
+	// Redirect to the home page
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }

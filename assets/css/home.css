@@ -63,8 +63,7 @@ body {
     width: 28%;
     /* background-color: rgb(163, 211, 211); */
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
 	border-top: solid 1px black;
 }
 
