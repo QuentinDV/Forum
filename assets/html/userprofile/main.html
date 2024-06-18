@@ -49,11 +49,11 @@
             <img src="../../{{.ImageUrl}}" alt="Post Image" width="400px">
             {{end}}
             <div class="post-info">
-                <form action="/likeform" method="post">
+                <form action="/postlikeform" method="post">
                     <input type="hidden" id="LikeID" name="LikeID" value="{{.PostID}}">
                     <input type="submit" value="Likes :{{.Likes}}">
                 </form>
-                <form action="/dislikeform" method="post">
+                <form action="/postdislikeform" method="post">
                     <input type="hidden" id="DislikeID" name="DislikeID" value="{{.PostID}}">
                     <input type="submit" value="Dislikes :{{.Dislikes}}">
                 </form>

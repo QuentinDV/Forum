@@ -17,6 +17,7 @@ type Post struct {
 	View             int
 	NumberofResponse int
 	NumberofSave     int
+	Reports          int
 	CategoryID       string
 	CategoryName     string
 	CategoryImageUrl string

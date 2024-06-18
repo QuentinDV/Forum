@@ -3,6 +3,7 @@ package web
 import (
 	"fmt"
 	"forum/assets/go/database"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -425,6 +426,228 @@ func SavePostForm(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Database update error", http.StatusInternalServerError)
 			return
 		}
+	}
+
+	// Redirect the user to the previous page
+	referer := r.Header.Get("Referer")
+	if referer == "" {
+		referer = "/" // Fallback URL if Referer header is not set
+	}
+	http.Redirect(w, r, referer, http.StatusSeeOther)
+}
+
+// CreateCommentForm handles the form submission for creating a new comment
+func CreateCommentForm(w http.ResponseWriter, r *http.Request) {
+	// Parse the form data
+	err := r.ParseMultipartForm(4 << 20) // Set maxMemory parameter to 4MB
+	if err != nil {
+		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
+		return
+	}
+
+	// Retrieve the connected account from the cookie
+	ConnectedAccount := RetrieveAccountfromCookie(r)
+	if (ConnectedAccount == database.Account{}) {
+		http.Error(w, "Unable to retrieve account from cookie", http.StatusUnauthorized)
+		return
+	}
+
+	// Retrieve form values
+	content := r.FormValue("content")
+	postID := r.FormValue("PostID")
+
+	// Create the comment in the database
+	db, err := database.ConnectCommentsDB("db/database.db")
+	if err != nil {
+		http.Error(w, "Database connection error", http.StatusInternalServerError)
+		return
+	}
+	defer db.Close()
+
+	// Get the profile picture file from the form data
+	file, _, err := r.FormFile("postimage")
+	var imageUrl string
+	if err == nil {
+		// File is present, save it
+		defer file.Close()
+
+		commentID, err := database.GenerateNewCommentID(db)
+		if err != nil {
+			http.Error(w, "Error generating new comment ID", http.StatusInternalServerError)
+			return
+		}
+
+		filePath := fmt.Sprintf("./assets/img/comment/%s.png", commentID)
+		imageUrl = filePath
+		err = database.SaveFile(filePath, file)
+		if err != nil {
+			http.Error(w, "Error saving the file", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		// File is not present, set a default or empty URL
+		imageUrl = ""
+	}
+
+	// Insert the new comment into the database
+	comment := database.Comment{
+		PostID:       postID,
+		Content:      content,
+		ImageUrl:     imageUrl,
+		AccountID:    ConnectedAccount.Id,
+		CreationDate: time.Now().Format("2006-01-02 15:04:05"),
+	}
+
+	err = database.InsertComment(db, comment)
+	if err != nil {
+		http.Error(w, "Error creating comment", http.StatusInternalServerError)
+		return
+	}
+
+	// Redirect the user to the previous page
+	referer := r.Header.Get("Referer")
+	if referer == "" {
+		referer = "/" // Fallback URL if Referer header is not set
+	}
+	http.Redirect(w, r, referer, http.StatusSeeOther)
+}
+
+func LikeCommentForm(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
+		return
+	}
+
+	ConnectedAccount := RetrieveAccountfromCookie(r)
+	CommentID := r.Form.Get("CommentID")
+	fmt.Println("CommentID:", CommentID)
+
+	db, err := database.ConnectUserDataDB("db/database.db")
+	if err != nil {
+		log.Println("Error connecting to the database:", err)
+		http.Error(w, "Database connection error", http.StatusInternalServerError)
+		return
+	}
+
+	// Get the comment's current likes and dislikes
+	Comment, err := database.GetComment(db, CommentID)
+	if err != nil {
+		log.Println("Error fetching comment:", err)
+		http.Error(w, "Error fetching comment", http.StatusInternalServerError)
+		return
+	}
+	log.Println("Current likes and dislikes for comment:", Comment.Likes, Comment.Dislikes)
+
+	// Check if the comment is already liked by the connected account
+	IsThisCommentLiked := database.IsThisCommentLiked(db, ConnectedAccount.Id, CommentID)
+
+	log.Println("IsThisCommentLiked:", IsThisCommentLiked)
+
+	// Toggle like/unlike based on current like status
+	if IsThisCommentLiked {
+		err = database.RemoveLikedComment(db, ConnectedAccount.Id, CommentID)
+		if err != nil {
+			log.Println("Error removing liked comment:", err)
+			http.Error(w, "Error removing liked comment", http.StatusInternalServerError)
+			return
+		}
+		log.Println("Comment unliked successfully")
+	} else {
+		err = database.RemoveDislikedComment(db, ConnectedAccount.Id, CommentID)
+		if err != nil {
+			log.Println("Error removing disliked comment:", err)
+			http.Error(w, "Error removing disliked comment", http.StatusInternalServerError)
+			return
+		}
+
+		err = database.AddLikedComment(db, ConnectedAccount.Id, CommentID)
+		if err != nil {
+			log.Println("Error adding liked comment:", err)
+			http.Error(w, "Error adding liked comment", http.StatusInternalServerError)
+			return
+		}
+		log.Println("Comment liked successfully")
+	}
+
+	// Redirect the user back to the previous page
+	referer := r.Header.Get("Referer")
+	if referer == "" {
+		referer = "/" // Fallback URL if Referer header is not set
+	}
+	http.Redirect(w, r, referer, http.StatusSeeOther)
+}
+
+func DislikeCommentForm(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
+		return
+	}
+
+	ConnectedAccount := RetrieveAccountfromCookie(r)
+	CommentID := r.Form.Get("CommentID")
+
+	db, err := database.ConnectUserDataDB("db/database.db")
+	if err != nil {
+		fmt.Println("Error connecting to the database:", err)
+		http.Error(w, "Database connection error", http.StatusInternalServerError)
+		return
+	}
+
+	IsThisCommentDisliked := database.IsThisCommentDisliked(db, ConnectedAccount.Id, CommentID)
+	if IsThisCommentDisliked {
+		err = database.RemoveDislikedComment(db, ConnectedAccount.Id, CommentID)
+		if err != nil {
+			fmt.Println("Error removing disliked comment:", err)
+			http.Error(w, "Database update error", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		err = database.RemoveLikedComment(db, ConnectedAccount.Id, CommentID)
+		if err != nil {
+			fmt.Println("Error removing liked comment:", err)
+			http.Error(w, "Database update error", http.StatusInternalServerError)
+			return
+		}
+
+		err = database.AddDislikedComment(db, ConnectedAccount.Id, CommentID)
+		if err != nil {
+			fmt.Println("Error adding disliked comment:", err)
+			http.Error(w, "Database update error", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	// Redirect the user to the previous page
+	referer := r.Header.Get("Referer")
+	if referer == "" {
+		referer = "/" // Fallback URL if Referer header is not set
+	}
+	http.Redirect(w, r, referer, http.StatusSeeOther)
+}
+
+func DeleteCommentForm(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
+		return
+	}
+
+	CommentID := r.Form.Get("CommentID")
+
+	db, err := database.ConnectCommentsDB("db/database.db")
+	if err != nil {
+		fmt.Println("Error connecting to the database:", err)
+		http.Error(w, "Database connection error", http.StatusInternalServerError)
+		return
+	}
+
+	err = database.DeleteComment(db, CommentID)
+	if err != nil {
+		fmt.Println("Error deleting comment:", err)
+		http.Error(w, "Error deleting comment", http.StatusInternalServerError)
+		return
 	}
 
 	// Redirect the user to the previous page

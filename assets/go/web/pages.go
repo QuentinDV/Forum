@@ -12,7 +12,8 @@ import (
 
 // HomeData struct represents the data needed to render the home page
 type HomeData struct {
-	ConnectedAccount    database.Account
+	Username            string
+	ImageUrl            string
 	FavoritesCategories []database.Category
 	AllCategories       []database.Category
 	AllPosts            []database.Post
@@ -37,12 +38,21 @@ type UserProfile struct {
 	SavedPosts                   []database.Post
 }
 
+type CommentWithPermissions struct {
+	database.Comment
+	IsAdmin     bool
+	IsModerator bool
+	IsSameUser  bool
+}
+
 type PostData struct {
 	IsAdmin     bool
 	IsModerator bool
 	IsSameUser  bool
 	IsSaved     bool
+	IsGuest     bool
 	Post        database.Post
+	Comments    []CommentWithPermissions
 }
 
 // CategoryData struct represents the data needed to render the category page
@@ -136,7 +146,8 @@ func Home(w http.ResponseWriter, r *http.Request) {
 
 	// Create a new HomeData struct
 	HomeData := HomeData{
-		ConnectedAccount:    ConnectedAccount,
+		Username:            ConnectedAccount.Username,
+		ImageUrl:            ConnectedAccount.ImageUrl,
 		FavoritesCategories: favoriteCategories,
 		AllCategories:       allCategories,
 		AllPosts:            allPosts,
@@ -333,10 +344,10 @@ func CategoryPageHandler(w http.ResponseWriter, r *http.Request) {
 
 // PostPageHandler handles the post page.
 func PostPageHandler(w http.ResponseWriter, r *http.Request) {
-	// Extrait l'ID du post de l'URL
+	// Extract the post ID from the URL
 	PostID := r.URL.Path[len("/post/"):]
 
-	// Vérifiez que l'ID du post n'est pas vide et ne commence pas par "assets/img/pfp/"
+	// Verify that the post ID is not empty and does not start with "assets/img/pfp/"
 	if PostID == "" || strings.HasPrefix(PostID, "assets/img/pfp/") {
 		http.NotFound(w, r)
 		return
@@ -350,7 +361,7 @@ func PostPageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 
-	// Récupère le post de la base de données
+	// Get the post from the database
 	post, err := database.GetPost(db, PostID)
 	if err != nil {
 		fmt.Println("Error getting post by ID:", err)
@@ -358,12 +369,36 @@ func PostPageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get all comments of the post
+	comments, err := database.GetCommentsByPost(db, PostID)
+	if err != nil {
+		fmt.Println("Error getting comments by post ID:", err)
+		http.Redirect(w, r, "/notfound", http.StatusSeeOther)
+		return
+	}
+
+	// Retrieve connected account
+	connectedAccount := RetrieveAccountfromCookie(r)
+
+	// Parcourez chaque commentaire et ajoutez les informations de permission
+	var commentsWithPermissions []CommentWithPermissions
+	for _, comment := range comments {
+		commentsWithPermissions = append(commentsWithPermissions, CommentWithPermissions{
+			Comment:     comment,
+			IsAdmin:     connectedAccount.IsAdmin,
+			IsModerator: connectedAccount.IsModerator,
+			IsSameUser:  connectedAccount.Id == comment.AccountID,
+		})
+	}
+
 	data := PostData{
-		IsAdmin:     RetrieveAccountfromCookie(r).IsAdmin,
-		IsModerator: RetrieveAccountfromCookie(r).IsModerator,
-		IsSameUser:  post.AccountID == RetrieveAccountfromCookie(r).Id,
-		IsSaved:     database.IsThisPostSaved(db, RetrieveAccountfromCookie(r).Id, post.PostID),
+		IsAdmin:     connectedAccount.IsAdmin,
+		IsModerator: connectedAccount.IsModerator,
+		IsSameUser:  post.AccountID == connectedAccount.Id,
+		IsSaved:     database.IsThisPostSaved(db, connectedAccount.Id, post.PostID),
+		IsGuest:     connectedAccount.Username == "Guest",
 		Post:        post,
+		Comments:    commentsWithPermissions,
 	}
 
 	// Execute the user profile template with the PostPageHandler struct
@@ -388,8 +423,8 @@ func UserProfileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if the username is valid
-	if username == "" || strings.HasPrefix(username, "assets") {
-		http.NotFound(w, r)
+	if username == "" || strings.HasPrefix(username, "assets") || username == "Guest" {
+		http.Redirect(w, r, "/notfound", http.StatusSeeOther)
 		return
 	}
 
@@ -464,6 +499,11 @@ func MyProfile(w http.ResponseWriter, r *http.Request) {
 
 	// Retrieve connected account
 	ConnectedAcc := RetrieveAccountfromCookie(r)
+
+	if ConnectedAcc.Username == "" || ConnectedAcc.Username == "Guest" {
+		http.Redirect(w, r, "/notfound", http.StatusSeeOther)
+		return
+	}
 
 	// Determine which page to display based on the URL path
 	path := r.URL.Path
@@ -670,6 +710,7 @@ func handleCommentsPage(w http.ResponseWriter, r *http.Request, db *sql.DB, acc 
 		fmt.Println("Error getting posts by creator:", err)
 		return
 	}
+	fmt.Println(comments)
 
 	// Retrieve connected account
 	ConnectedAcc := RetrieveAccountfromCookie(r)

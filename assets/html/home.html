@@ -12,20 +12,25 @@
 </head> 
 
     <div class="navbar">
-            <div> <h1> HOME </h1> </div>
-             <div class="navbars">
+        <div> <h1> HOME </h1> </div>
+            <div class="navbars">
                 <h1 class="settings" id="openMenu">LOGIN</h1> 
-                <button onclick="location.href='/user/{{.ConnectedAccount.Username}}'">{{.ConnectedAccount.Username}}</button>
-                <img id="profilePicture" alt="Profile Picture" width="px" src="{{.ConnectedAccount.ImageUrl}}">
-             </div> 
-             
-                 
+
+                {{if ne .Username "Guest"}}
+                <button onclick="location.href='/'"><h1 class="settings" id="openMenu">LOG OUT</h1> </button>
+                <button onclick="location.href='/user/{{.Username}}'">{{.Username}}</button>
+                {{end}}
+                
+                <img id="profilePicture" alt="Profile Picture" width="px" src="{{.ImageUrl}}">
+            </div>
+         </div>        
     </div>
+
     <div class="grid">
         <div class="gauche">
+            {{if ne .Username "Guest"}}
             <main>
                 <button onclick="location.href='/createcategory'">CREATE A NEW CATEGORY</button>
-
                 <div id="categoryPopup" class="popup">
                     <div class="popup-content">
                         <span class="close">&times;</span>
@@ -38,6 +43,7 @@
                     </div>
                 </div>
             </main>
+            {{end}}
             
             <a class="Cate ">FAVORITES CATEGORIES </a>
             <main>
@@ -96,6 +102,7 @@
         </div>
               
         <div class="mid">
+            {{if ne .Username "Guest"}}
             <h1 class="Cate">CREATE A NEW POST</h1>
             <div id="createpost" style="background-color: beige;">
                 <form action="/createpostform" method="post" enctype="multipart/form-data">
@@ -118,6 +125,7 @@
                     <button type="submit">Post</button>
                 </form>
             </div>
+            {{end}}
 
 
             <h1 class="Cate "> FOR YOU </h1>
@@ -140,11 +148,11 @@
                     <img src="{{.ImageUrl}}" alt="Post Image">
                     {{end}}
                     <div class="post-info">
-                        <form action="/likeform" method="post">
+                        <form action="/postlikeform" method="post">
                             <input type="hidden" id="LikeID" name="LikeID" value="{{.PostID}}">
                             <input type="submit" value="Likes :{{.Likes}}">
                         </form>
-                        <form action="/dislikeform" method="post">
+                        <form action="/postdislikeform" method="post">
                             <input type="hidden" id="DislikeID" name="DislikeID" value="{{.PostID}}">
                             <input type="submit" value="Dislikes :{{.Dislikes}}">
                         </form>

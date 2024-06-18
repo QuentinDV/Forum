@@ -44,28 +44,33 @@ func setupHTTPHandlers() {
 	// Forms
 	http.HandleFunc("/signupform", web.SignUpForm)
 	http.HandleFunc("/loginform", web.LoginForm)
-	http.HandleFunc("/guestform", web.LogOutForm)
+	http.HandleFunc("/guestform", web.GuestForm)
 	http.HandleFunc("/logoutform", web.LogOutForm)
 
 	http.HandleFunc("/createpostform", web.CreatePostForm)
 	http.HandleFunc("/createcategoryform", web.CreateCategoryForm)
-	http.HandleFunc("/likeform", web.LikeForm)
-	http.HandleFunc("/dislikeform", web.DislikeForm)
+	http.HandleFunc("/createcommentform", web.CreateCommentForm)
+
+	http.HandleFunc("/postlikeform", web.LikeForm)
+	http.HandleFunc("/postdislikeform", web.DislikeForm)
+	http.HandleFunc("/commentlikeform", web.LikeCommentForm)
+	http.HandleFunc("/commentdislikeform", web.DislikeCommentForm)
+
 	http.HandleFunc("/addviewform", web.AddViewForm)
 	http.HandleFunc("/savedpostform", web.SavePostForm)
 	http.HandleFunc("/subscribecategoryform", web.SubscribeCategoryForm)
-	http.HandleFunc("/resetpfpform", web.ResetPfpForm)
 
 	http.HandleFunc("/banUserform", web.BanForm)
 	http.HandleFunc("/promoteToModeratorform", web.ModeratorForm)
 	http.HandleFunc("/promoteToAdminform", web.AdminForm)
 	http.HandleFunc("/deleteUserform", web.DeleteAccountForm)
 	// http.HandleFunc("/deletecategoryform", web.DeleteCategoryForm)
-	// http.HandleFunc("/deletecommentform", web.DeleteCommentForm)
+	http.HandleFunc("/deletecommentform", web.DeleteCommentForm)
 	http.HandleFunc("/deletepostform", web.DeletePostForm)
 
 	http.HandleFunc("/PfpImageForm", web.PfpWithImageForm)
 	http.HandleFunc("/ChangePwForm", web.ChangePwForm)
+	http.HandleFunc("/resetpfpform", web.ResetPfpForm)
 
 	// Elements statiques (CSS, JS, images)
 	http.Handle("/assets/css/", http.StripPrefix("/assets/css/", http.FileServer(http.Dir("./assets/css"))))

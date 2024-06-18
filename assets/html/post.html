@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.Post.Title}}</title>
+    <link rel="stylesheet" href="/assets/css/posts.css">
 </head>
 <body>
     <button onclick="location.href='/home'">Home</button>
@@ -24,11 +25,11 @@
         <img src="../../{{.Post.ImageUrl}}" alt="Post Image" width="400">
         {{end}}
         <div class="post-info">
-            <form action="/likeform" method="post">
+            <form action="/postlikeform" method="post">
                 <input type="hidden" id="LikeID" name="LikeID" value="{{.Post.PostID}}">
                 <input type="submit" value="Likes :{{.Post.Likes}}">
             </form>
-            <form action="/dislikeform" method="post">
+            <form action="/postdislikeform" method="post">
                 <input type="hidden" id="DislikeID" name="DislikeID" value="{{.Post.PostID}}">
                 <input type="submit" value="Dislikes :{{.Post.Dislikes}}">
             </form>
@@ -56,5 +57,60 @@
         </div>
         <span>Posted on: {{.Post.CreationDate}}</span>
     </div>
+    {{if not .IsGuest}}
+    <h1 class="Cate">Post a Comment</h1>
+        <div id="createpost" style="background-color: beige;">
+            <form action="/createcommentform" method="post" enctype="multipart/form-data">
+                <input type="hidden" id="PostID" name="PostID" value="{{.Post.PostID}}">
+
+                <label for="content">Content:</label>
+                <textarea id="content" name="content" required></textarea>
+
+                <label for="postimage">Image (optional):</label>
+                <input type="file" id="postimage" name="postimage" accept="image/*">
+
+                <button type="submit">Post</button>
+            </form>
+        </div>
+    {{end}}
+
+
+        <div id="post" style="background-color: beige;">
+            {{range .Comments}}
+            <div class="post">
+                <div class="comment">
+                    <form action="/user/{{.AccountUsername}}" method="post">
+                        <img id="profilePicture" alt="Account Image" width="40px" src="../../{{.AccountImageUrl}}">
+                        <input type="submit" value="{{.AccountUsername}}">
+                    </form>
+
+                    <h2>{{.Content}}</h2>
+                    {{if ne .ImageUrl ""}}
+                    <img src="../../{{.ImageUrl}}" alt="Comment Image" width="200px">
+                    {{end}}
+                    <div class="post-info">
+                        <form action="/commentlikeform" method="post">
+                            <input type="hidden" id="CommentID" name="CommentID" value="{{.CommentID}}">
+                            <input type="submit" value="Likes :{{.Likes}}">
+                        </form>
+                        <form action="/commentdislikeform" method="post">
+                            <input type="hidden" id="CommentID" name="CommentID" value="{{.CommentID}}">
+                            <input type="submit" value="Dislikes :{{.Dislikes}}">
+                        </form>
+                    </div>
+
+                    {{if or .IsAdmin .IsModerator .IsSameUser}}
+                    <form action="/deletecommentform" method="post">
+                        <input type="hidden" id="CommentID" name="CommentID" value="{{.CommentID}}">
+                        <input type="image" src="../../assets/img/icon/bin.png" alt="Delete this Comment Icon" width="40px">
+                    </form>
+                    {{end}}
+                    <span>Posted on: {{.CreationDate}}</span>
+
+                </div>
+            </div>
+            {{end}}
+        </div>
+
 </body>
 </html>
