@@ -14,7 +14,7 @@
     <div class="navbar">
             <div> <h1> HOME </h1> </div>
              <div class="navbars">
-                <h1 class="settings" id="openMenu">LOGIN</h1> 
+                <button onclick="location.href='/'"><h1 class="settings" id="openMenu">LOG OUT</h1> </button>
                 <button onclick="location.href='/user/{{.ConnectedAccount.Username}}'">{{.ConnectedAccount.Username}}</button>
                 <img id="profilePicture" alt="Profile Picture" width="px" src="{{.ConnectedAccount.ImageUrl}}">
              </div> 
@@ -24,13 +24,13 @@
     <div class="grid">
         <div class="gauche">
             <main>
-                <button onclick="location.href='/createcategory'">CREATE A NEW CATEGORY</button>
-
-                <div id="categoryPopup" class="popup">
+                <h1 class="Cate" onclick="toggleFormcate()">CREATE A NEW CATEGORY</h1>
+    
+                <div id="createcate" class="popup">
                     <div class="popup-content">
-                        <span class="close">&times;</span>
+                        <span class="close" onclick="toggleFormcate()">&times;</span>
                         <h2>Create a New Category</h2>
-                        <form id="categoryForm">
+                        <form id="categoryForm" action="/createcategoryform" method="post">
                             <label for="categoryName">Category Name:</label>
                             <input type="text" id="categoryName" name="categoryName" required>
                             <button type="submit">Create</button>
@@ -96,49 +96,53 @@
         </div>
               
         <div class="mid">
-            <h1 class="Cate">CREATE A NEW POST</h1>
-            <div id="createpost" style="background-color: beige;">
-                <form action="/createpostform" method="post" enctype="multipart/form-data">
+
+            <h1 class="Cate" onclick="toggleForm()">CREATE A NEW POST</h1>
+            <div id="createpost" style="display: none;">
+                <form action="/createpostform" method="post" enctype="multipart/form-data" class="create-post-form">
                     <label for="categoryName">Category Title:</label>
                     <select id="categoryName" name="categoryName" required>
                         {{range .AllCategories}}
                         <option value="{{.Title}}">{{.Title}}</option>
                         {{end}}
                     </select>
-
+        
                     <label for="title">Title:</label>
                     <input type="text" id="title" name="title" required>
-
+        
                     <label for="content">Content:</label>
                     <textarea id="content" name="content" required></textarea>
-
+        
                     <label for="postimage">Image (optional):</label>
                     <input type="file" id="postimage" name="postimage" accept="image/*">
-
-                    <button type="submit">Post</button>
+        
+                    <button type="submit" class="btn">Post</button>
                 </form>
             </div>
 
 
             <h1 class="Cate "> FOR YOU </h1>
-            <div id="posts" style="background-color: beige;">
+            <div id="posts" style="background-color: rgba(24, 24, 7, 0);">
                 {{range .AllPosts}}
                 <div class="post">
-                    <form action="/category/{{.CategoryID}}" method="post">
-                        <img id="profilePicture" alt="Profile Picture" width="40px" src="{{.CategoryImageUrl}}">
-                        <input type="submit" value="{{.CategoryName}}">
-                    </form>
-        
-                    <form action="/user/{{.AccountUsername}}" method="post">
-                        <img id="profilePicture" alt="Account Image" width="40px" src="{{.AccountImageUrl}}">
-                        <input type="submit" value="{{.AccountUsername}}">
-                    </form>
-        
+                    <div class="profile-category">
+                        <form action="/category/{{.CategoryID}}" method="post">
+                            <img class="profile-picture" alt="Profile Picture" width="40px" src="{{.CategoryImageUrl}}">
+                            <input type="submit" value="{{.CategoryName}}">
+                        </form>
+                
+                        <form action="/user/{{.AccountUsername}}" method="post">
+                            <img class="profile-picture" alt="Account Image" width="40px" src="{{.AccountImageUrl}}">
+                            <input type="submit" value="{{.AccountUsername}}">
+                        </form>
+                    </div>
+                   <div class="text">
                     <h2>{{.Title}}</h2>
                     <p>{{.Content}}</p>
                     {{if ne .ImageUrl ""}}
-                    <img src="{{.ImageUrl}}" alt="Post Image">
+                    <img src="{{.ImageUrl}}" alt="Post Image"> 
                     {{end}}
+                </div> 
                     <div class="post-info">
                         <form action="/likeform" method="post">
                             <input type="hidden" id="LikeID" name="LikeID" value="{{.PostID}}">
@@ -149,16 +153,16 @@
                             <input type="submit" value="Dislikes :{{.Dislikes}}">
                         </form>
                     </div>
-                    <div>
-                        <span><img src="assets/img/icon/view.png" alt="view icon" width="50px"> {{.View}}</span>
-                        <a href="/post/{{.PostID}}"><img src="../../assets/img/icon/comment.png" alt="Comment Icon" width="40px"> {{.NumberofResponse}}</a>
-                    </div>
+                    <div class="post-details">
 
-                    <form action="/addviewform" method="post">
-                        <input type="hidden" id="PostID" name="PostID" value="{{.PostID}}">
-                        <input type="image" src="assets/img/icon/more.png" alt="More of this Post" width="40px">
-                    </form>
-                    <span>Posted on: {{.CreationDate}}</span>
+                        <span><img src="assets/img/icon/view.png" alt="view icon" width="50px"> {{.View}}</span>
+                        <a href="/post/{{.PostID}}"><img src="assets/img/icon/comment.png" alt="Comment Icon" width="40px"> {{.NumberofResponse}}</a>
+                        <form action="/addviewform" method="post">
+                            <input type="hidden" id="PostID" name="PostID" value="{{.PostID}}">
+                            <input type="image" src="assets/img/icon/more.png" alt="More of this Post" width="40px">
+                        </form>
+                        <span>Posted on: {{.CreationDate}}</span>
+                    </div>
                 </div>
                 {{end}}
             </div>

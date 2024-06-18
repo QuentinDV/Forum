@@ -1,18 +1,236 @@
+@font-face {
+    font-family: 'CustomFont';
+    src: url('https://example.com/path/to/your/font.woff2') format('woff2'),
+         url('https://example.com/path/to/your/font.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
 #posts {
-    background-color: beige;
-    padding: 20px; /* Optional: add padding to the container */
+    background-color: rgb(255, 255, 255);
+    padding: 20px; 
 }
 
 .post {
-    margin-bottom: 20px; /* Adjust the margin value to create the desired gap */
-    padding: 10px; /* Optional: add padding to the posts */
-    border: 1px solid #ccc; /* Optional: add border to each post */
-    background-color: white; /* Optional: set background color for posts */
-    border-radius: 5px; /* Optional: add rounded corners */
+    margin-bottom: 20px; 
+    padding: 10px; 
+    border: 1px solid #ccc; 
+    background-color: rgba(255, 255, 255, 0); 
+    border-radius: 5px; /
 }
 
-/* Optional: add styles for the image */
+
 .post img {
-    max-width: 100%; /* Ensure the image fits within the post */
-    height: auto; /* Maintain the aspect ratio of the image */
+    max-width: 100%; 
+    height: auto; 
 }
+
+.btn {
+    width: 150px;
+    height: 40px;
+    font-size: 18px;
+    background: #fff;
+    border: none;
+    border-radius: 50px;
+    color: #000;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.4s;
+  }
+  
+  .btn:hover {
+    box-shadow: inset 0 0 0 4px #ef476f, 
+                inset 0 0 0 8px #ffd166, 
+                inset 0 0 0 12px #06d6a0,
+                inset 0 0 0 16px #118ab2;
+    background: #073b4c;
+    color: #fff;
+  }
+
+  #createpost {
+    display: none;
+  background-color: #ffffff00;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; 
+    padding: 20px; 
+    border: 1px solid #ccc;
+}
+
+h1.Cate {
+    cursor: pointer;
+}
+
+
+
+
+
+.post-info {
+    display: flex;
+    align-items: center;
+    gap: 10px; 
+}
+
+.post-info form {
+    margin: 0;
+}
+
+.post-info input[type="submit"] {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.post-info input[type="submit"]:hover {
+    background-color: #e0e0e0;
+}
+
+.post-details {
+    display: flex;
+    align-items: center;
+    gap: 10px; 
+}
+
+.post-details span,
+.post-details a,
+.post-details form {
+    display: flex;
+    align-items: center;
+}
+
+.post-details img {
+    margin-right: 5px;
+}
+
+.post-details a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.post-details form {
+    margin: 0;
+}
+
+.profile-category {
+    display: flex;
+    align-items: center;
+    gap: 10px; 
+}
+
+.profile-category form {
+    display: flex;
+    align-items: center;
+    gap: 5px; 
+    margin: 0;
+}
+
+.profile-category img.profile-picture {
+    border-radius: 50%;
+}
+
+.profile-category input[type="submit"] {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.profile-category input[type="submit"]:hover {
+    background-color: #e0e0e0;
+}
+
+.text {
+
+    
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 16px; 
+        color: #333; 
+    
+}
+
+.profile-category {
+    display: flex;
+    align-items: center;
+    gap: 10px; 
+}
+
+.profile-category form {
+    display: flex;
+    align-items: center;
+    gap: 5px; 
+    margin: 0;
+}
+
+.profile-category img.profile-picture {
+    border-radius: 50%;
+}
+
+.profile-category input[type="submit"] {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: rgb(0, 0, 0);
+    cursor: pointer;
+}
+
+.profile-category input[type="submit"]:hover {
+    text-decoration: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#createpost {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.create-post-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 600px;
+    width: 100%;
+}
+
+.create-post-form label {
+    font-weight: bold;
+}
+
+.create-post-form input,
+.create-post-form select,
+.create-post-form textarea {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.create-post-form button.btn {
+    width: 100px;
+    padding: 10px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    align-self: flex-start;
+}
+
