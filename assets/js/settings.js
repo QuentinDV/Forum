@@ -13,3 +13,61 @@ openMenuButton.addEventListener('click', function() {
         menu.style.display = 'block';
     }
 });
+
+function toggleForm() {
+    var form = document.getElementById("createpost");
+    if (form.style.display === "none" || form.style.display === "") {
+        form.style.display = "block";
+    } else {
+        form.style.display = "none";
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const likeButton = document.getElementById('likeButton');
+    const likeCount = document.getElementById('likeCount');
+    let liked = false;
+
+    likeButton.addEventListener('click', () => {
+        liked = !liked;
+        likeButton.classList.toggle('liked', liked);
+        likeCount.textContent = parseInt(likeCount.textContent) + (liked ? 1 : -1);
+
+        // Update the form action
+        const likeForm = document.getElementById('likeForm');
+        likeForm.submit();
+    });
+});
+
+function toggleFormcate() {
+    var form = document.getElementById("createcate");
+    if (form.style.display === "none" || form.style.display === "") {
+        form.style.display = "block";
+    } else {
+        form.style.display = "none";
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createcate = document.getElementById('createcate');
+    const closePopup = document.querySelector('.close');
+
+    closePopup.addEventListener('click', toggleFormcate);
+
+    window.addEventListener('click', (event) => {
+        if (event.target === createcate) {
+            toggleFormcate();
+        }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteButtons = document.querySelectorAll('.deleteButton');
+    const deleteSound = document.getElementById('deleteSound');
+
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+            deleteSound.play();
+        });
+    });
+});

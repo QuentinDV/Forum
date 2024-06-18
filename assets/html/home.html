@@ -6,41 +6,39 @@
     <title>Forum</title>
     <link rel="stylesheet" href="/assets/css/home.css">
     <link rel="stylesheet" href="/assets/css/login.css">
-    <link rel="stylesheet" href="/assets/css/caroussel.css">
     <link rel="stylesheet" href="/assets/css/categories.css">
     <link rel="stylesheet" href="/assets/css/posts.css">
 </head> 
+<div class="navbar">
+    <div> <h1> HOME </h1> </div>
+    {{if ne .Username "Guest"}}
+        <div class="navbars">
+            <h1 class="settings" id="openMenu">LOGIN</h1> 
 
-    <div class="navbar">
-        <div> <h1> HOME </h1> </div>
-        {{if ne .Username "Guest"}}
-            <div class="navbars">
-                <h1 class="settings" id="openMenu">LOGIN</h1> 
+            <button onclick="location.href='/user/{{.Username}}'">{{.Username}}</button>
 
-                <button onclick="location.href='/user/{{.Username}}'">{{.Username}}</button>
-                
-                <img id="profilePicture" alt="Profile Picture" width="px" src="{{.ImageUrl}}">
-                
-            </div>
-        {{else}}
-            <div class="navbars">
-                <h1 class="settings" id="openMenu">LOGIN</h1> 
-                <h1>Guest</h1>
-                <img id="profilePicture" alt="Profile Picture" width="px" src="{{.ImageUrl}}">
-            </div>
-        {{end}}      
-    </div>
+            <img id="profilePicture" alt="Profile Picture" width="px" src="{{.ImageUrl}}">
 
+        </div>
+    {{else}}
+        <div class="navbars">
+            <h1 class="settings" id="openMenu">LOGIN</h1> 
+            <h1>Guest</h1>
+            <img id="profilePicture" alt="Profile Picture" width="px" src="{{.ImageUrl}}">
+        </div>
+    {{end}}
+</div>
+                 
     <div class="grid">
         <div class="gauche">
-            {{if ne .Username "Guest"}}
             <main>
-                <button onclick="location.href='/createcategory'">CREATE A NEW CATEGORY</button>
-                <div id="categoryPopup" class="popup">
+                <h1 class="Cate" onclick="toggleFormcate()">CREATE A NEW CATEGORY</h1>
+    
+                <div id="createcate" class="popup">
                     <div class="popup-content">
-                        <span class="close">&times;</span>
+                        <span class="close" onclick="toggleFormcate()">&times;</span>
                         <h2>Create a New Category</h2>
-                        <form id="categoryForm">
+                        <form id="categoryForm" action="/createcategoryform" method="post">
                             <label for="categoryName">Category Name:</label>
                             <input type="text" id="categoryName" name="categoryName" required>
                             <button type="submit">Create</button>
@@ -48,9 +46,6 @@
                     </div>
                 </div>
             </main>
-            {{else}}
-            <a class="Cate ">Please login create a Category.</a>
-            {{end}}
             
             <a class="Cate ">FAVORITES CATEGORIES </a>
             <main>
@@ -109,73 +104,73 @@
         </div>
               
         <div class="mid">
-            {{if ne .Username "Guest"}}
-            <h1 class="Cate">CREATE A NEW POST</h1>
-            <div id="createpost" style="background-color: beige;">
-                <form action="/createpostform" method="post" enctype="multipart/form-data">
+
+            <h1 class="Cate" onclick="toggleForm()">CREATE A NEW POST</h1>
+            <div id="createpost" style="display: none;">
+                <form action="/createpostform" method="post" enctype="multipart/form-data" class="create-post-form">
                     <label for="categoryName">Category Title:</label>
                     <select id="categoryName" name="categoryName" required>
                         {{range .AllCategories}}
                         <option value="{{.Title}}">{{.Title}}</option>
                         {{end}}
                     </select>
-
+        
                     <label for="title">Title:</label>
                     <input type="text" id="title" name="title" required>
-
+        
                     <label for="content">Content:</label>
                     <textarea id="content" name="content" required></textarea>
-
+        
                     <label for="postimage">Image (optional):</label>
                     <input type="file" id="postimage" name="postimage" accept="image/*">
-
-                    <button type="submit">Post</button>
+        
+                    <button type="submit" class="btn">Post</button>
                 </form>
             </div>
-            {{else}}
-            <h1 class="Cate">Please Login to Post</h1>
-            {{end}}
 
 
             <h1 class="Cate "> FOR YOU </h1>
-            <div id="posts" style="background-color: beige;">
+            <div id="posts" style="background-color: rgba(24, 24, 7, 0);">
                 {{range .AllPosts}}
                 <div class="post">
-                    <form action="/category/{{.CategoryID}}" method="post">
-                        <img id="profilePicture" alt="Profile Picture" width="40px" src="{{.CategoryImageUrl}}">
-                        <input type="submit" value="{{.CategoryName}}">
-                    </form>
-        
-                    <form action="/user/{{.AccountUsername}}" method="post">
-                        <img id="profilePicture" alt="Account Image" width="40px" src="{{.AccountImageUrl}}">
-                        <input type="submit" value="{{.AccountUsername}}">
-                    </form>
-        
+                    <div class="profile-category">
+                        <form action="/category/{{.CategoryID}}" method="post">
+                            <img class="profile-picture" alt="Profile Picture" width="40px" src="{{.CategoryImageUrl}}">
+                            <input type="submit" value="{{.CategoryName}}">
+                        </form>
+                
+                        <form action="/user/{{.AccountUsername}}" method="post">
+                            <img class="profile-picture" alt="Account Image" width="40px" src="{{.AccountImageUrl}}">
+                            <input type="submit" value="{{.AccountUsername}}">
+                        </form>
+                    </div>
+                   <div class="text">
                     <h2>{{.Title}}</h2>
                     <p>{{.Content}}</p>
                     {{if ne .ImageUrl ""}}
-                    <img src="{{.ImageUrl}}" alt="Post Image">
+                    <img src="{{.ImageUrl}}" alt="Post Image"> 
                     {{end}}
+                </div> 
                     <div class="post-info">
-                        <form action="/postlikeform" method="post">
+                        <form action="/likeform" method="post">
                             <input type="hidden" id="LikeID" name="LikeID" value="{{.PostID}}">
                             <input type="submit" value="Likes :{{.Likes}}">
                         </form>
-                        <form action="/postdislikeform" method="post">
+                        <form action="/dislikeform" method="post">
                             <input type="hidden" id="DislikeID" name="DislikeID" value="{{.PostID}}">
                             <input type="submit" value="Dislikes :{{.Dislikes}}">
                         </form>
                     </div>
-                    <div>
-                        <span><img src="assets/img/icon/view.png" alt="view icon" width="50px"> {{.View}}</span>
-                        <a href="/post/{{.PostID}}"><img src="../../assets/img/icon/comment.png" alt="Comment Icon" width="40px"> {{.Responses}}</a>
-                    </div>
+                    <div class="post-details">
 
-                    <form action="/addviewform" method="post">
-                        <input type="hidden" id="PostID" name="PostID" value="{{.PostID}}">
-                        <input type="image" src="assets/img/icon/more.png" alt="More of this Post" width="40px">
-                    </form>
-                    <span>Posted on: {{.CreationDate}}</span>
+                        <span><img src="assets/img/icon/view.png" alt="view icon" width="50px"> {{.View}}</span>
+                        <a href="/post/{{.PostID}}"><img src="assets/img/icon/comment.png" alt="Comment Icon" width="40px"> {{.NumberofResponse}}</a>
+                        <form action="/addviewform" method="post">
+                            <input type="hidden" id="PostID" name="PostID" value="{{.PostID}}">
+                            <input type="image" src="assets/img/icon/more.png" alt="More of this Post" width="40px">
+                        </form>
+                        <span>Posted on: {{.CreationDate}}</span>
+                    </div>
                 </div>
                 {{end}}
             </div>
@@ -229,40 +224,40 @@
 
 
 </body>    
- <div id="menu" class="menu-hidden" style="display: none;">
-        <ul>
-            <div login>
-                <ul id="menu">
-                    <div class="form-structor">
-                        <div class="signup">
-                            <form id="register" action="/signupform" method="post">
-                                <button onclick="location.href='/'" style="background: none;"> <img src="/assets/img/icon/logout.png" alt="Logout Icon" width="50"> </button>
-                                <h2 class="form-title" id="signup"><span>or</span>Sign up</h2>
-                                <div class="form-holder">
-                                    <input autocomplete="off" type="text" class="input" name="username" placeholder="Username" required/>
-                                    <input autocomplete="off" type="email" class="input" name="email" placeholder="Email" required />
-                                    <input autocomplete="off" type="password" class="input" name="pswrd" placeholder="Password" required />
-                                </div>
-                                <button class="submit-btn">Sign up</button>
-                            </form>
-                        </div>
-                        <form id="login" action="/loginform" method="post">
-                            <div class="login slide-up">
-                                <div class="center">
-                                    <h2 class="form-title" id="login"><span>or</span>Log in</h2>
-                                    <div class="form-holder">
-                                        <input autocomplete="off" type="text" class="input" name="identif" placeholder="Email or Username" required />
-                                        <input autocomplete="off" type="password" class="input" name="pswrd" placeholder="Password" required />
-                                    </div>
-                                    <button class="submit-btn">Log in</button>
-                                
-                                </div>
+<div id="menu" class="menu-hidden" style="display: none;">
+    <ul>
+        <div login>
+            <ul id="menu">
+                <div class="form-structor">
+                    <div class="signup">
+                        <form id="register" action="/signupform" method="post">
+                            <button onclick="location.href='/'" style="background: none;"> <img src="/assets/img/icon/logout.png" alt="Logout Icon" width="50"> </button>
+                            <h2 class="form-title" id="signup"><span>or</span>Sign up</h2>
+                            <div class="form-holder">
+                                <input autocomplete="off" type="text" class="input" name="username" placeholder="Username" required/>
+                                <input autocomplete="off" type="email" class="input" name="email" placeholder="Email" required />
+                                <input autocomplete="off" type="password" class="input" name="pswrd" placeholder="Password" required />
                             </div>
+                            <button class="submit-btn">Sign up</button>
                         </form>
                     </div>
+                    <form id="login" action="/loginform" method="post">
+                        <div class="login slide-up">
+                            <div class="center">
+                                <h2 class="form-title" id="login"><span>or</span>Log in</h2>
+                                <div class="form-holder">
+                                    <input autocomplete="off" type="text" class="input" name="identif" placeholder="Email or Username" required />
+                                    <input autocomplete="off" type="password" class="input" name="pswrd" placeholder="Password" required />
+                                </div>
+                                <button class="submit-btn">Log in</button>
+                            
+                            </div>
+                        </div>
+                    </form>
                 </div>
-        </ul>
-    </div> 
+            </div>
+    </ul>
+</div>
     <script src="/assets/js/"></script>
     <script src="/assets/js/login.js"></script>
     <script src="/assets/js/settings.js"></script>
