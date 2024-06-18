@@ -137,7 +137,7 @@ func LogOutForm(w http.ResponseWriter, r *http.Request) {
 	// Set the cookie
 	http.SetCookie(w, accountCookie)
 
-	// Redirect to the previous page
+	// Redirect to the login page
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 

@@ -32,7 +32,6 @@ func setupHTTPHandlers() {
 	http.HandleFunc("/", web.LogIn)
 	http.HandleFunc("/home", web.Home)
 	http.HandleFunc("/categories", web.Categories)
-	http.HandleFunc("/signup", web.SignUp)
 	http.HandleFunc("/admin", web.Admin)
 	http.HandleFunc("/notfound", web.NotFound)
 

@@ -16,6 +16,8 @@
     <h2>{{.Category.Description}}</h2>
     <h2>Subscribers : {{.Category.Subscriber}}</h2>
 
+    
+    {{if ne .Username "Guest"}}
     <form action="/subscribecategoryform" method="post">
         <input type="hidden" id="categoryID" name="categoryID" value="{{.Category.CategoryID}}">
         {{if .IsSubscribed}}
@@ -24,7 +26,9 @@
         <input type="submit" value="Subscribe">
         {{end}}
     </form>
-
+    {{end}}
+    
+    {{if ne .Username "Guest"}}
     <h1 class="Cate">CREATE A NEW POST</h1>
         <div id="createpost" style="background-color: beige;">
             <form action="/createpostform" method="post" enctype="multipart/form-data">
@@ -42,6 +46,9 @@
                 <button type="submit">Post</button>
             </form>
         </div>
+    {{else}}
+    <h1 class="Cate">Please Login to Subscribe or Post</h1>
+    {{end}}
 
     <div id="posts" style="background-color: beige;">
         {{range .Posts}}

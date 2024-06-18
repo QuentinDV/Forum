@@ -34,16 +34,18 @@
                 <input type="submit" value="Dislikes :{{.Post.Dislikes}}">
             </form>
             
-            {{if .IsSaved}}
-            <form action="/savedpostform" method="post">
-                <input type="hidden" id="PostID" name="PostID" value="{{.Post.PostID}}">
-                <input type="image" src="../../assets/img/icon/save.png" alt="More of this Post" width="40px">
-            </form>
-            {{else}}
-            <form action="/savedpostform" method="post">
-                <input type="hidden" id="PostID" name="PostID" value="{{.Post.PostID}}">
-                <input type="image" src="../../assets/img/icon/notsave.png" alt="More of this Post" width="40px">
-            </form>
+            {{if not .IsGuest}}
+                {{if .IsSaved}}
+                <form action="/savedpostform" method="post">
+                    <input type="hidden" id="PostID" name="PostID" value="{{.Post.PostID}}">
+                    <input type="image" src="../../assets/img/icon/save.png" alt="More of this Post" width="40px">
+                </form>
+                {{else}}
+                <form action="/savedpostform" method="post">
+                    <input type="hidden" id="PostID" name="PostID" value="{{.Post.PostID}}">
+                    <input type="image" src="../../assets/img/icon/notsave.png" alt="More of this Post" width="40px">
+                </form>
+                {{end}}
             {{end}}
 
             {{if or .IsAdmin .IsModerator .IsSameUser}}
@@ -72,6 +74,8 @@
                 <button type="submit">Post</button>
             </form>
         </div>
+    {{else}}
+    <h1 class="Cate">Please login to post a comment</h1>
     {{end}}
 
 

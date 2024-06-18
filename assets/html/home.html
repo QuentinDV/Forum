@@ -14,14 +14,19 @@
     <div class="navbar">
         <div> <h1> HOME </h1> </div>
             <div class="navbars">
+                {{if ne .Username "Guest"}}
                 <h1 class="settings" id="openMenu">LOGIN</h1> 
 
-                {{if ne .Username "Guest"}}
                 <button onclick="location.href='/'"><h1 class="settings" id="openMenu">LOG OUT</h1> </button>
                 <button onclick="location.href='/user/{{.Username}}'">{{.Username}}</button>
-                {{end}}
                 
                 <img id="profilePicture" alt="Profile Picture" width="px" src="{{.ImageUrl}}">
+                
+                {{else}}
+                <h1 class="settings" id="openMenu">LOGIN</h1> 
+                <h1>Guest</h1>
+                <img id="profilePicture" alt="Profile Picture" width="px" src="{{.ImageUrl}}">
+                {{end}}
             </div>
          </div>        
     </div>
@@ -43,6 +48,8 @@
                     </div>
                 </div>
             </main>
+            {{else}}
+            <a class="Cate ">Please login create a Category.</a>
             {{end}}
             
             <a class="Cate ">FAVORITES CATEGORIES </a>
@@ -125,6 +132,8 @@
                     <button type="submit">Post</button>
                 </form>
             </div>
+            {{else}}
+            <h1 class="Cate">Please Login to Post</h1>
             {{end}}
 
 
