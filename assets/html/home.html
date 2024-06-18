@@ -184,15 +184,29 @@
 
 
         <div class="droite">
-            <form id="sortForm" action="/sort" method="get">
-                <label>Trier par date :</label><br>
-                <button type="button" onclick="sortPosts('desc')" class="button" id="sortDesc">Date descendante</button>
-                <button type="button" onclick="sortPosts('asc')" class="button" id="sortAsc">Date ascendante</button>
-                <input type="hidden" name="sort" id="sortValue" value="">
-                <button type="submit" style="display: none;">Submit</button>
+            <form id="sortForm" action="/sortinghomeform" method="post">
+                <input type="hidden" id="iscategory" name="iscategory" value="false">
+                <button type="submit" id="sortingMethod" name="sortingMethod" value="By Date Descending">By Date Descending</button>
+                <button type="submit" id="sortingMethod" name="sortingMethod" value="By Date Ascending">By Date Ascending</button>
+                <button type="submit" id="sortingMethod" name="sortingMethod" value="By Likes Descending">By Likes Descending</button>
+                <button type="submit" id="sortingMethod" name="sortingMethod" value="By Likes Ascending">By Likes Ascending</button>
+                <button type="submit" id="sortingMethod" name="sortingMethod" value="By Views Ascending">By Views Descending</button>
+                <button type="submit" id="sortingMethod" name="sortingMethod" value="By Views Descending">By Views Ascending</button>
+                <button type="submit" id="sortingMethod" name="sortingMethod" value="By Responses Ascending">By Responses Descending</button>
+                <button type="submit" id="sortingMethod" name="sortingMethod" value="By Responses Descending">By Responses Ascending</button>
             </form>
 
-            <h1 class="Cate "> TOP POSTS </h1>
+            <form id="sortForm" action="/sortinghomeform" method="post">
+                <input type="hidden" id="sortingMethod" name="sortingMethod" value="By Categories">
+                <input type="hidden" id="iscategory" name="iscategory" value="true">
+                <label for="categoryName">Category Title:</label>
+                <select id="categoryName" name="categoryName" required>
+                    {{range .AllCategories}}
+                    <option value="{{.Title}}">{{.Title}}</option>
+                    {{end}}
+                </select>
+                <button type="submit">Filter by Category</button>
+            </form>
             
         </div> 
     </div>

@@ -144,7 +144,7 @@ func LikeForm(w http.ResponseWriter, r *http.Request) {
 	PostID := r.Form.Get("LikeID")
 
 	if ConnectedAccount.Username == "Guest" {
-		// Redirect the user back to the previous page
+		// Redirect the user back to the previous page;
 		referer := r.Header.Get("Referer")
 		if referer == "" {
 			referer = "/" // Fallback URL if Referer header is not set
@@ -695,4 +695,63 @@ func DeleteCommentForm(w http.ResponseWriter, r *http.Request) {
 		referer = "/" // Fallback URL if Referer header is not set
 	}
 	http.Redirect(w, r, referer, http.StatusSeeOther)
+}
+
+// SortPosts trie les posts en fonction de la méthode de tri sélectionnée.
+func SortPosts(posts []database.Post, sortedBy string) ([]database.Post, error) {
+	var err error
+
+	switch sortedBy {
+	case "By Date Descending":
+		posts, err = database.SortPostsByDateDescending(posts)
+	case "By Date Ascending":
+		posts, err = database.SortPostsByDateAscending(posts)
+	case "By Likes Descending":
+		posts = database.DescendingPostsSortingByLikes(posts)
+	case "By Likes Ascending":
+		posts = database.AscendingPostsSortingByLikes(posts)
+	case "By Views Ascending":
+		posts = database.SortPostsByViewsAscending(posts)
+	case "By Views Descending":
+		posts = database.SortPostsByViewsDescending(posts)
+	case "By Responses Ascending":
+		posts = database.SortPostsByResponsesAscending(posts)
+	case "By Responses Descending":
+		posts = database.SortPostsByResponsesDescending(posts)
+	default:
+		return nil, fmt.Errorf("invalid sorting method: %s", sortedBy)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return posts, nil
+}
+
+// SortingHomePostsForm handles the form submission for sorting the home posts
+func SortingHomePostsForm(w http.ResponseWriter, r *http.Request) {
+	// Parse the form data
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
+		return
+	}
+
+	// Retrieve the sorting method from the form
+	SortedBy = r.Form.Get("sortingMethod")
+	CategoryName = r.Form.Get("categoryName")
+
+	fmt.Println("SortedBy:", SortedBy)
+	fmt.Println("CategoryName:", CategoryName)
+
+	// Redirect to the home page
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
+
+}
+
+// ResetHOmeSorting resets the sorting method to the default value
+func ResetHOmeSorting() {
+	SortedBy = "By Date Descending"
+	CategoryName = ""
 }
