@@ -13,7 +13,13 @@
     <div> <h1> HOME </h1> </div>
     {{if ne .Username "Guest"}}
         <div class="navbars">
-            <h1 class="settings" id="openMenu">LOGIN</h1> 
+            <h1 id="openMenu"class="Btns">
+  
+                <div class="sign"><svg viewBox="0 0 512 512"><path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"></path></svg></div>
+                
+                <div class="logout">Logout</div>
+              
+              </h1> 
 
             <button onclick="location.href='/user/{{.Username}}'">{{.Username}}</button>
 
@@ -42,10 +48,13 @@
                             <label for="categoryName">Category Name:</label>
                             <input type="text" id="categoryName" name="categoryName" required>
                             <button type="submit">Create</button>
+                            
                         </form>
                     </div>
                 </div>
             </main>
+
+            
             
             <a class="Cate ">FAVORITES CATEGORIES </a>
             <main>
@@ -148,7 +157,7 @@
                     <h2>{{.Title}}</h2>
                     <p>{{.Content}}</p>
                     {{if ne .ImageUrl ""}}
-                    <img src="{{.ImageUrl}}" alt="Post Image"> 
+                    <img src="{{.ImageUrl}}" alt="Post Image" width="200px"> 
                     {{end}}
                 </div> 
                     <div class="post-info">
@@ -164,7 +173,7 @@
                     <div class="post-details">
 
                         <span><img src="assets/img/icon/view.png" alt="view icon" width="50px"> {{.View}}</span>
-                        <a href="/post/{{.PostID}}"><img src="assets/img/icon/comment.png" alt="Comment Icon" width="40px"> {{.NumberofResponse}}</a>
+                        <a href="/post/{{.PostID}}"><img src="assets/img/icon/comment.png" alt="Comment Icon" width="40px"> {{.Responses}}</a>
                         <form action="/addviewform" method="post">
                             <input type="hidden" id="PostID" name="PostID" value="{{.PostID}}">
                             <input type="image" src="assets/img/icon/more.png" alt="More of this Post" width="40px">
