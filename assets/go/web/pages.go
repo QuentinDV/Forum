@@ -172,21 +172,6 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Categories page of the forum.
-func Categories(w http.ResponseWriter, r *http.Request) {
-	// Retrieve the account from cookies
-	ConnectedAccount := RetrieveAccountfromCookie(r)
-
-	// Check if the ConnectedAccount is nil or not valid
-	if (ConnectedAccount == database.Account{}) || ConnectedAccount.Id == "" {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
-
-	// Serve the categories page
-	http.ServeFile(w, r, "assets/html/categories.html")
-}
-
 // LogIn page of the forum.
 func LogIn(w http.ResponseWriter, r *http.Request) {
 	// Serve the login page

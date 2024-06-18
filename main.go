@@ -31,7 +31,6 @@ func setupHTTPHandlers() {
 	// Pages
 	http.HandleFunc("/", web.LogIn)
 	http.HandleFunc("/home", web.Home)
-	http.HandleFunc("/categories", web.Categories)
 	http.HandleFunc("/admin", web.Admin)
 	http.HandleFunc("/notfound", web.NotFound)
 
@@ -94,7 +93,6 @@ func startHTTPSServer() {
 	// }
 	// Links
 	fmt.Println("\nPlay : http://localhost:8080/admin")
-	fmt.Println("\nPlay : http://localhost:8080/categories")
 	fmt.Println("\nPlay : http://localhost:8080/home")
 	fmt.Println("\nPlay : http://localhost:8080/")
 	http.ListenAndServe(":8080", nil)

@@ -13,8 +13,8 @@
 
     <div class="navbar">
         <div> <h1> HOME </h1> </div>
+        {{if ne .Username "Guest"}}
             <div class="navbars">
-                {{if ne .Username "Guest"}}
                 <h1 class="settings" id="openMenu">LOGIN</h1> 
 
                 <button onclick="location.href='/'"><h1 class="settings" id="openMenu">LOG OUT</h1> </button>
@@ -22,13 +22,14 @@
                 
                 <img id="profilePicture" alt="Profile Picture" width="px" src="{{.ImageUrl}}">
                 
-                {{else}}
+            </div>
+        {{else}}
+            <div class="navbars">
                 <h1 class="settings" id="openMenu">LOGIN</h1> 
                 <h1>Guest</h1>
-                <img id="profilePicture" alt="Profile Picture" width="px" src="{{.ImageUrl}}">
-                {{end}}
+                <button onclick="location.href='/signup'"><h1 class="settings" id="openMenu">SIGN UP</h1> </button>
             </div>
-         </div>        
+        {{end}}      
     </div>
 
     <div class="grid">
@@ -168,7 +169,7 @@
                     </div>
                     <div>
                         <span><img src="assets/img/icon/view.png" alt="view icon" width="50px"> {{.View}}</span>
-                        <a href="/post/{{.PostID}}"><img src="../../assets/img/icon/comment.png" alt="Comment Icon" width="40px"> {{.NumberofResponse}}</a>
+                        <a href="/post/{{.PostID}}"><img src="../../assets/img/icon/comment.png" alt="Comment Icon" width="40px"> {{.Responses}}</a>
                     </div>
 
                     <form action="/addviewform" method="post">
