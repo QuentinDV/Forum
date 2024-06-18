@@ -41,6 +41,8 @@ func ConnectPostDB(dbPath string) (*sql.DB, error) {
 		likes INTEGER DEFAULT 0,
 		dislikes INTEGER DEFAULT 0,
 		view INTEGER DEFAULT 0,
+		responses INTEGER DEFAULT 0,
+		reports INTEGER DEFAULT 0,
 		categoryID TEXT NOT NULL,
 		AccountID TEXT NOT NULL,
 		creationDate TEXT NOT NULL
@@ -71,8 +73,8 @@ func InsertPost(db *sql.DB, post Post) error {
 	newID := incrementID(lastID)
 
 	// Insert the new post with the incremented ID
-	_, err = db.Exec("INSERT INTO posts (postID, title, content, imageUrl, likes, dislikes, view, categoryID, AccountID, creationDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-		newID, post.Title, post.Content, post.ImageUrl, post.Likes, post.Dislikes, post.View, post.CategoryID, post.AccountID, post.CreationDate)
+	_, err = db.Exec("INSERT INTO posts (postID, title, content, imageUrl, likes, dislikes, view, responses, reports, categoryID, AccountID, creationDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		newID, post.Title, post.Content, post.ImageUrl, post.Likes, post.Dislikes, post.View, post.Responses, post.Reports, post.CategoryID, post.AccountID, post.CreationDate)
 	return err
 }
 
@@ -105,7 +107,7 @@ func DeletePost(db *sql.DB, id string) error {
 // GetAllPosts function retrieves all posts from the database.
 func GetAllPosts(db *sql.DB) ([]Post, error) {
 	rows, err := db.Query(`
-		SELECT p.postID, p.title, p.content, p.imageUrl, p.likes, p.dislikes, p.view, p.categoryID, c.title as categoryName, c.ImageUrl as categoryImageUrl, p.AccountID, a.username as accountUsername, a.ImageUrl as accountImageUrl, p.creationDate 
+		SELECT p.postID, p.title, p.content, p.imageUrl, p.likes, p.dislikes, p.view, p.responses, p.reports, p.categoryID, c.title as categoryName, c.ImageUrl as categoryImageUrl, p.AccountID, a.username as accountUsername, a.ImageUrl as accountImageUrl, p.creationDate 
 		FROM posts p
 		JOIN categories c ON p.categoryID = c.CategoryId
 		JOIN accounts a ON p.AccountID = a.id
@@ -118,7 +120,7 @@ func GetAllPosts(db *sql.DB) ([]Post, error) {
 	posts := []Post{}
 	for rows.Next() {
 		var post Post
-		err := rows.Scan(&post.PostID, &post.Title, &post.Content, &post.ImageUrl, &post.Likes, &post.Dislikes, &post.View, &post.CategoryID, &post.CategoryName, &post.CategoryImageUrl, &post.AccountID, &post.AccountUsername, &post.AccountImageUrl, &post.CreationDate)
+		err := rows.Scan(&post.PostID, &post.Title, &post.Content, &post.ImageUrl, &post.Likes, &post.Dislikes, &post.View, &post.Responses, &post.Reports, &post.CategoryID, &post.CategoryName, &post.CategoryImageUrl, &post.AccountID, &post.AccountUsername, &post.AccountImageUrl, &post.CreationDate)
 		if err != nil {
 			return nil, err
 		}
@@ -130,14 +132,14 @@ func GetAllPosts(db *sql.DB) ([]Post, error) {
 // GetPost function retrieves a post from the database.
 func GetPost(db *sql.DB, id string) (Post, error) {
 	row := db.QueryRow(`
-		SELECT p.postID, p.title, p.content, p.imageUrl, p.likes, p.dislikes, p.view, p.categoryID, c.title as categoryName, c.ImageUrl as categoryImageUrl, p.AccountID, a.username as accountUsername, a.ImageUrl as accountImageUrl, p.creationDate 
+		SELECT p.postID, p.title, p.content, p.imageUrl, p.likes, p.dislikes, p.view, p.responses, p.reports, p.categoryID, c.title as categoryName, c.ImageUrl as categoryImageUrl, p.AccountID, a.username as accountUsername, a.ImageUrl as accountImageUrl, p.creationDate 
 		FROM posts p
 		JOIN categories c ON p.categoryID = c.CategoryId
 		JOIN accounts a ON p.AccountID = a.id
 		WHERE p.postID = ?
 	`, id)
 	var post Post
-	err := row.Scan(&post.PostID, &post.Title, &post.Content, &post.ImageUrl, &post.Likes, &post.Dislikes, &post.View, &post.CategoryID, &post.CategoryName, &post.CategoryImageUrl, &post.AccountID, &post.AccountUsername, &post.AccountImageUrl, &post.CreationDate)
+	err := row.Scan(&post.PostID, &post.Title, &post.Content, &post.ImageUrl, &post.Likes, &post.Dislikes, &post.View, &post.Responses, &post.Reports, &post.CategoryID, &post.CategoryName, &post.CategoryImageUrl, &post.AccountID, &post.AccountUsername, &post.AccountImageUrl, &post.CreationDate)
 	if err != nil {
 		return Post{}, err
 	}
@@ -147,7 +149,7 @@ func GetPost(db *sql.DB, id string) (Post, error) {
 // GetPostsByCategory function retrieves all posts from a specific category.
 func GetPostsByCategory(db *sql.DB, categoryID string) ([]Post, error) {
 	rows, err := db.Query(`
-		SELECT p.postID, p.title, p.content, p.imageUrl, p.likes, p.dislikes, p.view, p.categoryID, c.title as categoryName, c.ImageUrl as categoryImageUrl, p.AccountID, a.username as accountUsername, a.ImageUrl as accountImageUrl, p.creationDate 
+		SELECT p.postID, p.title, p.content, p.imageUrl, p.likes, p.dislikes, p.view, p.responses, p.reports, p.categoryID, c.title as categoryName, c.ImageUrl as categoryImageUrl, p.AccountID, a.username as accountUsername, a.ImageUrl as accountImageUrl, p.creationDate 
 		FROM posts p
 		JOIN categories c ON p.categoryID = c.CategoryId
 		JOIN accounts a ON p.AccountID = a.id
@@ -161,7 +163,7 @@ func GetPostsByCategory(db *sql.DB, categoryID string) ([]Post, error) {
 	posts := []Post{}
 	for rows.Next() {
 		var post Post
-		err := rows.Scan(&post.PostID, &post.Title, &post.Content, &post.ImageUrl, &post.Likes, &post.Dislikes, &post.View, &post.CategoryID, &post.CategoryName, &post.CategoryImageUrl, &post.AccountID, &post.AccountUsername, &post.AccountImageUrl, &post.CreationDate)
+		err := rows.Scan(&post.PostID, &post.Title, &post.Content, &post.ImageUrl, &post.Likes, &post.Dislikes, &post.View, &post.Responses, &post.Reports, &post.CategoryID, &post.CategoryName, &post.CategoryImageUrl, &post.AccountID, &post.AccountUsername, &post.AccountImageUrl, &post.CreationDate)
 		if err != nil {
 			return nil, err
 		}
@@ -173,7 +175,7 @@ func GetPostsByCategory(db *sql.DB, categoryID string) ([]Post, error) {
 // GetPostsByCreator function retrieves all posts from a specific creator.
 func GetPostsByCreator(db *sql.DB, AccountID string) ([]Post, error) {
 	rows, err := db.Query(`
-		SELECT p.postID, p.title, p.content, p.imageUrl, p.likes, p.dislikes, p.view, p.categoryID, c.title as categoryName, c.ImageUrl as categoryImageUrl, p.AccountID, a.username as accountUsername, a.ImageUrl as accountImageUrl, p.creationDate 
+		SELECT p.postID, p.title, p.content, p.imageUrl, p.likes, p.dislikes, p.view, p.responses, p.reports, p.categoryID, c.title as categoryName, c.ImageUrl as categoryImageUrl, p.AccountID, a.username as accountUsername, a.ImageUrl as accountImageUrl, p.creationDate 
 		FROM posts p
 		JOIN categories c ON p.categoryID = c.CategoryId
 		JOIN accounts a ON p.AccountID = a.id
@@ -187,7 +189,7 @@ func GetPostsByCreator(db *sql.DB, AccountID string) ([]Post, error) {
 	posts := []Post{}
 	for rows.Next() {
 		var post Post
-		err := rows.Scan(&post.PostID, &post.Title, &post.Content, &post.ImageUrl, &post.Likes, &post.Dislikes, &post.View, &post.CategoryID, &post.CategoryName, &post.CategoryImageUrl, &post.AccountID, &post.AccountUsername, &post.AccountImageUrl, &post.CreationDate)
+		err := rows.Scan(&post.PostID, &post.Title, &post.Content, &post.ImageUrl, &post.Likes, &post.Dislikes, &post.View, &post.Responses, &post.Reports, &post.CategoryID, &post.CategoryName, &post.CategoryImageUrl, &post.AccountID, &post.AccountUsername, &post.AccountImageUrl, &post.CreationDate)
 		if err != nil {
 			return nil, err
 		}
@@ -199,7 +201,7 @@ func GetPostsByCreator(db *sql.DB, AccountID string) ([]Post, error) {
 // GetPostsByTitle function retrieves all posts with a specific title.
 func GetPostsByTitle(db *sql.DB, title string) ([]Post, error) {
 	rows, err := db.Query(`
-		SELECT p.postID, p.title, p.content, p.imageUrl, p.likes, p.dislikes, p.view, p.categoryID, c.title as categoryName, c.ImageUrl as categoryImageUrl, p.AccountID, a.username as accountUsername, a.ImageUrl as accountImageUrl, p.creationDate 
+		SELECT p.postID, p.title, p.content, p.imageUrl, p.likes, p.dislikes, p.view, p.responses, p.reports, p.categoryID, c.title as categoryName, c.ImageUrl as categoryImageUrl, p.AccountID, a.username as accountUsername, a.ImageUrl as accountImageUrl, p.creationDate 
 		FROM posts p
 		JOIN categories c ON p.categoryID = c.CategoryId
 		JOIN accounts a ON p.AccountID = a.id
@@ -213,7 +215,7 @@ func GetPostsByTitle(db *sql.DB, title string) ([]Post, error) {
 	posts := []Post{}
 	for rows.Next() {
 		var post Post
-		err := rows.Scan(&post.PostID, &post.Title, &post.Content, &post.ImageUrl, &post.Likes, &post.Dislikes, &post.View, &post.CategoryID, &post.CategoryName, &post.CategoryImageUrl, &post.AccountID, &post.AccountUsername, &post.AccountImageUrl, &post.CreationDate)
+		err := rows.Scan(&post.PostID, &post.Title, &post.Content, &post.ImageUrl, &post.Likes, &post.Dislikes, &post.View, &post.Responses, &post.Reports, &post.CategoryID, &post.CategoryName, &post.CategoryImageUrl, &post.AccountID, &post.AccountUsername, &post.AccountImageUrl, &post.CreationDate)
 		if err != nil {
 			return nil, err
 		}
@@ -254,13 +256,25 @@ func IncrementViewtoDB(db *sql.DB, postID string) error {
 
 // IncrementNumberOfResponse function increments the number of responses of a post.
 func IncrementNumberOfResponsetoDB(db *sql.DB, postID string) error {
-	_, err := db.Exec("UPDATE posts SET Responses = Responses + 1 WHERE postID = ?", postID)
+	_, err := db.Exec("UPDATE posts SET responses = responses + 1 WHERE postID = ?", postID)
 	return err
 }
 
 // DecrementNumberOfResponse function decrements the number of responses of a post.
 func DecrementNumberOfResponsetoDB(db *sql.DB, postID string) error {
-	_, err := db.Exec("UPDATE posts SET Responses = Responses - 1 WHERE postID = ?", postID)
+	_, err := db.Exec("UPDATE posts SET responses = responses - 1 WHERE postID = ?", postID)
+	return err
+}
+
+// IncrementNumberOfReports function increments the number of reports of a post.
+func IncrementNumberOfReportstoDB(db *sql.DB, postID string) error {
+	_, err := db.Exec("UPDATE posts SET Reports = Reports + 1 WHERE postID = ?", postID)
+	return err
+}
+
+// DecrementNumberOfReports function decrements the number of reports of a post.
+func DecrementNumberOfReportstoDB(db *sql.DB, postID string) error {
+	_, err := db.Exec("UPDATE posts SET Reports = Reports - 1 WHERE postID = ?", postID)
 	return err
 }
 

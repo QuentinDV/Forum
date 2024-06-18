@@ -442,6 +442,13 @@ func CreateCommentForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Increment the post's number of responses
+	err = database.IncrementNumberOfResponsetoDB(db, postID)
+	if err != nil {
+		http.Error(w, "Error incrementing number of responses", http.StatusInternalServerError)
+		return
+	}
+
 	// Redirect the user to the previous page
 	referer := r.Header.Get("Referer")
 	if referer == "" {
@@ -597,6 +604,21 @@ func DeleteCommentForm(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println("Error connecting to the database:", err)
 		http.Error(w, "Database connection error", http.StatusInternalServerError)
+		return
+	}
+
+	// Get the comment's post ID
+	Comment, err := database.GetComment(db, CommentID)
+	if err != nil {
+		fmt.Println("Error getting comment:", err)
+		http.Error(w, "Error getting comment", http.StatusInternalServerError)
+		return
+	}
+	PostID := Comment.PostID
+	err = database.DecrementNumberOfResponsetoDB(db, PostID)
+	if err != nil {
+		fmt.Println("Error decrementing number of responses:", err)
+		http.Error(w, "Error decrementing number of responses", http.StatusInternalServerError)
 		return
 	}
 
