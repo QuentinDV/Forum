@@ -19,7 +19,7 @@ type HomeData struct {
 	AllCategories       []database.Category
 	AllPosts            []database.Post
 	RecentPosts         []database.Post
-	TopPosts            []database.Post
+	ExistingTags        []string
 }
 
 type UserProfile struct {
@@ -61,7 +61,9 @@ type PostData struct {
 type CategoryData struct {
 	Category     database.Category
 	Posts        []database.Post
+	ExistingTags []string
 	IsSubscribed bool
+	IsAdmin      bool
 	Username     string
 }
 
@@ -123,6 +125,14 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		favoriteCategories = append(favoriteCategories, post)
 	}
 
+	// Get all tags from the database
+	allTag, err := database.GetAllTags(db)
+	if err != nil {
+		fmt.Println("Error getting all tags:", err)
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
+		return
+	}
+
 	// Get the recent posts
 	allPosts, err := database.GetAllPosts(db)
 	if err != nil {
@@ -150,6 +160,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		FavoritesCategories: favoriteCategories,
 		AllCategories:       allCategories,
 		AllPosts:            allPosts,
+		ExistingTags:        allTag,
 	}
 
 	// Execute the home template with the HomeData struct
@@ -204,43 +215,6 @@ func Admin(w http.ResponseWriter, r *http.Request) {
 	// Serve the admin page
 	tmpl := template.Must(template.ParseFiles("assets/html/admin.html"))
 	tmpl.Execute(w, allAcc)
-}
-
-// CreateCategory page of the forum.
-func CreateCategory(w http.ResponseWriter, r *http.Request) {
-	// Retrieve the account from cookies
-	ConnectedAccount := RetrieveAccountfromCookie(r)
-
-	// Check if the ConnectedAccount is nil or not valid
-	if (ConnectedAccount == database.Account{}) || ConnectedAccount.Id == "" {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
-
-	// Open the database
-	db, err := database.ConnectUserDB("db/database.db")
-	if err != nil {
-		fmt.Println("Error connecting to database:", err)
-		http.Redirect(w, r, "/error", http.StatusSeeOther)
-		return
-	}
-	defer db.Close()
-
-	// Get all tags from the database
-	allTag, err := database.GetAllTags(db)
-	if err != nil {
-		fmt.Println("Error getting all tags:", err)
-		http.Redirect(w, r, "/error", http.StatusSeeOther)
-		return
-	}
-
-	data := CreateCategoryData{
-		ExistingTags: allTag,
-	}
-
-	// Serve the create category page
-	tmpl := template.Must(template.ParseFiles("assets/html/creation/categorycreation.html"))
-	tmpl.Execute(w, data)
 }
 
 // Handler to render the create post page
@@ -344,15 +318,27 @@ func CategoryPageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get all tags from the database
+	allTag, err := database.GetAllTags(db)
+	if err != nil {
+		fmt.Println("Error getting all tags:", err)
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
+		return
+	}
+
 	CategoryData := struct {
 		Category     database.Category
 		Posts        []database.Post
 		IsSubscribed bool
+		IsAdmin      bool
 		Username     string
+		ExistingTags []string
 	}{
 		Category:     category,
 		Posts:        posts,
+		ExistingTags: allTag,
 		IsSubscribed: isSubscribed,
+		IsAdmin:      ConnectedAccount.IsAdmin,
 		Username:     ConnectedAccount.Username,
 	}
 

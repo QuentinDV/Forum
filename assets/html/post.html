@@ -51,7 +51,7 @@
             {{if or .IsAdmin .IsModerator .IsSameUser}}
             <form action="/deletepostform" method="post">
                 <input type="hidden" id="PostID" name="PostID" value="{{.Post.PostID}}">
-                <input type="image" src="../../assets/img/icon/bin.png" alt="More of this Post" width="40px">
+                <input type="image" src="../../assets/img/icon/bin.png" alt="Bin Icon" width="40px">
             </form>
             {{end}}
 
