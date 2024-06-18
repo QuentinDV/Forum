@@ -71,6 +71,9 @@ type CreatePostData struct {
 	CategoryTitles []string
 }
 
+var SortedBy = "By Date Descending"
+var CategoryName string
+
 // Home is the main page of the forum.
 func Home(w http.ResponseWriter, r *http.Request) {
 	// Retrieve the account from cookies
@@ -126,30 +129,15 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get the recent posts
-	// recentPosts, err := database.GetRecentPosts(db)
-	// if err != nil {
-	// 	fmt.Println("Error getting recent posts:", err)
-	// 	http.Redirect(w, r, "/error", http.StatusSeeOther)
-	// 	return
-	// }
-
-	// Get the top posts
-	topPosts, err := database.GetAllPosts(db)
-	if err != nil {
-		fmt.Println("Error getting top posts:", err)
-		http.Redirect(w, r, "/error", http.StatusSeeOther)
-		return
-	}
-	topPosts, err = database.DescendingPostsSortingByLikes(topPosts)
-	if err != nil {
-		fmt.Println("Error sorting posts by likes:", err)
-		http.Redirect(w, r, "/error", http.StatusSeeOther)
-		return
-	}
-
-	if len(topPosts) > 5 {
-		topPosts = topPosts[:5]
+	if SortedBy == "By Categories" {
+		allPosts = database.FilterPostsByCategory(allPosts, CategoryName)
+	} else {
+		allPosts, err = SortPosts(allPosts, SortedBy)
+		if err != nil {
+			fmt.Println("Error sorting posts:", err)
+			http.Redirect(w, r, "/error", http.StatusSeeOther)
+			return
+		}
 	}
 
 	// Create a new HomeData struct
@@ -159,7 +147,6 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		FavoritesCategories: favoriteCategories,
 		AllCategories:       allCategories,
 		AllPosts:            allPosts,
-		TopPosts:            topPosts,
 	}
 
 	// Execute the home template with the HomeData struct

@@ -7,58 +7,88 @@
     <link rel="stylesheet" href="/assets/css/admin.css">
 </head>
 <body>
-    <button onclick="location.href='/home'">Home</button>
-    <h1>Liste des comptes</h1>
-    <div class="accountgrid">
-        <p><strong>ID:</strong></p>
-        <p><strong>Username:</strong></p>
-        <p><strong>Email:</strong></p>
-        <p><strong>IsBan:</strong></p>
-        <p><strong>IsModerator:</strong></p>
-        <p><strong>IsAdmin:</strong></p>
-        <p><strong>Reset Pfp:</strong></p>
-        <p><strong>Delete Account</strong></p>
-        <p><strong>CreationDate:</strong></p>
+    <div class="wrapper">
+        <div><span class="dot"></span></div>
+        <div><span class="dot"></span></div>
+        <div><span class="dot"></span></div>
+        <div><span class="dot"></span></div>
+        <div><span class="dot"></span></div>
+        <div><span class="dot"></span></div>
+        <div><span class="dot"></span></div>
+        <div><span class="dot"></span></div>
+        <div><span class="dot"></span></div>
+        <div><span class="dot"></span></div>
+        <div><span class="dot"></span></div>
+        <div><span class="dot"></span></div>
+        <div><span class="dot"></span></div>
+        <div><span class="dot"></span></div>
+        <div><span class="dot"></span></div>
     </div>
-    <div class="accountgrid-container">
-        {{range .}}
+    <div class="over">
+        <button onclick="location.href='/home'">Home</button>
+        <h1>Liste des comptes</h1>
         <div class="accountgrid">
-            <p>{{.Id}}</p>
-            <p>{{.Username}}</p>
-            <p>{{.Email}}</p>
-
-            <form action="/banUserform" method="post">
-                <input type="hidden" name="userId" value="{{.Id}}">
-                <input type="hidden" name="username" value="{{.Username}}">
-                <input type="hidden" name="banstatus" value="{{.IsBan}}">
-                <button id="banButton{{.Id}}" type="submit">{{.IsBan}}</button>
-            </form>
-
-            <form action="/promoteToModeratorform" method="post">
-                <input type="hidden" name="userId" value="{{.Id}}">
-                <input type="hidden" name="username" value="{{.Username}}">
-                <input type="hidden" name="moderator" value="{{.IsModerator}}">
-                <button id="moderatorButton{{.Id}}" type="submit">{{.IsModerator}}</button>
-            </form>
-
-            <form action="/promoteToAdminform" method="post">
-                <input type="hidden" name="userId" value="{{.Id}}">
-                <input type="hidden" name="admin" value="{{.IsAdmin}}">
-                <input type="hidden" name="username" value="{{.Username}}">
-                <button id="adminButton{{.Id}}" type="submit">{{.IsAdmin}}</button>
-            </form>
-            <form action="/resetpfpform" method="post">
-                <input type="hidden" name="UserID" value="{{.Id}}">
-                <button id="submitreset" type="submit">Reset Pfp</button>
-            </form>
-            <form action="/deleteUserform" method="post">
-                <input type="hidden" name="userId" value="{{.Id}}">
-                <input type="hidden" name="username" value="{{.Username}}">
-                <button id="deleteButton{{.Id}}" type="submit">Delete Account</button>
-            </form>
-            <p>{{.CreationDate}}</p>
+            <p><strong>ID:</strong></p>
+            <p><strong>Username:</strong></p>
+            <p><strong>Email:</strong></p>
+            <p><strong>IsBan:</strong></p>
+            <p><strong>IsModerator:</strong></p>
+            <p><strong>IsAdmin:</strong></p>
+            <p><strong>Reset Pfp:</strong></p>
+            <p><strong>Delete Account:</strong></p>
+            <p><strong>CreationDate:</strong></p>
         </div>
-        {{end}}
+        <div class="accountgrid-container">
+            {{range .}}
+            <div class="accountgrid">
+                <p>{{.Id}}</p>
+                <p>{{.Username}}</p>
+                <p>{{.Email}}</p>
+
+                <form action="/banUserform" method="post">
+                    <input type="hidden" name="userId" value="{{.Id}}">
+                    <input type="hidden" name="username" value="{{.Username}}">
+                    <input type="hidden" name="banstatus" value="{{.IsBan}}">
+                    <button id="banButton{{.Id}}" type="submit">{{.IsBan}}</button>
+                </form>
+
+                <form action="/promoteToModeratorform" method="post">
+                    <input type="hidden" name="userId" value="{{.Id}}">
+                    <input type="hidden" name="username" value="{{.Username}}">
+                    <input type="hidden" name="moderator" value="{{.IsModerator}}">
+                    <button id="moderatorButton{{.Id}}" type="submit">{{.IsModerator}}</button>
+                </form>
+
+                <form action="/promoteToAdminform" method="post">
+                    <input type="hidden" name="userId" value="{{.Id}}">
+                    <input type="hidden" name="admin" value="{{.IsAdmin}}">
+                    <input type="hidden" name="username" value="{{.Username}}">
+                    <button id="adminButton{{.Id}}" type="submit">{{.IsAdmin}}</button>
+                </form>
+                <form class="button" action="/resetpfpform" method="post">
+                    <input type="hidden" name="UserID" value="{{.Id}}">
+                    <button id="submitreset" type="submit" class="reset-button">
+                        <svg class="svg-icon" fill="none" height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg">
+                            <g stroke="#ff342b" stroke-linecap="round" stroke-width="1.5">
+                                <path d="m3.33337 10.8333c0 3.6819 2.98477 6.6667 6.66663 6.6667 3.682 0 6.6667-2.9848 6.6667-6.6667 0-3.68188-2.9847-6.66664-6.6667-6.66664-1.29938 0-2.51191.37174-3.5371 1.01468"></path>
+                                <path d="m7.69867 1.58163-1.44987 3.28435c-.18587.42104.00478.91303.42582 1.0989l3.28438 1.44986"></path>
+                            </g>
+                        </svg>
+                        <span class="label">resete pp</span>
+                    </button>
+                </form>
+
+                <form action="/deleteUserform" method="post">
+                    <input type="hidden" name="userId" value="{{.Id}}">
+                    <input type="hidden" name="username" value="{{.Username}}">
+                    <button  class="ui-btn" id="deleteButton{{.Id}}" type="submit">Delete</button>
+                </form>
+                <p>{{.CreationDate}}</p>
+            </div>
+            {{end}}
+        </div>
     </div>
+    <audio id="deleteSound" src="/assets/sounds/delete-sound.mp3"></audio>
+    <script src="/assets/js/settings.js"></script>
 </body>
 </html>

@@ -60,3 +60,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteButtons = document.querySelectorAll('.deleteButton');
+    const deleteSound = document.getElementById('deleteSound');
+
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+            deleteSound.play();
+        });
+    });
+});

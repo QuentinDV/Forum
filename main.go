@@ -57,6 +57,7 @@ func setupHTTPHandlers() {
 	http.HandleFunc("/addviewform", web.AddViewForm)
 	http.HandleFunc("/savedpostform", web.SavePostForm)
 	http.HandleFunc("/subscribecategoryform", web.SubscribeCategoryForm)
+	http.HandleFunc("/sortinghomeform", web.SortingHomePostsForm)
 
 	http.HandleFunc("/banUserform", web.BanForm)
 	http.HandleFunc("/promoteToModeratorform", web.ModeratorForm)

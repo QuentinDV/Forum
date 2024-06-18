@@ -6,21 +6,29 @@
     <title>Forum</title>
     <link rel="stylesheet" href="/assets/css/home.css">
     <link rel="stylesheet" href="/assets/css/login.css">
-    <link rel="stylesheet" href="/assets/css/caroussel.css">
     <link rel="stylesheet" href="/assets/css/categories.css">
     <link rel="stylesheet" href="/assets/css/posts.css">
 </head> 
+<div class="navbar">
+    <div> <h1> HOME </h1> </div>
+    {{if ne .Username "Guest"}}
+        <div class="navbars">
+            <h1 class="settings" id="openMenu">LOGIN</h1> 
 
-    <div class="navbar">
-            <div> <h1> HOME </h1> </div>
-             <div class="navbars">
-                <button onclick="location.href='/'"><h1 class="settings" id="openMenu">LOG OUT</h1> </button>
-                <button onclick="location.href='/user/{{.ConnectedAccount.Username}}'">{{.ConnectedAccount.Username}}</button>
-                <img id="profilePicture" alt="Profile Picture" width="px" src="{{.ConnectedAccount.ImageUrl}}">
-             </div> 
-             
+            <button onclick="location.href='/user/{{.Username}}'">{{.Username}}</button>
+
+            <img id="profilePicture" alt="Profile Picture" width="px" src="{{.ImageUrl}}">
+
+        </div>
+    {{else}}
+        <div class="navbars">
+            <h1 class="settings" id="openMenu">LOGIN</h1> 
+            <h1>Guest</h1>
+            <img id="profilePicture" alt="Profile Picture" width="px" src="{{.ImageUrl}}">
+        </div>
+    {{end}}
+</div>
                  
-    </div>
     <div class="grid">
         <div class="gauche">
             <main>
@@ -171,7 +179,29 @@
 
 
         <div class="droite">
-            <h1 class="Cate "> TOP POSTS </h1>
+            <form id="sortForm" action="/sortinghomeform" method="post">
+                <input type="hidden" id="iscategory" name="iscategory" value="false">
+                <button type="submit" id="sortingMethod" name="sortingMethod" value="By Date Descending">By Date Descending</button>
+                <button type="submit" id="sortingMethod" name="sortingMethod" value="By Date Ascending">By Date Ascending</button>
+                <button type="submit" id="sortingMethod" name="sortingMethod" value="By Likes Descending">By Likes Descending</button>
+                <button type="submit" id="sortingMethod" name="sortingMethod" value="By Likes Ascending">By Likes Ascending</button>
+                <button type="submit" id="sortingMethod" name="sortingMethod" value="By Views Ascending">By Views Descending</button>
+                <button type="submit" id="sortingMethod" name="sortingMethod" value="By Views Descending">By Views Ascending</button>
+                <button type="submit" id="sortingMethod" name="sortingMethod" value="By Responses Ascending">By Responses Descending</button>
+                <button type="submit" id="sortingMethod" name="sortingMethod" value="By Responses Descending">By Responses Ascending</button>
+            </form>
+
+            <form id="sortForm" action="/sortinghomeform" method="post">
+                <input type="hidden" id="sortingMethod" name="sortingMethod" value="By Categories">
+                <input type="hidden" id="iscategory" name="iscategory" value="true">
+                <label for="categoryName">Category Title:</label>
+                <select id="categoryName" name="categoryName" required>
+                    {{range .AllCategories}}
+                    <option value="{{.Title}}">{{.Title}}</option>
+                    {{end}}
+                </select>
+                <button type="submit">Filter by Category</button>
+            </form>
             
         </div> 
     </div>
@@ -187,39 +217,40 @@
 
 
 </body>    
- <div id="menu" class="menu-hidden" style="display: none;">
-        <ul>
-            <div login>
-                <ul id="menu">
-                    <div class="form-structor">
-                        <div class="signup">
-                            <form id="register" action="/signupform" method="post">
-                                <h2 class="form-title" id="signup"><span>or</span>Sign up</h2>
-                                <div class="form-holder">
-                                    <input autocomplete="off" type="text" class="input" name="username" placeholder="Username" required/>
-                                    <input autocomplete="off" type="email" class="input" name="email" placeholder="Email" required />
-                                    <input autocomplete="off" type="password" class="input" name="pswrd" placeholder="Password" required />
-                                </div>
-                                <button class="submit-btn">Sign up</button>
-                            </form>
-                        </div>
-                        <form id="login" action="/loginform" method="post">
-                            <div class="login slide-up">
-                                <div class="center">
-                                    <h2 class="form-title" id="login"><span>or</span>Log in</h2>
-                                    <div class="form-holder">
-                                        <input autocomplete="off" type="text" class="input" name="identif" placeholder="Email or Username" required />
-                                        <input autocomplete="off" type="password" class="input" name="pswrd" placeholder="Password" required />
-                                    </div>
-                                    <button class="submit-btn">Log in</button>
-                                
-                                </div>
+<div id="menu" class="menu-hidden" style="display: none;">
+    <ul>
+        <div login>
+            <ul id="menu">
+                <div class="form-structor">
+                    <div class="signup">
+                        <form id="register" action="/signupform" method="post">
+                            <button onclick="location.href='/'" style="background: none;"> <img src="/assets/img/icon/logout.png" alt="Logout Icon" width="50"> </button>
+                            <h2 class="form-title" id="signup"><span>or</span>Sign up</h2>
+                            <div class="form-holder">
+                                <input autocomplete="off" type="text" class="input" name="username" placeholder="Username" required/>
+                                <input autocomplete="off" type="email" class="input" name="email" placeholder="Email" required />
+                                <input autocomplete="off" type="password" class="input" name="pswrd" placeholder="Password" required />
                             </div>
+                            <button class="submit-btn">Sign up</button>
                         </form>
                     </div>
+                    <form id="login" action="/loginform" method="post">
+                        <div class="login slide-up">
+                            <div class="center">
+                                <h2 class="form-title" id="login"><span>or</span>Log in</h2>
+                                <div class="form-holder">
+                                    <input autocomplete="off" type="text" class="input" name="identif" placeholder="Email or Username" required />
+                                    <input autocomplete="off" type="password" class="input" name="pswrd" placeholder="Password" required />
+                                </div>
+                                <button class="submit-btn">Log in</button>
+                            
+                            </div>
+                        </div>
+                    </form>
                 </div>
-        </ul>
-    </div> 
+            </div>
+    </ul>
+</div>
     <script src="/assets/js/"></script>
     <script src="/assets/js/login.js"></script>
     <script src="/assets/js/settings.js"></script>

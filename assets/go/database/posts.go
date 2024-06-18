@@ -264,26 +264,6 @@ func DecrementNumberOfResponsetoDB(db *sql.DB, postID string) error {
 	return err
 }
 
-// Function to sort posts by the number of likes
-func DescendingPostsSortingByLikes(posts []Post) ([]Post, error) {
-	// Sort the posts by the number of likes in descending order
-	sort.Slice(posts, func(i, j int) bool {
-		return posts[i].Likes > posts[j].Likes
-	})
-
-	return posts, nil
-}
-
-// Function to sort posts by the number of likes in ascending order
-func AscendingPostsSortingByLikes(posts []Post) ([]Post, error) {
-	// Sort the posts by the number of likes in ascending order
-	sort.Slice(posts, func(i, j int) bool {
-		return posts[i].Likes < posts[j].Likes
-	})
-
-	return posts, nil
-}
-
 // Generate a new post ID
 func GenerateNewPostID(db *sql.DB) string {
 	// Get the last post ID
@@ -351,19 +331,19 @@ func SortPostsByDateAscending(posts []Post) ([]Post, error) {
 	return parsedPosts, nil
 }
 
-// SortPostsByCategoryName sorts a slice of posts by their category name in ascending order.
-func SortPostsByCategoryName(posts []Post) []Post {
-	// Sort the posts by CategoryName
+// Function to sort posts by the number of likes
+func DescendingPostsSortingByLikes(posts []Post) []Post {
+	// Sort the posts by the number of likes in descending order
 	sort.Slice(posts, func(i, j int) bool {
-		return posts[i].CategoryName < posts[j].CategoryName
+		return posts[i].Likes > posts[j].Likes
 	})
 
 	return posts
 }
 
-// SortPostsByLikes sorts a slice of posts by their likes in ascending order.
-func SortPostsByLikes(posts []Post) []Post {
-	// Sort the posts by Likes
+// Function to sort posts by the number of likes in ascending order
+func AscendingPostsSortingByLikes(posts []Post) []Post {
+	// Sort the posts by the number of likes in ascending order
 	sort.Slice(posts, func(i, j int) bool {
 		return posts[i].Likes < posts[j].Likes
 	})
@@ -371,8 +351,21 @@ func SortPostsByLikes(posts []Post) []Post {
 	return posts
 }
 
+// FilterPostsByCategory filters posts and keeps those with a specific category name.
+func FilterPostsByCategory(posts []Post, categoryName string) []Post {
+	filteredPosts := []Post{}
+
+	for _, post := range posts {
+		if post.CategoryName == categoryName {
+			filteredPosts = append(filteredPosts, post)
+		}
+	}
+
+	return filteredPosts
+}
+
 // SortPostsByViews sorts a slice of posts by their views in ascending order.
-func SortPostsByViews(posts []Post) []Post {
+func SortPostsByViewsAscending(posts []Post) []Post {
 	// Sort the posts by View
 	sort.Slice(posts, func(i, j int) bool {
 		return posts[i].View < posts[j].View
@@ -381,11 +374,31 @@ func SortPostsByViews(posts []Post) []Post {
 	return posts
 }
 
+// SortPostsByViewsDescending sorts a slice of posts by their views in descending order.
+func SortPostsByViewsDescending(posts []Post) []Post {
+	// Sort the posts by View in descending order
+	sort.Slice(posts, func(i, j int) bool {
+		return posts[i].View > posts[j].View
+	})
+
+	return posts
+}
+
 // SortPostsByResponses sorts a slice of posts by their responses in ascending order.
-func SortPostsByResponses(posts []Post) []Post {
+func SortPostsByResponsesAscending(posts []Post) []Post {
 	// Sort the posts by Responses
 	sort.Slice(posts, func(i, j int) bool {
 		return posts[i].Responses < posts[j].Responses
+	})
+
+	return posts
+}
+
+// SortPostsByResponsesDescending sorts a slice of posts by their responses in descending order.
+func SortPostsByResponsesDescending(posts []Post) []Post {
+	// Sort the posts by Responses in descending order
+	sort.Slice(posts, func(i, j int) bool {
+		return posts[i].Responses > posts[j].Responses
 	})
 
 	return posts
