@@ -137,11 +137,37 @@ func LogOutForm(w http.ResponseWriter, r *http.Request) {
 	// Set the cookie
 	http.SetCookie(w, accountCookie)
 
-	// Get the URL of the previous page from the Referer header
-	previousPage := r.Header.Get("Referer")
+	// Redirect to the login page
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
 
-	// Redirect to the previous page
-	http.Redirect(w, r, previousPage, http.StatusSeeOther)
+// GuestForm is a function that handles the guest form submission.
+// It sets the account cookie to a default "Guest" account.
+func GuestForm(w http.ResponseWriter, r *http.Request) {
+	// Initialize a default "Guest" account
+	db, err := database.ConnectUserDB("db/database.db")
+
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	Acc, err := database.GetAccountbyID(db, "0")
+	if err != nil {
+		fmt.Println("Error getting account by ID:", err)
+		return
+	}
+
+	// Create a new cookie for the account
+	accountCookie := &http.Cookie{
+		Name: "account",
+		// The value of the cookie is a string that contains the account's information separated by "|"
+		Value: fmt.Sprintf("%s|%s|%s|%s|%s|%t|%t|%t|%s", Acc.Id, Acc.Email, Acc.Password, Acc.Username, Acc.ImageUrl, Acc.IsBan, Acc.IsModerator, Acc.IsAdmin, Acc.CreationDate),
+	}
+	// Set the cookie
+	http.SetCookie(w, accountCookie)
+
+	// Redirect to the home page
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
 
 func PfpWithImageForm(w http.ResponseWriter, r *http.Request) {

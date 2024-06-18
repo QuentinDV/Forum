@@ -218,3 +218,25 @@ func DecrementNumberOfDislikes(db *sql.DB, commentID string) error {
 	}
 	return nil
 }
+
+// GenerateNewCommentID generates a new unique ID for a comment
+func GenerateNewCommentID(db *sql.DB) (string, error) {
+	// Get the last comment ID
+	row := db.QueryRow("SELECT commentID FROM comments ORDER BY commentID DESC LIMIT 1")
+	var lastID string
+	err := row.Scan(&lastID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// If there are no comments in the database, set the last ID to "0"
+			lastID = "0"
+		} else {
+			// If there's another error, return it
+			return "", err
+		}
+	}
+
+	// Increment the last ID
+	newID := incrementID(lastID)
+
+	return newID, nil
+}

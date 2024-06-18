@@ -15,8 +15,8 @@ type Post struct {
 	Likes            int
 	Dislikes         int
 	View             int
-	NumberofResponse int
-	NumberofSave     int
+	Responses        int
+	Reports          int
 	CategoryID       string
 	CategoryName     string
 	CategoryImageUrl string
@@ -254,13 +254,13 @@ func IncrementViewtoDB(db *sql.DB, postID string) error {
 
 // IncrementNumberOfResponse function increments the number of responses of a post.
 func IncrementNumberOfResponsetoDB(db *sql.DB, postID string) error {
-	_, err := db.Exec("UPDATE posts SET NumberofResponse = NumberofResponse + 1 WHERE postID = ?", postID)
+	_, err := db.Exec("UPDATE posts SET Responses = Responses + 1 WHERE postID = ?", postID)
 	return err
 }
 
 // DecrementNumberOfResponse function decrements the number of responses of a post.
 func DecrementNumberOfResponsetoDB(db *sql.DB, postID string) error {
-	_, err := db.Exec("UPDATE posts SET NumberofResponse = NumberofResponse - 1 WHERE postID = ?", postID)
+	_, err := db.Exec("UPDATE posts SET Responses = Responses - 1 WHERE postID = ?", postID)
 	return err
 }
 
@@ -303,4 +303,90 @@ func GenerateNewPostID(db *sql.DB) string {
 	// Increment the last ID
 	newID := incrementID(lastID)
 	return newID
+}
+
+// SortPostsByCreationDate function sorts posts by creation date in descending order.
+func SortPostsByDateDescending(posts []Post) ([]Post, error) {
+	// Parse the CreationDate field to time.Time for sorting
+	parsedPosts := make([]Post, len(posts))
+	for i, post := range posts {
+		parsedTime, err := time.Parse("2006-01-02 15:04:05", post.CreationDate)
+		if err != nil {
+			return nil, err
+		}
+		parsedPosts[i] = post
+		parsedPosts[i].CreationDate = parsedTime.Format(time.RFC3339) // Use a standard time format for sorting
+	}
+
+	// Sort the posts by CreationDate
+	sort.Slice(parsedPosts, func(i, j int) bool {
+		timeI, _ := time.Parse(time.RFC3339, parsedPosts[i].CreationDate)
+		timeJ, _ := time.Parse(time.RFC3339, parsedPosts[j].CreationDate)
+		return timeI.After(timeJ) // Sort in descending order
+	})
+
+	return parsedPosts, nil
+}
+
+// SortPostsByDateAscending sorts a slice of posts by their creation date in ascending order (oldest first).
+func SortPostsByDateAscending(posts []Post) ([]Post, error) {
+	// Parse the CreationDate field to time.Time for sorting
+	parsedPosts := make([]Post, len(posts))
+	for i, post := range posts {
+		parsedTime, err := time.Parse("2006-01-02 15:04:05", post.CreationDate)
+		if err != nil {
+			return nil, err
+		}
+		parsedPosts[i] = post
+		parsedPosts[i].CreationDate = parsedTime.Format(time.RFC3339) // Use a standard time format for sorting
+	}
+
+	// Sort the posts by CreationDate
+	sort.Slice(parsedPosts, func(i, j int) bool {
+		timeI, _ := time.Parse(time.RFC3339, parsedPosts[i].CreationDate)
+		timeJ, _ := time.Parse(time.RFC3339, parsedPosts[j].CreationDate)
+		return timeI.Before(timeJ) // Sort in ascending order
+	})
+
+	return parsedPosts, nil
+}
+
+// SortPostsByCategoryName sorts a slice of posts by their category name in ascending order.
+func SortPostsByCategoryName(posts []Post) []Post {
+	// Sort the posts by CategoryName
+	sort.Slice(posts, func(i, j int) bool {
+		return posts[i].CategoryName < posts[j].CategoryName
+	})
+
+	return posts
+}
+
+// SortPostsByLikes sorts a slice of posts by their likes in ascending order.
+func SortPostsByLikes(posts []Post) []Post {
+	// Sort the posts by Likes
+	sort.Slice(posts, func(i, j int) bool {
+		return posts[i].Likes < posts[j].Likes
+	})
+
+	return posts
+}
+
+// SortPostsByViews sorts a slice of posts by their views in ascending order.
+func SortPostsByViews(posts []Post) []Post {
+	// Sort the posts by View
+	sort.Slice(posts, func(i, j int) bool {
+		return posts[i].View < posts[j].View
+	})
+
+	return posts
+}
+
+// SortPostsByResponses sorts a slice of posts by their responses in ascending order.
+func SortPostsByResponses(posts []Post) []Post {
+	// Sort the posts by Responses
+	sort.Slice(posts, func(i, j int) bool {
+		return posts[i].Responses < posts[j].Responses
+	})
+
+	return posts
 }

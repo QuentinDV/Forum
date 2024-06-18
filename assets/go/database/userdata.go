@@ -228,6 +228,8 @@ func AddLikedComment(db *sql.DB, AccountID string, commentID string) error {
 		}
 	}
 
+	IncrementNumberOfLikes(db, commentID)
+
 	// Add commentID to LikedComments
 	userData.LikedComments = append(userData.LikedComments, commentID)
 	return UpdateUserData(db, userData)
@@ -240,6 +242,7 @@ func RemoveLikedComment(db *sql.DB, AccountID string, commentID string) error {
 	}
 	for i, id := range userData.LikedComments {
 		if id == commentID {
+			DecrementNumberOfLikes(db, commentID)
 			userData.LikedComments = append(userData.LikedComments[:i], userData.LikedComments[i+1:]...)
 			break
 		}
@@ -260,6 +263,8 @@ func AddDislikedComment(db *sql.DB, AccountID string, commentID string) error {
 		}
 	}
 
+	IncrementNumberOfDislikes(db, commentID)
+
 	// Add commentID to DislikedComments
 	userData.DislikedComments = append(userData.DislikedComments, commentID)
 	return UpdateUserData(db, userData)
@@ -272,6 +277,7 @@ func RemoveDislikedComment(db *sql.DB, AccountID string, commentID string) error
 	}
 	for i, id := range userData.DislikedComments {
 		if id == commentID {
+			DecrementNumberOfDislikes(db, commentID)
 			userData.DislikedComments = append(userData.DislikedComments[:i], userData.DislikedComments[i+1:]...)
 			break
 		}

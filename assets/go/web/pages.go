@@ -12,7 +12,8 @@ import (
 
 // HomeData struct represents the data needed to render the home page
 type HomeData struct {
-	ConnectedAccount    database.Account
+	Username            string
+	ImageUrl            string
 	FavoritesCategories []database.Category
 	AllCategories       []database.Category
 	AllPosts            []database.Post
@@ -37,12 +38,21 @@ type UserProfile struct {
 	SavedPosts                   []database.Post
 }
 
+type CommentWithPermissions struct {
+	database.Comment
+	IsAdmin     bool
+	IsModerator bool
+	IsSameUser  bool
+}
+
 type PostData struct {
 	IsAdmin     bool
 	IsModerator bool
 	IsSameUser  bool
 	IsSaved     bool
+	IsGuest     bool
 	Post        database.Post
+	Comments    []CommentWithPermissions
 }
 
 // CategoryData struct represents the data needed to render the category page
@@ -50,6 +60,7 @@ type CategoryData struct {
 	Category     database.Category
 	Posts        []database.Post
 	IsSubscribed bool
+	Username     string
 }
 
 type CreateCategoryData struct {
@@ -62,7 +73,14 @@ type CreatePostData struct {
 
 // Home is the main page of the forum.
 func Home(w http.ResponseWriter, r *http.Request) {
+	// Retrieve the account from cookies
 	ConnectedAccount := RetrieveAccountfromCookie(r)
+
+	// Check if the ConnectedAccount is nil or not valid
+	if (ConnectedAccount == database.Account{}) || ConnectedAccount.Id == "" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
 
 	// Open the database
 	db, err := database.ConnectUserDB("db/database.db")
@@ -136,7 +154,8 @@ func Home(w http.ResponseWriter, r *http.Request) {
 
 	// Create a new HomeData struct
 	HomeData := HomeData{
-		ConnectedAccount:    ConnectedAccount,
+		Username:            ConnectedAccount.Username,
+		ImageUrl:            ConnectedAccount.ImageUrl,
 		FavoritesCategories: favoriteCategories,
 		AllCategories:       allCategories,
 		AllPosts:            allPosts,
@@ -153,26 +172,23 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Categories page of the forum.
-func Categories(w http.ResponseWriter, r *http.Request) {
-	// Serve the categories page
-	http.ServeFile(w, r, "assets/html/categories.html")
-}
-
 // LogIn page of the forum.
 func LogIn(w http.ResponseWriter, r *http.Request) {
 	// Serve the login page
 	http.ServeFile(w, r, "assets/html/login.html")
 }
 
-// SignUp page of the forum.
-func SignUp(w http.ResponseWriter, r *http.Request) {
-	// Serve the signup page
-	http.ServeFile(w, r, "assets/html/signup.html")
-}
-
 // Admin page of the forum.
 func Admin(w http.ResponseWriter, r *http.Request) {
+	// Retrieve the account from cookies
+	ConnectedAccount := RetrieveAccountfromCookie(r)
+
+	// Check if the ConnectedAccount is nil or not valid
+	if (ConnectedAccount == database.Account{}) || ConnectedAccount.Id == "" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
 	// Open the database
 	db, err := sql.Open("sqlite3", "db/database.db")
 	if err != nil {
@@ -190,7 +206,7 @@ func Admin(w http.ResponseWriter, r *http.Request) {
 	ConnectedAcc := RetrieveAccountfromCookie(r)
 
 	// Check if the user is the same as the connected account
-	if !ConnectedAcc.IsAdmin {
+	if !ConnectedAcc.IsAdmin || ConnectedAcc.Username == "Guest" {
 		http.Redirect(w, r, "/notfound", http.StatusSeeOther)
 		return
 	}
@@ -202,6 +218,15 @@ func Admin(w http.ResponseWriter, r *http.Request) {
 
 // CreateCategory page of the forum.
 func CreateCategory(w http.ResponseWriter, r *http.Request) {
+	// Retrieve the account from cookies
+	ConnectedAccount := RetrieveAccountfromCookie(r)
+
+	// Check if the ConnectedAccount is nil or not valid
+	if (ConnectedAccount == database.Account{}) || ConnectedAccount.Id == "" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
 	// Open the database
 	db, err := database.ConnectUserDB("db/database.db")
 	if err != nil {
@@ -230,6 +255,15 @@ func CreateCategory(w http.ResponseWriter, r *http.Request) {
 
 // Handler to render the create post page
 func CreatePostHome(w http.ResponseWriter, r *http.Request) {
+	// Retrieve the account from cookies
+	ConnectedAccount := RetrieveAccountfromCookie(r)
+
+	// Check if the ConnectedAccount is nil or not valid
+	if (ConnectedAccount == database.Account{}) || ConnectedAccount.Id == "" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
 	// Open the database
 	db, err := database.ConnectUserDB("db/database.db")
 	if err != nil {
@@ -275,6 +309,15 @@ func NotFound(w http.ResponseWriter, r *http.Request) {
 
 // CategoryPageHandler handles the category page requests
 func CategoryPageHandler(w http.ResponseWriter, r *http.Request) {
+	// Retrieve the account from cookies
+	ConnectedAccount := RetrieveAccountfromCookie(r)
+
+	// Check if the ConnectedAccount is nil or not valid
+	if (ConnectedAccount == database.Account{}) || ConnectedAccount.Id == "" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
 	// Extrait l'ID de la catégorie de l'URL
 	CategoryID := r.URL.Path[len("/category/"):]
 
@@ -315,10 +358,12 @@ func CategoryPageHandler(w http.ResponseWriter, r *http.Request) {
 		Category     database.Category
 		Posts        []database.Post
 		IsSubscribed bool
+		Username     string
 	}{
 		Category:     category,
 		Posts:        posts,
 		IsSubscribed: isSubscribed,
+		Username:     ConnectedAccount.Username,
 	}
 
 	// Execute the user profile template with the CategoryData struct
@@ -333,10 +378,19 @@ func CategoryPageHandler(w http.ResponseWriter, r *http.Request) {
 
 // PostPageHandler handles the post page.
 func PostPageHandler(w http.ResponseWriter, r *http.Request) {
-	// Extrait l'ID du post de l'URL
+	// Retrieve the account from cookies
+	ConnectedAccount := RetrieveAccountfromCookie(r)
+
+	// Check if the ConnectedAccount is nil or not valid
+	if (ConnectedAccount == database.Account{}) || ConnectedAccount.Id == "" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	// Extract the post ID from the URL
 	PostID := r.URL.Path[len("/post/"):]
 
-	// Vérifiez que l'ID du post n'est pas vide et ne commence pas par "assets/img/pfp/"
+	// Verify that the post ID is not empty and does not start with "assets/img/pfp/"
 	if PostID == "" || strings.HasPrefix(PostID, "assets/img/pfp/") {
 		http.NotFound(w, r)
 		return
@@ -350,7 +404,7 @@ func PostPageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 
-	// Récupère le post de la base de données
+	// Get the post from the database
 	post, err := database.GetPost(db, PostID)
 	if err != nil {
 		fmt.Println("Error getting post by ID:", err)
@@ -358,12 +412,36 @@ func PostPageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get all comments of the post
+	comments, err := database.GetCommentsByPost(db, PostID)
+	if err != nil {
+		fmt.Println("Error getting comments by post ID:", err)
+		http.Redirect(w, r, "/notfound", http.StatusSeeOther)
+		return
+	}
+
+	// Retrieve connected account
+	connectedAccount := RetrieveAccountfromCookie(r)
+
+	// Parcourez chaque commentaire et ajoutez les informations de permission
+	var commentsWithPermissions []CommentWithPermissions
+	for _, comment := range comments {
+		commentsWithPermissions = append(commentsWithPermissions, CommentWithPermissions{
+			Comment:     comment,
+			IsAdmin:     connectedAccount.IsAdmin,
+			IsModerator: connectedAccount.IsModerator,
+			IsSameUser:  connectedAccount.Id == comment.AccountID,
+		})
+	}
+
 	data := PostData{
-		IsAdmin:     RetrieveAccountfromCookie(r).IsAdmin,
-		IsModerator: RetrieveAccountfromCookie(r).IsModerator,
-		IsSameUser:  post.AccountID == RetrieveAccountfromCookie(r).Id,
-		IsSaved:     database.IsThisPostSaved(db, RetrieveAccountfromCookie(r).Id, post.PostID),
+		IsAdmin:     connectedAccount.IsAdmin,
+		IsModerator: connectedAccount.IsModerator,
+		IsSameUser:  post.AccountID == connectedAccount.Id,
+		IsSaved:     database.IsThisPostSaved(db, connectedAccount.Id, post.PostID),
+		IsGuest:     connectedAccount.Username == "Guest",
 		Post:        post,
+		Comments:    commentsWithPermissions,
 	}
 
 	// Execute the user profile template with the PostPageHandler struct
@@ -373,6 +451,15 @@ func PostPageHandler(w http.ResponseWriter, r *http.Request) {
 
 // UserProfileHandler handles the user profile page and its subpages.
 func UserProfileHandler(w http.ResponseWriter, r *http.Request) {
+	// Retrieve the account from cookies
+	ConnectedAccount := RetrieveAccountfromCookie(r)
+
+	// Check if the ConnectedAccount is nil or not valid
+	if (ConnectedAccount == database.Account{}) || ConnectedAccount.Id == "" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
 	path := r.URL.Path
 	parts := strings.Split(strings.TrimPrefix(path, "/user/"), "/")
 
@@ -388,8 +475,8 @@ func UserProfileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if the username is valid
-	if username == "" || strings.HasPrefix(username, "assets") {
-		http.NotFound(w, r)
+	if username == "" || strings.HasPrefix(username, "assets") || username == "Guest" {
+		http.Redirect(w, r, "/notfound", http.StatusSeeOther)
 		return
 	}
 
@@ -455,6 +542,15 @@ func UserProfileHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func MyProfile(w http.ResponseWriter, r *http.Request) {
+	// Retrieve the account from cookies
+	ConnectedAccount := RetrieveAccountfromCookie(r)
+
+	// Check if the ConnectedAccount is nil or not valid
+	if (ConnectedAccount == database.Account{}) || ConnectedAccount.Id == "" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
 	// Open the database
 	db, err := sql.Open("sqlite3", "db/database.db")
 	if err != nil {
@@ -464,6 +560,11 @@ func MyProfile(w http.ResponseWriter, r *http.Request) {
 
 	// Retrieve connected account
 	ConnectedAcc := RetrieveAccountfromCookie(r)
+
+	if ConnectedAcc.Username == "" || ConnectedAcc.Username == "Guest" {
+		http.Redirect(w, r, "/notfound", http.StatusSeeOther)
+		return
+	}
 
 	// Determine which page to display based on the URL path
 	path := r.URL.Path
@@ -486,6 +587,15 @@ func MyProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleProfileMainPage(w http.ResponseWriter, r *http.Request, db *sql.DB, acc database.Account) {
+	// Retrieve the account from cookies
+	ConnectedAccount := RetrieveAccountfromCookie(r)
+
+	// Check if the ConnectedAccount is nil or not valid
+	if (ConnectedAccount == database.Account{}) || ConnectedAccount.Id == "" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
 	// Get the favorite categories of the account
 	NumberofSubscribedCategories, err := database.GetSubscribedCategories(db, acc.Id)
 	if err != nil {
@@ -525,6 +635,15 @@ func handleProfileMainPage(w http.ResponseWriter, r *http.Request, db *sql.DB, a
 }
 
 func handleLikedPostsPage(w http.ResponseWriter, r *http.Request, db *sql.DB, acc database.Account) {
+	// Retrieve the account from cookies
+	ConnectedAccount := RetrieveAccountfromCookie(r)
+
+	// Check if the ConnectedAccount is nil or not valid
+	if (ConnectedAccount == database.Account{}) || ConnectedAccount.Id == "" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
 	// Get the favorite posts of the account
 	favoritePostsIDs, err := database.GetLikedPosts(db, acc.Id)
 	if err != nil {
@@ -591,6 +710,15 @@ func handleLikedPostsPage(w http.ResponseWriter, r *http.Request, db *sql.DB, ac
 }
 
 func handleDislikedPostsPage(w http.ResponseWriter, r *http.Request, db *sql.DB, acc database.Account) {
+	// Retrieve the account from cookies
+	ConnectedAccount := RetrieveAccountfromCookie(r)
+
+	// Check if the ConnectedAccount is nil or not valid
+	if (ConnectedAccount == database.Account{}) || ConnectedAccount.Id == "" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
 	// Get the disliked posts of the account
 	dislikedPostsIDs, err := database.GetDisLikedPosts(db, acc.Id)
 	if err != nil {
@@ -657,6 +785,15 @@ func handleDislikedPostsPage(w http.ResponseWriter, r *http.Request, db *sql.DB,
 }
 
 func handleCommentsPage(w http.ResponseWriter, r *http.Request, db *sql.DB, acc database.Account) {
+	// Retrieve the account from cookies
+	ConnectedAccount := RetrieveAccountfromCookie(r)
+
+	// Check if the ConnectedAccount is nil or not valid
+	if (ConnectedAccount == database.Account{}) || ConnectedAccount.Id == "" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
 	// Get the favorite categories of the account
 	NumberofSubscribedCategories, err := database.GetSubscribedCategories(db, acc.Id)
 	if err != nil {
@@ -670,6 +807,7 @@ func handleCommentsPage(w http.ResponseWriter, r *http.Request, db *sql.DB, acc 
 		fmt.Println("Error getting posts by creator:", err)
 		return
 	}
+	fmt.Println(comments)
 
 	// Retrieve connected account
 	ConnectedAcc := RetrieveAccountfromCookie(r)
@@ -695,6 +833,15 @@ func handleCommentsPage(w http.ResponseWriter, r *http.Request, db *sql.DB, acc 
 }
 
 func handleSavedPostsPage(w http.ResponseWriter, r *http.Request, db *sql.DB, acc database.Account) {
+	// Retrieve the account from cookies
+	ConnectedAccount := RetrieveAccountfromCookie(r)
+
+	// Check if the ConnectedAccount is nil or not valid
+	if (ConnectedAccount == database.Account{}) || ConnectedAccount.Id == "" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
 	// Load and prepare data specific to the saved posts page
 	SavedPostsIDs, err := database.GetSavedPosts(db, acc.Id)
 	if err != nil {
@@ -743,6 +890,15 @@ func handleSavedPostsPage(w http.ResponseWriter, r *http.Request, db *sql.DB, ac
 }
 
 func handleAccountPage(w http.ResponseWriter, r *http.Request, db *sql.DB, acc database.Account) {
+	// Retrieve the account from cookies
+	ConnectedAccount := RetrieveAccountfromCookie(r)
+
+	// Check if the ConnectedAccount is nil or not valid
+	if (ConnectedAccount == database.Account{}) || ConnectedAccount.Id == "" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
 	// Load and prepare data specific to the account settings page
 	// Get the favorite categories of the account
 	NumberofSubscribedCategories, err := database.GetSubscribedCategories(db, acc.Id)
