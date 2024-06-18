@@ -143,6 +143,16 @@ func LikeForm(w http.ResponseWriter, r *http.Request) {
 	ConnectedAccount := RetrieveAccountfromCookie(r)
 	PostID := r.Form.Get("LikeID")
 
+	if ConnectedAccount.Username == "Guest" {
+		// Redirect the user back to the previous page
+		referer := r.Header.Get("Referer")
+		if referer == "" {
+			referer = "/" // Fallback URL if Referer header is not set
+		}
+		http.Redirect(w, r, referer, http.StatusSeeOther)
+		return
+	}
+
 	db, err := database.ConnectUserDataDB("db/database.db")
 	if err != nil {
 		fmt.Println("Error connecting to the database:", err)
@@ -191,6 +201,16 @@ func DislikeForm(w http.ResponseWriter, r *http.Request) {
 
 	ConnectedAccount := RetrieveAccountfromCookie(r)
 	PostID := r.Form.Get("DislikeID")
+
+	if ConnectedAccount.Username == "Guest" {
+		// Redirect the user back to the previous page
+		referer := r.Header.Get("Referer")
+		if referer == "" {
+			referer = "/" // Fallback URL if Referer header is not set
+		}
+		http.Redirect(w, r, referer, http.StatusSeeOther)
+		return
+	}
 
 	db, err := database.ConnectUserDataDB("db/database.db")
 	if err != nil {
@@ -521,7 +541,16 @@ func LikeCommentForm(w http.ResponseWriter, r *http.Request) {
 
 	ConnectedAccount := RetrieveAccountfromCookie(r)
 	CommentID := r.Form.Get("CommentID")
-	fmt.Println("CommentID:", CommentID)
+
+	if ConnectedAccount.Username == "Guest" {
+		// Redirect the user back to the previous page
+		referer := r.Header.Get("Referer")
+		if referer == "" {
+			referer = "/" // Fallback URL if Referer header is not set
+		}
+		http.Redirect(w, r, referer, http.StatusSeeOther)
+		return
+	}
 
 	db, err := database.ConnectUserDataDB("db/database.db")
 	if err != nil {
@@ -587,6 +616,16 @@ func DislikeCommentForm(w http.ResponseWriter, r *http.Request) {
 
 	ConnectedAccount := RetrieveAccountfromCookie(r)
 	CommentID := r.Form.Get("CommentID")
+
+	if ConnectedAccount.Username == "Guest" {
+		// Redirect the user back to the previous page
+		referer := r.Header.Get("Referer")
+		if referer == "" {
+			referer = "/" // Fallback URL if Referer header is not set
+		}
+		http.Redirect(w, r, referer, http.StatusSeeOther)
+		return
+	}
 
 	db, err := database.ConnectUserDataDB("db/database.db")
 	if err != nil {
