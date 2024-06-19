@@ -178,8 +178,10 @@ func Home(w http.ResponseWriter, r *http.Request) {
 
 // LogIn page of the forum.
 func LogIn(w http.ResponseWriter, r *http.Request) {
+
 	// Serve the login page
-	http.ServeFile(w, r, "assets/html/login.html")
+	tmpl := template.Must(template.ParseFiles("assets/html/login.html"))
+	tmpl.Execute(w, database.LogInError{false, false})
 }
 
 // Admin page of the forum.

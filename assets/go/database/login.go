@@ -32,7 +32,7 @@ func RecoverAccount(identif, password string) (Account, LogInError, error) {
 	}
 
 	if err != nil {
-		return emptyaccount, LogInError{}, err
+		return emptyaccount, LogInError{IndentifError: true, PassWordError: true}, err
 	}
 
 	// Vérifier si le compte existe
