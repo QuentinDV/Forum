@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile | Liked Posts</title>
     <link rel="stylesheet" href="/assets/css/posts.css">
+    <link rel="stylesheet" href="/assets/css/home.css">
+    <link rel="stylesheet" href="/assets/css/categories.css">
 </head>
 <body>
     <img id="profilePicture" alt="Profile Picture" width="400px" src="../../{{.ImageUrl}}">
@@ -14,21 +16,26 @@
     <h2>Sign up : {{.CreationDate}}</h2>
 
     <div>
-        <button onclick="location.href='/home'">Home</button>
-        <button onclick="location.href='/user/{{.Username}}'">Posts</button>
-        <button onclick="location.href='/user/{{.Username}}/liked'">Liked</button>
-        <button onclick="location.href='/user/{{.Username}}/disliked'">Disliked</button>
-        <button onclick="location.href='/user/{{.Username}}/comments'">Comments</button>
-        <button onclick="location.href='/user/{{.Username}}/savedposts'">Saved Posts</button>
+        <button class="buttonn" onclick="location.href='/home'">Home</button>
+        <button class="buttonn" onclick="location.href='/user/{{.Username}}'">Posts</button>
+        <button class="buttonn" onclick="location.href='/user/{{.Username}}/liked'">Liked</button>
+        <button class="buttonn" onclick="location.href='/user/{{.Username}}/disliked'">Disliked</button>
+        <button class="buttonn" onclick="location.href='/user/{{.Username}}/comments'">Comments</button>
+        <button class="buttonn" onclick="location.href='/user/{{.Username}}/savedposts'">Saved Posts</button>
         {{if .IsSameAccount}}
-        <button onclick="location.href='/user/{{.Username}}/account'">Manage Account</button>
+        <button class="buttonn" onclick="location.href='/user/{{.Username}}/account'">Manage Account</button>
+        {{end}}
+        {{if .IsAdmin}}
+        <button class="buttonn" onclick="location.href='/admin'">Admin Panel</button>
         {{end}}
     </div>
 
+
     <h1>Liked Posts :</h1>
-    <div id="posts" style="background-color: beige;">
+    <div id="posts" style="background-color: rgba(245, 245, 220, 0);">
         {{range .LikedPosts}}
         <div class="post">
+            <div class="profile-category">
             <form action="/category/{{.CategoryID}}" method="post">
                 <img id="profilePicture" alt="Profile Picture" width="40px" src="{{.CategoryImageUrl}}">
                 <input type="submit" value="{{.CategoryName}}">
@@ -38,12 +45,16 @@
                 <img id="profilePicture" alt="Account Image" width="40px" src="../../{{.AccountImageUrl}}">
                 <input type="submit" value="{{.AccountUsername}}">
             </form>
-
+            </div>
+            <div class="text">
             <h2>{{.Title}}</h2>
             <p>{{.Content}}</p>
             {{if ne .ImageUrl ""}}
             <img src="../../{{.ImageUrl}}" alt="Post Image" width="400px">
             {{end}}
+            </div>
+
+
             <div class="post-info">
                 <form action="/postlikeform" method="post">
                     <input type="hidden" id="LikeID" name="LikeID" value="{{.PostID}}">
@@ -54,20 +65,25 @@
                     <input type="submit" value="Dislikes :{{.Dislikes}}">
                 </form>
             </div>
-            <div>
-                <span><img src="../../assets/img/icon/view.png" alt="view icon" width="50px"> {{.View}}</span>
-                <a href="/post/{{.PostID}}"><img src="../../assets/img/icon/comment.png" alt="Comment Icon" width="40px"> {{.Responses}}</a>
-            </div>
-            <div>
-                <form action="/addviewform" method="post">
-                    <input type="hidden" id="PostID" name="PostID" value="{{.PostID}}">
-                    <input type="image" src="../../assets/img/icon/more.png" alt="More of this Post" width="40px">
-                </form>
-            </div>
-            <span>Posted on: {{.CreationDate}}</span>
+
+                <div class="post-details">
+
+                    <span><img src="../../assets/img/icon/view.png" class="imag" alt="view icon" width="50px"> {{.View}}</span>
+                    <a href="/post/{{.PostID}}"><img src="../../assets/img/icon/comment.png" alt="Comment Icon" width="40px"> {{.Responses}}</a>
+                    <form action="/addviewform" method="post">
+                        <input type="hidden" id="PostID" name="PostID" value="{{.PostID}}">
+                        <input type="image" src="../../assets/img/icon/more.png" alt="More of this Post" width="40px">
+                    </form>
+                    <span>Posted on: {{.CreationDate}}</span>
+                </div>
+
         </div>
         {{end}}
     </div>
+</div>
+
 
 </body>
+<script src="/assets/js/"></script>
+<script src="/assets/js/settings.js"></script>
 </html>

@@ -332,88 +332,6 @@ func CreatePostForm(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, referer, http.StatusSeeOther)
 }
 
-func DeletePostForm(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	if err != nil {
-		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
-		return
-	}
-
-	PostID := r.Form.Get("PostID")
-
-	db, err := database.ConnectPostDB("db/database.db")
-	if err != nil {
-		fmt.Println("Error connecting to the database:", err)
-		http.Error(w, "Database connection error", http.StatusInternalServerError)
-		return
-	}
-
-	allAcc, err := database.GetAllAccounts(db)
-	if err != nil {
-		fmt.Println("Error getting all accounts:", err)
-		http.Error(w, "Database error", http.StatusInternalServerError)
-		return
-	}
-
-	Comments, err := database.GetAllComments(db, PostID)
-	if err != nil {
-		fmt.Println("Error getting all comments:", err)
-		http.Error(w, "Database error", http.StatusInternalServerError)
-		return
-	}
-
-	for _, acc := range allAcc {
-		err = database.RemoveLikedPost(db, acc.Id, PostID)
-		if err != nil {
-			fmt.Println("Error removing liked post:", err)
-			http.Error(w, "Database error", http.StatusInternalServerError)
-			return
-		}
-
-		err = database.RemoveDisLikedPost(db, acc.Id, PostID)
-		if err != nil {
-			fmt.Println("Error removing disliked post:", err)
-			http.Error(w, "Database error", http.StatusInternalServerError)
-			return
-		}
-
-		err = database.RemoveSavedPost(db, acc.Id, PostID)
-		if err != nil {
-			fmt.Println("Error removing saved post:", err)
-			http.Error(w, "Database error", http.StatusInternalServerError)
-			return
-		}
-
-		for _, comment := range Comments {
-			err = database.RemoveLikedComment(db, acc.Id, comment.CommentID)
-			if err != nil {
-				fmt.Println("Error removing liked comment:", err)
-				http.Error(w, "Database error", http.StatusInternalServerError)
-				return
-			}
-
-			err = database.RemoveDislikedComment(db, acc.Id, comment.CommentID)
-			if err != nil {
-				fmt.Println("Error removing disliked comment:", err)
-				http.Error(w, "Database error", http.StatusInternalServerError)
-				return
-			}
-		}
-
-	}
-
-	err = database.DeletePost(db, PostID)
-	if err != nil {
-		fmt.Println("Error deleting post:", err)
-		http.Error(w, "Error deleting post", http.StatusInternalServerError)
-		return
-	}
-
-	// Redirect to the home page
-	http.Redirect(w, r, "../../home", http.StatusSeeOther)
-
-}
-
 func SavePostForm(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
@@ -521,6 +439,13 @@ func CreateCommentForm(w http.ResponseWriter, r *http.Request) {
 	err = database.InsertComment(db, comment)
 	if err != nil {
 		http.Error(w, "Error creating comment", http.StatusInternalServerError)
+		return
+	}
+
+	// Increment the post's number of responses
+	err = database.IncrementNumberOfResponsetoDB(db, postID)
+	if err != nil {
+		http.Error(w, "Error incrementing number of responses", http.StatusInternalServerError)
 		return
 	}
 
@@ -682,6 +607,21 @@ func DeleteCommentForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get the comment's post ID
+	Comment, err := database.GetComment(db, CommentID)
+	if err != nil {
+		fmt.Println("Error getting comment:", err)
+		http.Error(w, "Error getting comment", http.StatusInternalServerError)
+		return
+	}
+	PostID := Comment.PostID
+	err = database.DecrementNumberOfResponsetoDB(db, PostID)
+	if err != nil {
+		fmt.Println("Error decrementing number of responses:", err)
+		http.Error(w, "Error decrementing number of responses", http.StatusInternalServerError)
+		return
+	}
+
 	err = database.DeleteComment(db, CommentID)
 	if err != nil {
 		fmt.Println("Error deleting comment:", err)
@@ -751,7 +691,10 @@ func SortingHomePostsForm(w http.ResponseWriter, r *http.Request) {
 }
 
 // ResetHOmeSorting resets the sorting method to the default value
-func ResetHOmeSorting() {
+func ResetHomeSortingForm(w http.ResponseWriter, r *http.Request) {
 	SortedBy = "By Date Descending"
 	CategoryName = ""
+
+	// Redirect to the home page
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }

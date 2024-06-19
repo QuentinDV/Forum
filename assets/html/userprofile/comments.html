@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile | Comments</title>
     <link rel="stylesheet" href="/assets/css/posts.css">
+    <link rel="stylesheet" href="/assets/css/home.css">
+    <link rel="stylesheet" href="/assets/css/categories.css">
 </head>
 <body>
     <img id="profilePicture" alt="Profile Picture" width="400px" src="../../{{.ImageUrl}}">
@@ -14,50 +16,61 @@
     <h2>Sign up : {{.CreationDate}}</h2>
 
     <div>
-        <button onclick="location.href='/home'">Home</button>
-        <button onclick="location.href='/user/{{.Username}}'">Posts</button>
-        <button onclick="location.href='/user/{{.Username}}/liked'">Liked</button>
-        <button onclick="location.href='/user/{{.Username}}/disliked'">Disliked</button>
-        <button onclick="location.href='/user/{{.Username}}/comments'">Comments</button>
-        <button onclick="location.href='/user/{{.Username}}/savedposts'">Saved Posts</button>
+        <button class="buttonn" onclick="location.href='/home'">Home</button>
+        <button class="buttonn" onclick="location.href='/user/{{.Username}}'">Posts</button>
+        <button class="buttonn" onclick="location.href='/user/{{.Username}}/liked'">Liked</button>
+        <button class="buttonn" onclick="location.href='/user/{{.Username}}/disliked'">Disliked</button>
+        <button class="buttonn" onclick="location.href='/user/{{.Username}}/comments'">Comments</button>
+        <button class="buttonn" onclick="location.href='/user/{{.Username}}/savedposts'">Saved Posts</button>
         {{if .IsSameAccount}}
-        <button onclick="location.href='/user/{{.Username}}/account'">Manage Account</button>
+        <button class="buttonn" onclick="location.href='/user/{{.Username}}/account'">Manage Account</button>
+        {{end}}
+        {{if .IsAdmin}}
+        <button class="buttonn" onclick="location.href='/admin'">Admin Panel</button>
         {{end}}
     </div>
+
 
     <h1>Comments :</h1>
-    <div id="post" style="background-color: beige;">
-        {{range .MyComments}}
-        <div class="post">
-            <div class="comment">
-                <button onclick="location.href='/post/{{.PostID}}'">View Post</button>
+<div id="post" style="background-color: rgba(245, 245, 220, 0);">
+    {{range .MyComments}}
+    <div class="post">
+        <div class="profile-category">
+            <button onclick="location.href='/post/{{.PostID}}'">View Post</button>
 
-                <form action="/user/{{.AccountUsername}}" method="post">
-                    <img id="profilePicture" alt="Account Image" width="40px" src="../../{{.AccountImageUrl}}">
-                    <input type="submit" value="{{.AccountUsername}}">
-                </form>
-
-                <h2>{{.Content}}</h2>
-                {{if ne .ImageUrl ""}}
-                <img src="../../{{.ImageUrl}}" alt="Comment Image" width="200px">
-                {{end}}
-                <div class="post-info">
-                    <form action="/commentlikeform" method="post">
-                        <input type="hidden" id="CommentID" name="CommentID" value="{{.CommentID}}">
-                        <input type="submit" value="Likes :{{.Likes}}">
-                    </form>
-                    <form action="/commentdislikeform" method="post">
-                        <input type="hidden" id="CommentID" name="CommentID" value="{{.CommentID}}">
-                        <input type="submit" value="Dislikes :{{.Dislikes}}">
-                    </form>
-                </div>
-                
-                <span>Posted on: {{.CreationDate}}</span>
-
-            </div>
+            <form action="/user/{{.AccountUsername}}" method="post">
+                <img class="profile-picture" alt="Account Image" width="40px" src="../../{{.AccountImageUrl}}">
+                <input type="submit" value="{{.AccountUsername}}">
+            </form>
         </div>
-        {{end}}
+
+        <div class="text">
+            <h2>{{.Content}}</h2>
+            {{if ne .ImageUrl ""}}
+            <img src="../../{{.ImageUrl}}" alt="Comment Image" width="200px">
+            {{end}}
+        </div> 
+
+        <div class="post-info">
+            <form action="/commentlikeform" method="post">
+                <input type="hidden" id="CommentID" name="CommentID" value="{{.CommentID}}">
+                <input type="submit" value="Likes :{{.Likes}}">
+            </form>
+            <form action="/commentdislikeform" method="post">
+                <input type="hidden" id="CommentID" name="CommentID" value="{{.CommentID}}">
+                <input type="submit" value="Dislikes :{{.Dislikes}}">
+            </form>
+        </div>
+        
+        <div class="post-details">
+            <span>Posted on: {{.CreationDate}}</span>
+        </div>
     </div>
+    {{end}}
+</div>
+
 
 </body>
+<script src="/assets/js/"></script>
+<script src="/assets/js/settings.js"></script>
 </html>

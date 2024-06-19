@@ -14,7 +14,22 @@
         <h1>{{.Category.Title}}</h1>
     </div>  
     <h2>{{.Category.Description}}</h2>
+    
+    <div class="Categorytags" style="display: flex;">
+        <strong><p>Tags :</p></strong>
+    {{range .ExistingTags}}
+        <p style="padding-right: 3px;">{{.}},</p>
+    {{end}}
+    </div>
+
     <h2>Subscribers : {{.Category.Subscriber}}</h2>
+
+    {{if .IsAdmin}}
+        <form action="/deletecategoryform" method="post">
+            <input type="hidden" id="categoryID" name="categoryID" value="{{.Category.CategoryID}}">
+            <input type="image" src="../../assets/img/icon/bin.png" alt="Bin Icon" width="40px">
+        </form>
+    {{end}}
 
     
     {{if ne .Username "Guest"}}

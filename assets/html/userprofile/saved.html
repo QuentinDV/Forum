@@ -14,16 +14,20 @@
     <h2>Sign up : {{.CreationDate}}</h2>
 
     <div>
-        <button onclick="location.href='/home'">Home</button>
-        <button onclick="location.href='/user/{{.Username}}'">Posts</button>
-        <button onclick="location.href='/user/{{.Username}}/liked'">Liked</button>
-        <button onclick="location.href='/user/{{.Username}}/disliked'">Disliked</button>
-        <button onclick="location.href='/user/{{.Username}}/comments'">Comments</button>
-        <button onclick="location.href='/user/{{.Username}}/savedposts'">Saved Posts</button>
+        <button class="buttonn" onclick="location.href='/home'">Home</button>
+        <button class="buttonn" onclick="location.href='/user/{{.Username}}'">Posts</button>
+        <button class="buttonn" onclick="location.href='/user/{{.Username}}/liked'">Liked</button>
+        <button class="buttonn" onclick="location.href='/user/{{.Username}}/disliked'">Disliked</button>
+        <button class="buttonn" onclick="location.href='/user/{{.Username}}/comments'">Comments</button>
+        <button class="buttonn" onclick="location.href='/user/{{.Username}}/savedposts'">Saved Posts</button>
         {{if .IsSameAccount}}
-        <button onclick="location.href='/user/{{.Username}}/account'">Manage Account</button>
+        <button class="buttonn" onclick="location.href='/user/{{.Username}}/account'">Manage Account</button>
+        {{end}}
+        {{if .IsAdmin}}
+        <button class="buttonn" onclick="location.href='/admin'">Admin Panel</button>
         {{end}}
     </div>
+
 
     <h1>Saved Posts :</h1>
     <div id="posts" style="background-color: beige;">

@@ -237,3 +237,218 @@ func DeleteAccountForm(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Cannot delete protected user", http.StatusForbidden)
 	}
 }
+
+func DeletePostForm(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
+		return
+	}
+
+	PostID := r.Form.Get("PostID")
+
+	db, err := database.ConnectPostDB("db/database.db")
+	if err != nil {
+		fmt.Println("Error connecting to the database:", err)
+		http.Error(w, "Database connection error", http.StatusInternalServerError)
+		return
+	}
+
+	allAcc, err := database.GetAllAccounts(db)
+	if err != nil {
+		fmt.Println("Error getting all accounts:", err)
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+
+	Comments, err := database.GetAllComments(db, PostID)
+	if err != nil {
+		fmt.Println("Error getting all comments:", err)
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+
+	for _, acc := range allAcc {
+		err = database.RemoveLikedPost(db, acc.Id, PostID)
+		if err != nil {
+			fmt.Println("Error removing liked post:", err)
+			http.Error(w, "Database error", http.StatusInternalServerError)
+			return
+		}
+
+		err = database.RemoveDisLikedPost(db, acc.Id, PostID)
+		if err != nil {
+			fmt.Println("Error removing disliked post:", err)
+			http.Error(w, "Database error", http.StatusInternalServerError)
+			return
+		}
+
+		err = database.RemoveSavedPost(db, acc.Id, PostID)
+		if err != nil {
+			fmt.Println("Error removing saved post:", err)
+			http.Error(w, "Database error", http.StatusInternalServerError)
+			return
+		}
+
+		for _, comment := range Comments {
+			err = database.RemoveLikedComment(db, acc.Id, comment.CommentID)
+			if err != nil {
+				fmt.Println("Error removing liked comment:", err)
+				http.Error(w, "Database error", http.StatusInternalServerError)
+				return
+			}
+
+			err = database.RemoveDislikedComment(db, acc.Id, comment.CommentID)
+			if err != nil {
+				fmt.Println("Error removing disliked comment:", err)
+				http.Error(w, "Database error", http.StatusInternalServerError)
+				return
+			}
+		}
+
+	}
+
+	err = database.DeletePost(db, PostID)
+	if err != nil {
+		fmt.Println("Error deleting post:", err)
+		http.Error(w, "Error deleting post", http.StatusInternalServerError)
+		return
+	}
+
+	// Redirect to the home page
+	http.Redirect(w, r, "../../home", http.StatusSeeOther)
+
+}
+
+func DeleteCategoryForm(w http.ResponseWriter, r *http.Request) {
+	// Parse the form data
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
+		return
+	}
+
+	// Get the category ID from the form data
+	categoryID := r.Form.Get("categoryID")
+
+	db, err := database.ConnectUserDB("db/database.db")
+	if err != nil {
+		http.Error(w, "Database connection error", http.StatusInternalServerError)
+		return
+	}
+	defer db.Close()
+
+	// Get all posts in the category
+	posts, err := database.GetPostsByCategory(db, categoryID)
+	if err != nil {
+		http.Error(w, "Error retrieving posts", http.StatusInternalServerError)
+		return
+	}
+
+	// Get all accounts
+	allAcc, err := database.GetAllAccounts(db)
+	if err != nil {
+		fmt.Println("Error getting all accounts:", err)
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+
+	// Delete all posts and associated data in the category
+	for _, post := range posts {
+		// Get all comments for the post
+		comments, err := database.GetAllComments(db, post.PostID)
+		if err != nil {
+			fmt.Println("Error getting all comments:", err)
+			http.Error(w, "Database error", http.StatusInternalServerError)
+			return
+		}
+
+		// Remove likes/dislikes and comments for each account
+		for _, acc := range allAcc {
+			err = database.RemoveLikedPost(db, acc.Id, post.PostID)
+			if err != nil {
+				fmt.Println("Error removing liked post:", err)
+				http.Error(w, "Database error", http.StatusInternalServerError)
+				return
+			}
+
+			err = database.RemoveDisLikedPost(db, acc.Id, post.PostID)
+			if err != nil {
+				fmt.Println("Error removing disliked post:", err)
+				http.Error(w, "Database error", http.StatusInternalServerError)
+				return
+			}
+
+			err = database.RemoveSavedPost(db, acc.Id, post.PostID)
+			if err != nil {
+				fmt.Println("Error removing saved post:", err)
+				http.Error(w, "Database error", http.StatusInternalServerError)
+				return
+			}
+
+			for _, comment := range comments {
+				err = database.RemoveLikedComment(db, acc.Id, comment.CommentID)
+				if err != nil {
+					fmt.Println("Error removing liked comment:", err)
+					http.Error(w, "Database error", http.StatusInternalServerError)
+					return
+				}
+
+				err = database.RemoveDislikedComment(db, acc.Id, comment.CommentID)
+				if err != nil {
+					fmt.Println("Error removing disliked comment:", err)
+					http.Error(w, "Database error", http.StatusInternalServerError)
+					return
+				}
+			}
+		}
+
+		// Delete all comments for the post
+		for _, comment := range comments {
+			err = database.DeleteComment(db, comment.CommentID)
+			if err != nil {
+				fmt.Println("Error deleting comment:", err)
+				http.Error(w, "Database error", http.StatusInternalServerError)
+				return
+			}
+		}
+
+		// Delete the post itself
+		err = database.DeletePost(db, post.PostID)
+		if err != nil {
+			fmt.Println("Error deleting post:", err)
+			http.Error(w, "Error deleting post", http.StatusInternalServerError)
+			return
+		}
+
+		// Remove the post image if it exists
+		if post.ImageUrl != "" {
+			fmt.Println("Deleting post image: " + post.ImageUrl)
+			err = os.Remove(post.ImageUrl)
+			if err != nil {
+				http.Error(w, "Error deleting post image", http.StatusInternalServerError)
+				return
+			}
+		}
+	}
+
+	// Unscribe all users from the category
+	for _, acc := range allAcc {
+		err = database.RemoveSubscribedCategory(db, acc.Id, categoryID)
+		if err != nil {
+			fmt.Println("Error unsubscribing user from category:", err)
+			http.Error(w, "Database error", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	// Delete the category
+	err = database.DeleteCategory(db, categoryID)
+	if err != nil {
+		http.Error(w, "Error deleting category", http.StatusInternalServerError)
+		return
+	}
+
+	// Redirect to the admin page
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
+}

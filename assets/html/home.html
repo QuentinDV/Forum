@@ -13,24 +13,24 @@
     <div> <h1> HOME </h1> </div>
     {{if ne .Username "Guest"}}
         <div class="navbars">
-            <h1 id="openMenu"class="Btns">
-  
-                <div class="sign"><svg viewBox="0 0 512 512"><path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"></path></svg></div>
-                
-                <div class="logout">Logout</div>
-              
-              </h1> 
+            
 
             <button onclick="location.href='/user/{{.Username}}'">{{.Username}}</button>
 
-            <img id="profilePicture" alt="Profile Picture" width="px" src="{{.ImageUrl}}">
+            <img id="profilePicture" alt="Profile Picture" width="px" src="{{.ImageUrl}}"><h1 id="openMenu"class="Btns">
+  
+                <div class="sign"><svg viewBox="0 0 512 512"><path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"></path></svg></div>
+                
+                <div class="logout"></div>
+              
+              </h1> 
 
         </div>
     {{else}}
         <div class="navbars">
             <h1 class="settings" id="openMenu">LOGIN</h1> 
             <h1>Guest</h1>
-            <img id="profilePicture" alt="Profile Picture" width="px" src="{{.ImageUrl}}">
+            <img id="profilePicture" alt="Profile Picture" width="px" src="{{.ImageUrl}}" >
         </div>
     {{end}}
 </div>
@@ -44,11 +44,35 @@
                     <div class="popup-content">
                         <span class="close" onclick="toggleFormcate()">&times;</span>
                         <h2>Create a New Category</h2>
-                        <form id="categoryForm" action="/createcategoryform" method="post">
+                        <form action="/createcategoryform" method="post">
                             <label for="categoryName">Category Name:</label>
-                            <input type="text" id="categoryName" name="categoryName" required>
+                            <input   class="input"  class="input" type="text" id="categoryName" name="categoryName" required>
+
+                            <br>
+                            <br>
+                            <br>
+                    
+                            <label for="description">Category Description:</label>
+                            <input class="input" type="text" id="description" name="description" required>
+                            <br>
+                            <br>
+                            <br>
+                    
+                            <label for="imageUrl">Category Image URL:</label>
+                            <input class="input" type="text" id="imageUrl" name="imageUrl" required>
+                            <br>
+                            <br>
+                    
+                    
+                            <label for="tags">Select or Enter Tags:</label>
+                            <select id="existingTags" name="existingTags[]" multiple>
+                                {{range .ExistingTags}}
+                                <option value="{{.}}">{{.}}</option>
+                                {{end}}
+                            </select>
+                            <input class="input" type="text" id="newTags" name="newTags" placeholder="Enter new tags separated by commas">
+                    
                             <button type="submit">Create</button>
-                            
                         </form>
                     </div>
                 </div>
@@ -157,22 +181,22 @@
                     <h2>{{.Title}}</h2>
                     <p>{{.Content}}</p>
                     {{if ne .ImageUrl ""}}
-                    <img src="{{.ImageUrl}}" alt="Post Image" width="200px"> 
+                    <img src="{{.ImageUrl}}" alt="Post Image" width="100px" height="20px"> 
                     {{end}}
                 </div> 
                     <div class="post-info">
-                        <form action="/likeform" method="post">
+                        <form action="/postlikeform" method="post">
                             <input type="hidden" id="LikeID" name="LikeID" value="{{.PostID}}">
                             <input type="submit" value="Likes :{{.Likes}}">
                         </form>
-                        <form action="/dislikeform" method="post">
+                        <form action="/postdislikeform" method="post">
                             <input type="hidden" id="DislikeID" name="DislikeID" value="{{.PostID}}">
                             <input type="submit" value="Dislikes :{{.Dislikes}}">
                         </form>
                     </div>
                     <div class="post-details">
 
-                        <span><img src="assets/img/icon/view.png" alt="view icon" width="50px"> {{.View}}</span>
+                        <span><img src="assets/img/icon/view.png" class="imag" alt="view icon" width="50px"> {{.View}}</span>
                         <a href="/post/{{.PostID}}"><img src="assets/img/icon/comment.png" alt="Comment Icon" width="40px"> {{.Responses}}</a>
                         <form action="/addviewform" method="post">
                             <input type="hidden" id="PostID" name="PostID" value="{{.PostID}}">
@@ -186,36 +210,161 @@
         </div>
 
 
-
-        <div class="droite">
-            <form id="sortForm" action="/sortinghomeform" method="post">
-                <input type="hidden" id="iscategory" name="iscategory" value="false">
-                <button type="submit" id="sortingMethod" name="sortingMethod" value="By Date Descending">By Date Descending</button>
-                <button type="submit" id="sortingMethod" name="sortingMethod" value="By Date Ascending">By Date Ascending</button>
-                <button type="submit" id="sortingMethod" name="sortingMethod" value="By Likes Descending">By Likes Descending</button>
-                <button type="submit" id="sortingMethod" name="sortingMethod" value="By Likes Ascending">By Likes Ascending</button>
-                <button type="submit" id="sortingMethod" name="sortingMethod" value="By Views Ascending">By Views Descending</button>
-                <button type="submit" id="sortingMethod" name="sortingMethod" value="By Views Descending">By Views Ascending</button>
-                <button type="submit" id="sortingMethod" name="sortingMethod" value="By Responses Ascending">By Responses Descending</button>
-                <button type="submit" id="sortingMethod" name="sortingMethod" value="By Responses Descending">By Responses Ascending</button>
-            </form>
-
-            <form id="sortForm" action="/sortinghomeform" method="post">
-                <input type="hidden" id="sortingMethod" name="sortingMethod" value="By Categories">
-                <input type="hidden" id="iscategory" name="iscategory" value="true">
-                <label for="categoryName">Category Title:</label>
-                <select id="categoryName" name="categoryName" required>
-                    {{range .AllCategories}}
-                    <option value="{{.Title}}">{{.Title}}</option>
-                    {{end}}
-                </select>
-                <button type="submit">Filter by Category</button>
-            </form>
+<div class="droite">
+        <form id="sortForm" action="/sortinghomeform" method="post" class="menu">
+            <input type="hidden" id="iscategory" name="iscategory" value="false" class="menu__item">
+            <button type="submit" id="sortingMethod" name="sortingMethod" value="By Date Descending" class="menu__item">
+                <div>
+                    <span class="menu__item-link">By Date Descending</span>
+                    <div class="marquee">
+                        <div class="marquee__inner" aria-hidden="true">
+                            <span>By Date Descending</span>
+                            <span>By Date Descending</span>
+                            <span>By Date Descending</span>
+                            <span>By Date Descending</span>
+                            <span>By Date Descending</span>
+                            <span>By Date Descending</span>
+                        </div>
+                    </div>
+                </div>
+            </button>
+            <button type="submit" id="sortingMethod" name="sortingMethod" value="By Date Ascending" class="menu__item">
+                <div>
+                    <span class="menu__item-link">By Date Ascending</span>
+                    <div class="marquee">
+                        <div class="marquee__inner" aria-hidden="true">
+                            <span>By Date Ascending</span>
+                            <span>By Date Ascending</span>
+                            <span>By Date Ascending</span>
+                            <span>By Date Ascending</span>
+                            <span>By Date Ascending</span>
+                            <span>By Date Ascending</span>
+                        </div>
+                    </div>
+                </div>
+            </button>
+            <button type="submit" id="sortingMethod" name="sortingMethod" value="By Likes Descending" class="menu__item">
+                <div>
+                    <span class="menu__item-link">By Likes Descending</span>
+                    <div class="marquee">
+                        <div class="marquee__inner" aria-hidden="true">
+                            <span>By Likes Descending</span>
+                            <span>By Likes Descending</span>
+                            <span>By Likes Descending</span>
+                            <span>By Likes Descending</span>
+                            <span>By Likes Descending</span>
+                            <span>By Likes Descending</span>
+                        </div>
+                    </div>
+                </div>
+            </button>
+            <button type="submit" id="sortingMethod" name="sortingMethod" value="By Likes Ascending" class="menu__item">
+                <div>
+                    <span class="menu__item-link">By Likes Ascending</span>
+                    <div class="marquee">
+                        <div class="marquee__inner" aria-hidden="true">
+                            <span>By Likes Ascending</span>
+                            <span>By Likes Ascending</span>
+                            <span>By Likes Ascending</span>
+                            <span>By Likes Ascending</span>
+                            <span>By Likes Ascending</span>
+                            <span>By Likes Ascending</span>
+                        </div>
+                    </div>
+                </div>
+            </button>
+            <button type="submit" id="sortingMethod" name="sortingMethod" value="By Views Ascending" class="menu__item">
+                <div>
+                    <span class="menu__item-link">By Views Descending</span>
+                    <div class="marquee">
+                        <div class="marquee__inner" aria-hidden="true">
+                            <span>By Views Descending</span>
+                            <span>By Views Descending</span>
+                            <span>By Views Descending</span>
+                            <span>By Views Descending</span>
+                            <span>By Views Descending</span>
+                            <span>By Views Descending</span>
+                        </div>
+                    </div>
+                </div>
+            </button>
+            <button type="submit" id="sortingMethod" name="sortingMethod" value="By Views Descending" class="menu__item">
+                <div>
+                    <span class="menu__item-link">By Views Ascending</span>
+                    <div class="marquee">
+                        <div class="marquee__inner" aria-hidden="true">
+                            <span>By Views Ascending</span>
+                            <span>By Views Ascending</span>
+                            <span>By Views Ascending</span>
+                            <span>By Views Ascending</span>
+                            <span>By Views Ascending</span>
+                            <span>By Views Ascending</span>
+                        </div>
+                    </div>
+                </div>
+            </button>
+            <button type="submit" id="sortingMethod" name="sortingMethod" value="By Responses Ascending" class="menu__item">
+                <div>
+                    <span class="menu__item-link">By Responses Descending</span>
+                    <div class="marquee">
+                        <div class="marquee__inner" aria-hidden="true">
+                            <span>By Responses Descending</span>
+                            <span>By Responses Descending</span>
+                            <span>By Responses Descending</span>
+                            <span>By Responses Descending</span>
+                            <span>By Responses Descending</span>
+                            <span>By Responses Descending</span>
+                        </div>
+                    </div>
+                </div>
+            </button>
+            <button type="submit" id="sortingMethod" name="sortingMethod" value="By Responses Descending" class="menu__item">
+                <div>
+                    <span class="menu__item-link">By Responses Ascending</span>
+                    <div class="marquee">
+                        <div class="marquee__inner" aria-hidden="true">
+                            <span>By Responses Ascending</span>
+                            <span>By Responses Ascending</span>
+                            <span>By Responses Ascending</span>
+                            <span>By Responses Ascending</span>
+                            <span>By Responses Ascending</span>
+                            <span>By Responses Ascending</span>
+                        </div>
+                    </div>
+                </div>
+            </button>
+        </form>
+<form id="sortForm" action="/sortinghomeform" method="post" class="menu">
+    <input type="hidden" id="sortingMethod" name="sortingMethod" value="By Categories">
+    <input type="hidden" id="iscategory" name="iscategory" value="true">
+    <label for="categoryName" class="menu__item-label">Category Title:</label>
+    <select id="categoryName" name="categoryName" class="menu__item-select" required>
+        {{range .AllCategories}}
+        <option value="{{.Title}}">{{.Title}}</option>
+        {{end}}
+    </select>
+    <button type="submit" class="menu__item">
+        <div class="menu__item-content">
+            <span class="menu__item-link">Filter by Category</span>
+            <div class="marquee">
+                <div class="marquee__inner" aria-hidden="true">
+                    <span>Filter by Category</span>
+                    <span>Filter by Category</span>
+                    <span>Filter by Category</span>
+                    <span>Filter by Category</span>
+                    <span>Filter by Category</span>
+                    <span>Filter by Category</span>
+                </div>
+            </div>
+        </div>
+    </button>  
+</form>
+      
             
         </div> 
     </div>
 </div> 
-
+</div>  
 <body class="demo-1">
     
         
