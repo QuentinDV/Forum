@@ -47,6 +47,12 @@
                                     <input autocomplete="off" type="password" class="input" name="pswrd" placeholder="Password" required />
                                 </div>
                                 <button class="submit-btn">Log in</button>
+                                {{if .IndentifError}}
+                                <p style="color: red;">Email or Username Incorrect</p>
+                                {{end}}
+                                {{if .PassWordError}}
+                                <p style="color: red;">Password Incorrect</p>
+                                {{end}}
                             
                             </div>
                         </div>

@@ -77,6 +77,13 @@ func LoginForm(w http.ResponseWriter, r *http.Request) {
 
 	Acc, LogInError, err := database.RecoverAccount(identif, password)
 	fmt.Println("LogInError:", LogInError)
+
+	if LogInError.IndentifError || LogInError.PassWordError {
+		tmpl := template.Must(template.ParseFiles("assets/html/login.html"))
+		tmpl.Execute(w, LogInError)
+		return
+	}
+
 	if err != nil {
 		return
 	}
@@ -89,7 +96,7 @@ func LoginForm(w http.ResponseWriter, r *http.Request) {
 	// If the account found in the database is the same as the empty account,
 	// execute the home template with the login error
 	// if Acc == account {
-	// 	tmpl := template.Must(template.ParseFiles("assets/html/home.html"))
+	// 	tmpl := template.Must(template.ParseFiles("assets/html/login.html"))
 	// 	tmpl.Execute(w, logInError)
 	// 	return
 	// }

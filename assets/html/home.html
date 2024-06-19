@@ -35,7 +35,11 @@
     <div class="grid">
         <div class="gauche">
             <main>
+                {{if ne .Username "Guest"}}
                 <h1 class="Cate" onclick="toggleFormcate()">CREATE A NEW CATEGORY</h1>
+                {{else}}
+                <h1 class="Cate" onclick="location.href='/'">LOG IN TO CREATE A CATEGORY</h1>
+                {{end}}
     
                 <div id="createcate" class="popup">
                     <div class="popup-content">
@@ -132,8 +136,12 @@
         </div>
               
         <div class="mid">
-
+            {{if ne .Username "Guest"}}
             <h1 class="Cate" onclick="toggleForm()">CREATE A NEW POST</h1>
+            {{else}}
+            <h1 class="Cate" onclick="location.href='/'">LOG IN TO CREATE A POST</h1>
+            {{end}}
+            
             <div id="createpost" style="display: none;">
                 <form action="/createpostform" method="post" enctype="multipart/form-data" class="create-post-form">
                     <label for="categoryName">Category Title:</label>
