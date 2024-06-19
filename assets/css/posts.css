@@ -234,3 +234,11 @@ h1.Cate {
     align-self: flex-start;
 }
 
+.manage {
+
+    display: flex;
+    
+    align-items: center;
+    padding: 20px;
+
+}

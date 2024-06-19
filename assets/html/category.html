@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.Category.Title}}</title>
     <link rel="stylesheet" href="/assets/css/posts.css">
+    <link rel="stylesheet" href="/assets/css/home.css">
+    <link rel="stylesheet" href="/assets/css/login.css">
+    <link rel="stylesheet" href="/assets/css/categories.css">
+    
     <link rel="icon" href="{{.Category.ImageUrl}}" type="image/x-icon">
 </head>
 <body>
@@ -71,23 +75,29 @@
     {{end}}
     
     {{if ne .Username "Guest"}}
-    <h1 class="Cate">CREATE A NEW POST</h1>
-        <div id="createpost" style="background-color: beige;">
-            <form action="/createpostform" method="post" enctype="multipart/form-data">
-                <input type="hidden" id="categoryName" name="categoryName" value="{{.Category.Title}}">
+    <h1 class="Cate" onclick="toggleForm()">CREATE A NEW POST</h1>
+    <div id="createpost" style="display: none;">
+        <form action="/createpostform" method="post" enctype="multipart/form-data" class="create-post-form">
+            <label for="categoryName">Category Title:</label>
+            <select id="categoryName" name="categoryName" required>
+                {{range .AllCategories}}
+                <option value="{{.Title}}">{{.Title}}</option>
+                {{end}}
+            </select>
 
-                <label for="title">Title:</label>
-                <input type="text" id="title" name="title" required>
+            <label for="title">Title:</label>
+            <input  class="input" type="text" id="title" name="title" required>
 
-                <label for="content">Content:</label>
-                <textarea id="content" name="content" required></textarea>
+            <label for="content">Content:</label>
+            <textarea  class="input" id="content" name="content" required></textarea>
 
-                <label for="postimage">Image (optional):</label>
-                <input type="file" id="postimage" name="postimage" accept="image/*">
+            <label for="postimage">Image (optional):</label>
+            <input  type="file" id="postimage" name="postimage" accept="image/*">
 
-                <button type="submit">Post</button>
-            </form>
-        </div>
+            <button type="submit" class="btn">Post</button>
+        </form>
+    </div>
+
     {{else}}
     <h1 class="Cate">Please Login to Subscribe or Post</h1>
     {{end}}
@@ -136,4 +146,7 @@
         {{end}}
     </div>
 </body>
+<script src="/assets/js/"></script>
+<script src="/assets/js/login.js"></script>
+<script src="/assets/js/settings.js"></script>
 </html>

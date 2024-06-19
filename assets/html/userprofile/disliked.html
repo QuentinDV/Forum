@@ -5,9 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile | Disliked Posts</title>
     <link rel="stylesheet" href="/assets/css/posts.css">
+
+    <link rel="stylesheet" href="/assets/css/home.css">
+    <link rel="stylesheet" href="/assets/css/categories.css">
+    
 </head>
 <body>
-    <img id="profilePicture" alt="Profile Picture" width="400px" src="../../{{.ImageUrl}}">
+    <img id="profilePicture" alt="Profile Picture" width="200px" src="../../{{.ImageUrl}}">
     
     <h1>{{.Username}}</h1>
     <h2>Subscribed Categories : {{.NumberofSubscribedCategories}}</h2>
@@ -31,48 +35,57 @@
 
 
     <h1>Disiked Posts :</h1>
-    <div id="posts" style="background-color: beige;">
+    <div id="posts" style="background-color: rgba(245, 245, 220, 0);">
         {{range .DislikedPosts}}
         <div class="post">
+            <div class="profile-category">
             <form action="/category/{{.CategoryID}}" method="post">
-                <img id="profilePicture" alt="Profile Picture" width="40px" src="{{.CategoryImageUrl}}">
+                <img class="profile-picture" alt="Profile Picture" width="40px" src="{{.CategoryImageUrl}}">
                 <input type="submit" value="{{.CategoryName}}">
             </form>
 
-            <form action="/user/{{.AccountUsername}}" method="post">
-                <img id="profilePicture" alt="Account Image" width="40px" src="../../{{.AccountImageUrl}}">
-                <input type="submit" value="{{.AccountUsername}}">
-            </form>
 
-            <h2>{{.Title}}</h2>
-            <p>{{.Content}}</p>
-            {{if ne .ImageUrl ""}}
-            <img src="../../{{.ImageUrl}}" alt="Post Image" width="400px">
-            {{end}}
-            <div class="post-info">
-                <form action="/postlikeform" method="post">
-                    <input type="hidden" id="LikeID" name="LikeID" value="{{.PostID}}">
-                    <input type="submit" value="Likes :{{.Likes}}">
-                </form>
-                <form action="/postdislikeform" method="post">
-                    <input type="hidden" id="DislikeID" name="DislikeID" value="{{.PostID}}">
-                    <input type="submit" value="Dislikes :{{.Dislikes}}">
+                <form action="/user/{{.AccountUsername}}" method="post">
+                    <img class="profile-picture" alt="Account Image" width="40px" src="../../{{.AccountImageUrl}}">
+                    <input type="submit" value="{{.AccountUsername}}">
                 </form>
             </div>
-            <div>
-                <span><img src="../../assets/img/icon/view.png" alt="view icon" width="50px"> {{.View}}</span>
-                <a href="/post/{{.PostID}}"><img src="../../assets/img/icon/comment.png" alt="Comment Icon" width="40px"> {{.Responses}}</a>
-            </div>
-            <div>
-                <form action="/addviewform" method="post">
-                    <input type="hidden" id="PostID" name="PostID" value="{{.PostID}}">
-                    <input type="image" src="../../assets/img/icon/more.png" alt="More of this Post" width="40px">
-                </form>
-            </div>
+
+            <div class="text">
+                <h2>{{.Title}}</h2>
+                <p>{{.Content}}</p>
+                {{if ne .ImageUrl ""}}
+                <img class="imgurl" src="../../{{.ImageUrl}}" alt="Post Image" width="400px"> 
+                {{end}}
+        </div> 
+        <div class="post-info">
+            <form action="/postlikeform" method="post">
+                <input type="hidden" id="LikeID" name="LikeID" value="{{.PostID}}">
+                <input type="submit" value="Likes :{{.Likes}}">
+            </form>
+            <form action="/postdislikeform" method="post">
+                <input type="hidden" id="DislikeID" name="DislikeID" value="{{.PostID}}">
+                <input type="submit" value="Dislikes :{{.Dislikes}}">
+            </form>
+        </div>
+        <div class="post-details">
+
+            <span><img class="imag" src="../../assets/img/icon/view.png"  alt="view icon" width="100px" height="50px"> {{.View}}</span>
+            <a href="/post/{{.PostID}}"><img src="../../assets/img/icon/comment.png" alt="Comment Icon" width="40px"> {{.Responses}}</a>
+            <form action="/addviewform" method="post">
+                <input type="hidden" id="PostID" name="PostID" value="{{.PostID}}">
+                <input type="image" src="../../assets/img/icon/more.png" alt="More of this Post" width="40px">
+            </form>
             <span>Posted on: {{.CreationDate}}</span>
+        </div>
         </div>
         {{end}}
     </div>
+</div>
+
+
+
+
 
     <h1>Disliked Comments :</h1>
     <div id="posts" style="background-color: beige;">

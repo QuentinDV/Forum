@@ -23,7 +23,6 @@
 		background-repeat: no-repeat;
 		background-position: left bottom;
 		background-size: 500px;
-		/* background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNkRvYc2Z_dfV55ySQpeNw8Vz1g0L9L7WO4_kW7bFgDPu0npCu"); */
 	}
 }
 
@@ -259,3 +258,24 @@
 			-webkit-transition: all 0.3s ease;
 		}
 	}
+	.buttone {
+		display: flex;
+		justify-content: center;
+		color: #000000;
+		font-size: 17px;
+		background-color: #e2e2e2;
+		border: 1px solid #706755;
+		border-radius: 5px;
+		cursor: pointer;
+		padding: 10px;
+		box-shadow: 0px 6px 0px #383838;
+		transition: all 0.1s;
+	  }
+	  
+	  .buttone:active {
+		box-shadow: 0px 2px 0px #000000;
+		position: relative;
+		top: 2px;
+	  }
+	  
+

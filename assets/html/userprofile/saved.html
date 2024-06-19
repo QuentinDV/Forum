@@ -5,13 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile | Saved Posts</title>
     <link rel="stylesheet" href="/assets/css/posts.css">
+    <link rel="stylesheet" href="/assets/css/home.css">
+    <link rel="stylesheet" href="/assets/css/categories.css">
 </head>
 <body>
-    <img id="profilePicture" alt="Profile Picture" width="400px" src="../../{{.ImageUrl}}">
     
+    <img id="profilePicture" alt="Profile Picture" width="200px" src="../../{{.ImageUrl}}">
+    <div class="manage">
     <h1>{{.Username}}</h1>
     <h2>Subscribed Categories : {{.NumberofSubscribedCategories}}</h2>
     <h2>Sign up : {{.CreationDate}}</h2>
+</div>
 
     <div>
         <button class="buttonn" onclick="location.href='/home'">Home</button>

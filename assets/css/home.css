@@ -59,12 +59,14 @@ body {
 
 
 .droite {
+  padding-top: 100px;
     height: 1000px;
-    width: 30%;
+    width: 25%;
     /* background-color: rgb(163, 211, 211); */
     display: flex;
     flex-direction: column;
 	border-top: solid 1px black;
+  border-left: solid 1px black;
 }
 
 
