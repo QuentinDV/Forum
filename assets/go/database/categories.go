@@ -246,6 +246,12 @@ func GetAllTags(db *sql.DB) ([]string, error) {
 	return tags, nil
 }
 
+// Modify Owner function modifies the owner of a category.
+func ModifyOwner(db *sql.DB, categoryID string, accountID string) error {
+	_, err := db.Exec("UPDATE categories SET AccountID = ? WHERE CategoryId = ?", accountID, categoryID)
+	return err
+}
+
 // GetCartegoryTags function retrieves all tags from a category.
 func GetCartegoryTags(db *sql.DB, categoryID string) ([]string, error) {
 	category, err := GetCategorybyID(db, categoryID)

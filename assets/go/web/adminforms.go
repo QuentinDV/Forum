@@ -217,6 +217,21 @@ func DeleteAccountForm(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
+		// Give the user's categories to the admin
+		Allcategories, err := database.GetCategoriesByCreator(db, id)
+		if err != nil {
+			http.Error(w, "Error retrieving categories", http.StatusInternalServerError)
+			return
+		}
+
+		for _, category := range Allcategories {
+			err = database.ModifyOwner(db, category.CategoryID, "1")
+			if err != nil {
+				http.Error(w, "Error changing category creator", http.StatusInternalServerError)
+				return
+			}
+		}
+
 		// Delete the account
 		err = database.DeleteAccount(db, id)
 		if err != nil {
