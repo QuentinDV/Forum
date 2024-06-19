@@ -172,7 +172,7 @@ func GuestForm(w http.ResponseWriter, r *http.Request) {
 
 func PfpWithImageForm(w http.ResponseWriter, r *http.Request) {
 	// Parse the form data
-	err := r.ParseMultipartForm(4 << 20) // Set maxMemory parameter to 4MB
+	err := r.ParseMultipartForm(20 << 20) // Set maxMemory parameter to 20MB
 	if err != nil {
 		// If there is an error, return an internal server error response
 		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
@@ -242,41 +242,40 @@ func ChangePwForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Retrieve the connected account from the cookie or session
 	ConnectedAccount := RetrieveAccountfromCookie(r)
 
-	oldpassword := r.Form.Get("oldPw")
 	newpassword := r.Form.Get("newPw")
 
-	// fmt.Println("oldpassword:", oldpassword)
-	// fmt.Println("newpassword:", newpassword)
-
-	// Change the image url in the database
+	// Change the password in the database
 	db, err := database.ConnectUserDB("db/database.db")
 	if err != nil {
+		http.Error(w, "Database connection error", http.StatusInternalServerError)
 		return
 	}
 	defer db.Close()
-	database.ChangePassword(db, ConnectedAccount.Id, ConnectedAccount.Username, oldpassword, newpassword)
+	err = database.ChangePassword(db, ConnectedAccount.Id, newpassword)
+	if err != nil {
+		http.Error(w, "Failed to change password", http.StatusInternalServerError)
+		return
+	}
 
-	// Get the account from the database
+	// Get the updated account from the database
 	Acc, err := database.GetAccountByUsername(db, ConnectedAccount.Username)
 	if err != nil {
 		fmt.Println("Error getting account by username:", err)
 		return
 	}
+
 	// Update the cookies
-	// Create a new cookie for the account
 	accountCookie := &http.Cookie{
-		Name: "account",
-		// The value of the cookie is a string that contains the account's information separated by "|"
+		Name:  "account",
 		Value: fmt.Sprintf("%s|%s|%s|%s|%s|%t|%t|%t|%s", Acc.Id, Acc.Email, Acc.Password, Acc.Username, Acc.ImageUrl, Acc.IsBan, Acc.IsModerator, Acc.IsAdmin, Acc.CreationDate),
 		Path:  "/",
 	}
-
-	// Set the cookie
 	http.SetCookie(w, accountCookie)
 
-	// Redirect to the home page
+	// Redirect to the user profile page
 	http.Redirect(w, r, "/userprofile", http.StatusSeeOther)
 }
 

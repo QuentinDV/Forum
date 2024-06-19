@@ -3,10 +3,11 @@ package database
 // Importing necessary packages
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"io"
 	"os"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 // Account struct represents a user account in the system
@@ -89,23 +90,15 @@ func ChangeData(db *sql.DB, id string, username string, imageUrl string) error {
 	return err
 }
 
-func ChangePassword(db *sql.DB, id string, username string, oldPassword string, newPassword string) error {
-	var password string
-	err := db.QueryRow("SELECT password FROM accounts WHERE id = ?", id).Scan(&password)
+func ChangePassword(db *sql.DB, id string, newPassword string) error {
+	// Hash the new password
+	newHashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
 
-	if !checkPassword(password, oldPassword) {
-		return errors.New("invalid old password")
-	}
-
-	newPassword, err = hashPasswordBcrypt(newPassword)
-	if err != nil {
-		return err
-	}
-
-	_, err = db.Exec("UPDATE accounts SET password = ? WHERE id = ?", newPassword, id)
+	// Update the password in the database
+	_, err = db.Exec("UPDATE accounts SET password = ? WHERE id = ?", string(newHashedPassword), id)
 	return err
 }
 

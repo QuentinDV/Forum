@@ -11,7 +11,7 @@ import (
 
 func CreateCategoryForm(w http.ResponseWriter, r *http.Request) {
 	// Parse the form data
-	err := r.ParseMultipartForm(4 << 20) // Set maxMemory parameter to 4MB
+	err := r.ParseMultipartForm(20 << 20) // Set maxMemory parameter to 20MB
 	if err != nil {
 		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
 		return
@@ -100,7 +100,7 @@ func CreateCategoryForm(w http.ResponseWriter, r *http.Request) {
 
 func ModifyCategoryForm(w http.ResponseWriter, r *http.Request) {
 	// Parse the form data
-	err := r.ParseMultipartForm(4 << 20) // Set maxMemory parameter to 4MB
+	err := r.ParseMultipartForm(20 << 20) // Set maxMemory parameter to 20MB
 	if err != nil {
 		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
 		return
@@ -352,7 +352,7 @@ func DislikeForm(w http.ResponseWriter, r *http.Request) {
 // CreatePostForm handles the form submission for creating a new post
 func CreatePostForm(w http.ResponseWriter, r *http.Request) {
 	// Parse the form data
-	err := r.ParseMultipartForm(4 << 20) // Set maxMemory parameter to 4MB
+	err := r.ParseMultipartForm(20 << 20) // Set maxMemory parameter to 20MB
 	if err != nil {
 		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
 		return
@@ -475,7 +475,7 @@ func SavePostForm(w http.ResponseWriter, r *http.Request) {
 // CreateCommentForm handles the form submission for creating a new comment
 func CreateCommentForm(w http.ResponseWriter, r *http.Request) {
 	// Parse the form data
-	err := r.ParseMultipartForm(4 << 20) // Set maxMemory parameter to 4MB
+	err := r.ParseMultipartForm(20 << 20) // Set maxMemory parameter to 20MB
 	if err != nil {
 		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
 		return
