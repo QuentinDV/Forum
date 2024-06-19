@@ -48,6 +48,7 @@ func setupHTTPHandlers() {
 	http.HandleFunc("/createpostform", web.CreatePostForm)
 	http.HandleFunc("/createcategoryform", web.CreateCategoryForm)
 	http.HandleFunc("/createcommentform", web.CreateCommentForm)
+	http.HandleFunc("/modifycategory", web.ModifyCategoryForm)
 
 	http.HandleFunc("/postlikeform", web.LikeForm)
 	http.HandleFunc("/postdislikeform", web.DislikeForm)

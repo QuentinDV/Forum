@@ -264,3 +264,22 @@ func CopyDefaultProfilePicture(newID string) (string, error) {
 
 	return destinationPath, nil
 }
+
+func GetAllUsernames(db *sql.DB) ([]string, error) {
+	rows, err := db.Query("SELECT username FROM accounts WHERE id != 0")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var usernames []string
+	for rows.Next() {
+		var username string
+		if err := rows.Scan(&username); err != nil {
+			return nil, err
+		}
+		usernames = append(usernames, username)
+	}
+
+	return usernames, nil
+}

@@ -59,12 +59,15 @@ type PostData struct {
 
 // CategoryData struct represents the data needed to render the category page
 type CategoryData struct {
-	Category     database.Category
-	Posts        []database.Post
-	ExistingTags []string
-	IsSubscribed bool
-	IsAdmin      bool
-	Username     string
+	Category      database.Category
+	Posts         []database.Post
+	CategoryTags  []string
+	ExistingTags  []string
+	AllUsernames  []string
+	IsSubscribed  bool
+	IsAdmin       bool
+	IsSameAccount bool
+	Username      string
 }
 
 type CreateCategoryData struct {
@@ -99,7 +102,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	// Get all categories from the database
-	allCategories, err := database.GetAllCategories(db)
+	allCategories, err := database.SortBySubsriber(db)
 	if err != nil {
 		fmt.Println("Error getting all categories:", err)
 		http.Redirect(w, r, "/error", http.StatusSeeOther)
@@ -364,20 +367,33 @@ func CategoryPageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	AllUsernames, err := database.GetAllUsernames(db)
+	if err != nil {
+		fmt.Println("Error getting all usernames:", err)
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
+		return
+	}
+
 	CategoryData := struct {
-		Category     database.Category
-		Posts        []database.Post
-		IsSubscribed bool
-		IsAdmin      bool
-		Username     string
-		ExistingTags []string
+		Category      database.Category
+		Posts         []database.Post
+		IsSubscribed  bool
+		IsAdmin       bool
+		IsSameAccount bool
+		Username      string
+		ExistingTags  []string
+		CategoryTags  []string
+		AllUsernames  []string
 	}{
-		Category:     category,
-		Posts:        posts,
-		ExistingTags: allTag,
-		IsSubscribed: isSubscribed,
-		IsAdmin:      ConnectedAccount.IsAdmin,
-		Username:     ConnectedAccount.Username,
+		Category:      category,
+		Posts:         posts,
+		ExistingTags:  allTag,
+		CategoryTags:  category.Tags,
+		AllUsernames:  AllUsernames,
+		IsSubscribed:  isSubscribed,
+		IsAdmin:       ConnectedAccount.IsAdmin,
+		IsSameAccount: category.AccountID == ConnectedAccount.Id,
+		Username:      ConnectedAccount.Username,
 	}
 
 	// Execute the user profile template with the CategoryData struct
