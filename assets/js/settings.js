@@ -116,3 +116,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+function toggleModifyForm() {
+    var form = document.getElementById('modifyCategoryPopup');
+    if (form.style.display === 'none' || form.style.display === '') {
+        form.style.display = 'block';
+    } else {
+        form.style.display = 'none';
+    }
+}

@@ -424,3 +424,21 @@ h1.Cate {
     background: none;
     font-size: 20px;
 }
+
+.create-post-container {
+    background-color: beige;
+    padding: 20px;
+    border: 1px solid #ccc;
+}
+
+.modify-category-popup {
+    display: none;
+    background-color: beige;
+    padding: 20px;
+    border: 1px solid #ccc;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+}

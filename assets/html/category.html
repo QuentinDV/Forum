@@ -4,11 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.Category.Title}}</title>
-    <link rel="stylesheet" href="/assets/css/posts.css">
+    <link rel="stylesheet" href="/assets/css/posts.css">    
     <link rel="stylesheet" href="/assets/css/home.css">
     <link rel="stylesheet" href="/assets/css/login.css">
     <link rel="stylesheet" href="/assets/css/categories.css">
-    
     <link rel="icon" href="{{.Category.ImageUrl}}" type="image/x-icon">
 </head>
 <body>
@@ -33,6 +32,7 @@
             <input type="hidden" id="categoryID" name="categoryID" value="{{.Category.CategoryID}}">
             <input type="image" src="../../assets/img/icon/bin.png" alt="Bin Icon" width="40px">
         </form>
+
 
         <form action="/modifycategory" method="post" enctype="multipart/form-data">
             <input type="hidden" id="categoryID" name="categoryID" value="{{.Category.CategoryID}}">
@@ -61,7 +61,7 @@
             <button type="submit">Modify</button>
         </form>
     {{end}}
-
+   
     
     {{if ne .Username "Guest"}}
     <form action="/subscribecategoryform" method="post">
@@ -76,50 +76,47 @@
     
     {{if ne .Username "Guest"}}
     <h1 class="Cate" onclick="toggleForm()">CREATE A NEW POST</h1>
-    <div id="createpost" style="display: none;">
-        <form action="/createpostform" method="post" enctype="multipart/form-data" class="create-post-form">
-            <label for="categoryName">Category Title:</label>
-            <select id="categoryName" name="categoryName" required>
-                {{range .AllCategories}}
-                <option value="{{.Title}}">{{.Title}}</option>
-                {{end}}
-            </select>
-
+    <div id="createpost" style="background-color: beige; display: none;">
+        <form action="/createpostform" method="post" enctype="multipart/form-data">
+            <input type="hidden" id="categoryName" name="categoryName" value="{{.Category.Title}}">
+    
             <label for="title">Title:</label>
-            <input  class="input" type="text" id="title" name="title" required>
-
+            <input type="text" id="title" name="title" required>
+    
             <label for="content">Content:</label>
-            <textarea  class="input" id="content" name="content" required></textarea>
-
+            <textarea id="content" name="content" required></textarea>
+    
             <label for="postimage">Image (optional):</label>
-            <input  type="file" id="postimage" name="postimage" accept="image/*">
-
-            <button type="submit" class="btn">Post</button>
+            <input type="file" id="postimage" name="postimage" accept="image/*">
+    
+            <button type="submit">Post</button>
         </form>
     </div>
-
     {{else}}
     <h1 class="Cate">Please Login to Subscribe or Post</h1>
     {{end}}
 
-    <div id="posts" style="background-color: beige;">
+    <div id="posts" style="background-color: rgba(0, 0, 0, 0);">
         {{range .Posts}}
         <div class="post">
-            <form action="/category/{{.CategoryID}}" method="post">
-                <img id="profilePicture" alt="Profile Picture" width="40px" src="{{.CategoryImageUrl}}">
-                <input type="submit" value="{{.CategoryName}}">
-            </form>
-
-            <form action="/user/{{.AccountUsername}}" method="post">
-                <img id="profilePicture" alt="Account Image" width="40px" src="../../{{.AccountImageUrl}}">
-                <input type="submit" value="{{.AccountUsername}}">
-            </form>
-
-            <h2>{{.Title}}</h2>
-            <p>{{.Content}}</p>
-            {{if ne .ImageUrl ""}}
-            <img src="../../{{.ImageUrl}}" alt="Post Image" width="400px">
-            {{end}}
+            <div class="profile-category">
+                <form action="/category/{{.CategoryID}}" method="post">
+                    <img class="profile-picture" alt="Profile Picture" width="40px" src="{{.CategoryImageUrl}}">
+                    <input type="submit" value="{{.CategoryName}}">
+                </form>
+    
+                <form action="/user/{{.AccountUsername}}" method="post">
+                    <img class="profile-picture" alt="Account Image" width="40px" src="../../{{.AccountImageUrl}}">
+                    <input type="submit" value="{{.AccountUsername}}">
+                </form>
+            </div>
+            <div class="text">
+                <h2>{{.Title}}</h2>
+                <p>{{.Content}}</p>
+                {{if ne .ImageUrl ""}}
+                <img src="../../{{.ImageUrl}}" alt="Post Image" width="400px">
+                {{end}}
+            </div>
             <div class="post-info">
                 <form action="/postlikeform" method="post">
                     <input type="hidden" id="LikeID" name="LikeID" value="{{.PostID}}">
@@ -130,23 +127,20 @@
                     <input type="submit" value="Dislikes :{{.Dislikes}}">
                 </form>
             </div>
-
-            <div>
-                <span><img src="../../assets/img/icon/view.png" alt="view icon" width="50px"> {{.View}}</span>
+            <div class="post-details">
+                <span><img src="../../assets/img/icon/view.png" class="imag" alt="view icon" width="50px"> {{.View}}</span>
                 <a href="/post/{{.PostID}}"><img src="../../assets/img/icon/comment.png" alt="Comment Icon" width="40px"> {{.Responses}}</a>
-            </div>
-            <div>
                 <form action="/addviewform" method="post">
                     <input type="hidden" id="PostID" name="PostID" value="{{.PostID}}">
                     <input type="image" src="../../assets/img/icon/more.png" alt="More of this Post" width="40px">
                 </form>
+                <span>Posted on: {{.CreationDate}}</span>
             </div>
-            <span>Posted on: {{.CreationDate}}</span>
         </div>
         {{end}}
     </div>
 </body>
-<script src="/assets/js/"></script>
-<script src="/assets/js/login.js"></script>
-<script src="/assets/js/settings.js"></script>
+    <script src="/assets/js/"></script>
+    <script src="/assets/js/login.js"></script>
+    <script src="/assets/js/settings.js"></script>
 </html>
