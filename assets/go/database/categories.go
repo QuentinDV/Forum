@@ -68,6 +68,14 @@ func InsertCategory(db *sql.DB, category Category) error {
 	return err
 }
 
+// ModifyCategory function modifies a category in the database.
+func ModifyCategory(db *sql.DB, category Category) error {
+	tagsStr := strings.Join(category.Tags, ",") // Join tags with a comma
+	_, err := db.Exec("UPDATE categories SET description = ?, ImageUrl = ?, tags = ?, AccountID = ? WHERE CategoryId = ?",
+		category.Description, category.ImageUrl, tagsStr, category.AccountID, category.CategoryID)
+	return err
+}
+
 // CreateCategory function creates a new category in the database.
 func CreateCategory(db *sql.DB, title string, description string, imageUrl string, tags []string, accountID string) error {
 	Category := Category{
@@ -166,27 +174,27 @@ func GetCategoriesByTag(db *sql.DB, tag string) ([]Category, error) {
 
 // GetCategoryByTitle function retrieves a category by its title.
 func GetCategoryByTitle(db *sql.DB, title string) (Category, error) {
-    var category Category
-    var tagsStr string
+	var category Category
+	var tagsStr string
 
-    err := db.QueryRow("SELECT * FROM categories WHERE title LIKE ?", "%"+title+"%").Scan(
-        &category.CategoryID,
-        &category.Title,
-        &category.Description,
-        &category.ImageUrl,
-        &category.NomberOfPosts,
-        &category.Subscriber,
-        &tagsStr,
-        &category.AccountID,
-        &category.CreationDate,
-    )
-    if err != nil {
-        return Category{}, err
-    }
+	err := db.QueryRow("SELECT * FROM categories WHERE title LIKE ?", "%"+title+"%").Scan(
+		&category.CategoryID,
+		&category.Title,
+		&category.Description,
+		&category.ImageUrl,
+		&category.NomberOfPosts,
+		&category.Subscriber,
+		&tagsStr,
+		&category.AccountID,
+		&category.CreationDate,
+	)
+	if err != nil {
+		return Category{}, err
+	}
 
-    category.Tags = strings.Split(tagsStr, ",") // Split tags by comma
+	category.Tags = strings.Split(tagsStr, ",") // Split tags by comma
 
-    return category, nil
+	return category, nil
 }
 
 // AddTagToCategory function adds a tag to a category.
@@ -238,6 +246,21 @@ func GetAllTags(db *sql.DB) ([]string, error) {
 	return tags, nil
 }
 
+// Modify Owner function modifies the owner of a category.
+func ModifyOwner(db *sql.DB, categoryID string, accountID string) error {
+	_, err := db.Exec("UPDATE categories SET AccountID = ? WHERE CategoryId = ?", accountID, categoryID)
+	return err
+}
+
+// GetCartegoryTags function retrieves all tags from a category.
+func GetCartegoryTags(db *sql.DB, categoryID string) ([]string, error) {
+	category, err := GetCategorybyID(db, categoryID)
+	if err != nil {
+		return nil, err
+	}
+	return category.Tags, nil
+}
+
 // IncrementNumberOfPosts function increments the number of posts in a category.
 func IncrementNumberOfPosts(db *sql.DB, categoryID string) error {
 	_, err := db.Exec("UPDATE categories SET nomberofposts  = nomberofposts  + 1 WHERE CategoryId = ?", categoryID)
@@ -262,10 +285,23 @@ func DecrementSubscriber(db *sql.DB, categoryID string) error {
 	return err
 }
 
-// ModifyCategory function modifies a category in the database.
-func ModifyCategory(db *sql.DB, category Category) error {
-	tagsStr := strings.Join(category.Tags, ",") // Join tags with a comma
-	_, err := db.Exec("UPDATE categories SET title = ?, description = ?, ImageUrl = ?, tags = ? WHERE CategoryId = ?",
-		category.Title, category.Description, category.ImageUrl, tagsStr, category.CategoryID)
-	return err
+func SortBySubsriber(db *sql.DB) ([]Category, error) {
+	rows, err := db.Query("SELECT * FROM categories ORDER BY Subscriber DESC")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var categories []Category
+	for rows.Next() {
+		var category Category
+		var tagsStr string
+		err := rows.Scan(&category.CategoryID, &category.Title, &category.Description, &category.ImageUrl, &category.NomberOfPosts, &category.Subscriber, &tagsStr, &category.AccountID, &category.CreationDate)
+		if err != nil {
+			return nil, err
+		}
+		category.Tags = strings.Split(tagsStr, ",") // Split tags by comma
+		categories = append(categories, category)
+	}
+	return categories, nil
 }

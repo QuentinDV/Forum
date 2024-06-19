@@ -417,3 +417,49 @@ func SortPostsByResponsesDescending(posts []Post) []Post {
 
 	return posts
 }
+
+// Get all posts that have been reported
+func GetReportedPosts(db *sql.DB) ([]Post, error) {
+	rows, err := db.Query(`
+		SELECT p.postID, p.title, p.content, p.imageUrl, p.likes, p.dislikes, p.view, p.responses, p.reports, p.categoryID, c.title as categoryName, c.ImageUrl as categoryImageUrl, p.AccountID, a.username as accountUsername, a.ImageUrl as accountImageUrl, p.creationDate 
+		FROM posts p
+		JOIN categories c ON p.categoryID = c.CategoryId
+		JOIN accounts a ON p.AccountID = a.id
+		WHERE p.reports > 0
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	posts := []Post{}
+	for rows.Next() {
+		var post Post
+		err := rows.Scan(&post.PostID, &post.Title, &post.Content, &post.ImageUrl, &post.Likes, &post.Dislikes, &post.View, &post.Responses, &post.Reports, &post.CategoryID, &post.CategoryName, &post.CategoryImageUrl, &post.AccountID, &post.AccountUsername, &post.AccountImageUrl, &post.CreationDate)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, post)
+	}
+	return posts, nil
+}
+
+// SortPostsByReports sorts a slice of posts by their reports in ascending order.
+func SortPostsByReportsAscending(posts []Post) []Post {
+	// Sort the posts by Reports
+	sort.Slice(posts, func(i, j int) bool {
+		return posts[i].Reports < posts[j].Reports
+	})
+
+	return posts
+}
+
+// SortPostsByReportsDescending sorts a slice of posts by their reports in descending order.
+func SortPostsByReportsDescending(posts []Post) []Post {
+	// Sort the posts by Reports in descending order
+	sort.Slice(posts, func(i, j int) bool {
+		return posts[i].Reports > posts[j].Reports
+	})
+
+	return posts
+}

@@ -31,6 +31,7 @@
         {{end}}
         {{if .IsAdmin}}
         <button class="buttonn" onclick="location.href='/admin'">Admin Panel</button>
+        <button  class="buttonn" onclick="location.href='/reportedposts'">Reports Posts</button>
         {{end}}
     </div>
 
@@ -55,7 +56,7 @@
                 <h2>{{.Title}}</h2>
                 <p>{{.Content}}</p>
                 {{if ne .ImageUrl ""}}
-                <img src="../../{{.ImageUrl}}" alt="Post Image" width="400px">
+                <img class="imgurl" src="../../{{.ImageUrl}}" alt="Post Image" width="400px"> 
                 {{end}}
         </div> 
         <div class="post-info">

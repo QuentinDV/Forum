@@ -59,12 +59,15 @@ type PostData struct {
 
 // CategoryData struct represents the data needed to render the category page
 type CategoryData struct {
-	Category     database.Category
-	Posts        []database.Post
-	ExistingTags []string
-	IsSubscribed bool
-	IsAdmin      bool
-	Username     string
+	Category      database.Category
+	Posts         []database.Post
+	CategoryTags  []string
+	ExistingTags  []string
+	AllUsernames  []string
+	IsSubscribed  bool
+	IsAdmin       bool
+	IsSameAccount bool
+	Username      string
 }
 
 type CreateCategoryData struct {
@@ -99,7 +102,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	// Get all categories from the database
-	allCategories, err := database.GetAllCategories(db)
+	allCategories, err := database.SortBySubsriber(db)
 	if err != nil {
 		fmt.Println("Error getting all categories:", err)
 		http.Redirect(w, r, "/error", http.StatusSeeOther)
@@ -217,6 +220,44 @@ func Admin(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, allAcc)
 }
 
+// Handler to render the ReportePosts page
+func ReportePosts(w http.ResponseWriter, r *http.Request) {
+	// Retrieve the account from cookies
+	ConnectedAccount := RetrieveAccountfromCookie(r)
+
+	// Check if the ConnectedAccount is nil or not valid
+	if (ConnectedAccount == database.Account{}) || ConnectedAccount.Id == "" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	// Check if the user is the same as the connected account
+	if !ConnectedAccount.IsAdmin || ConnectedAccount.Username == "Guest" {
+		http.Redirect(w, r, "/notfound", http.StatusSeeOther)
+		return
+	}
+
+	// Open the database
+	db, err := sql.Open("sqlite3", "db/database.db")
+	if err != nil {
+		fmt.Println("Error opening database:", err)
+		return
+	}
+
+	// get all posts of the account
+	Reportedposts, err := database.GetReportedPosts(db)
+	if err != nil {
+		fmt.Println("Error getting posts by creator:", err)
+		return
+	}
+
+	Reportedposts = database.SortPostsByReportsDescending(Reportedposts)
+
+	// Serve the admin page
+	tmpl := template.Must(template.ParseFiles("assets/html/reportedposts.html"))
+	tmpl.Execute(w, Reportedposts)
+}
+
 // Handler to render the create post page
 func CreatePostHome(w http.ResponseWriter, r *http.Request) {
 	// Retrieve the account from cookies
@@ -326,20 +367,33 @@ func CategoryPageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	AllUsernames, err := database.GetAllUsernames(db)
+	if err != nil {
+		fmt.Println("Error getting all usernames:", err)
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
+		return
+	}
+
 	CategoryData := struct {
-		Category     database.Category
-		Posts        []database.Post
-		IsSubscribed bool
-		IsAdmin      bool
-		Username     string
-		ExistingTags []string
+		Category      database.Category
+		Posts         []database.Post
+		IsSubscribed  bool
+		IsAdmin       bool
+		IsSameAccount bool
+		Username      string
+		ExistingTags  []string
+		CategoryTags  []string
+		AllUsernames  []string
 	}{
-		Category:     category,
-		Posts:        posts,
-		ExistingTags: allTag,
-		IsSubscribed: isSubscribed,
-		IsAdmin:      ConnectedAccount.IsAdmin,
-		Username:     ConnectedAccount.Username,
+		Category:      category,
+		Posts:         posts,
+		ExistingTags:  allTag,
+		CategoryTags:  category.Tags,
+		AllUsernames:  AllUsernames,
+		IsSubscribed:  isSubscribed,
+		IsAdmin:       ConnectedAccount.IsAdmin,
+		IsSameAccount: category.AccountID == ConnectedAccount.Id,
+		Username:      ConnectedAccount.Username,
 	}
 
 	// Execute the user profile template with the CategoryData struct
@@ -647,7 +701,6 @@ func handleLikedPostsPage(w http.ResponseWriter, r *http.Request, db *sql.DB, ac
 	var likesComments []database.Comment
 
 	for i := 1; i < len(likedCommentsIDs); i++ {
-
 		comment, err := database.GetComment(db, likedCommentsIDs[i])
 		if err != nil {
 			fmt.Println("Error getting comment:", err)
@@ -655,6 +708,7 @@ func handleLikedPostsPage(w http.ResponseWriter, r *http.Request, db *sql.DB, ac
 		}
 		likesComments = append(likesComments, comment)
 	}
+	fmt.Println(likesComments)
 
 	// Get the favorite categories of the account
 	NumberofSubscribedCategories, err := database.GetSubscribedCategories(db, acc.Id)

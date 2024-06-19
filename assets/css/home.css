@@ -364,3 +364,8 @@ body {
     -webkit-box-shadow: inset 10px 10px 30px #bebebe, inset -10px -10px 30px #ffffff;
     box-shadow: inset 10px 10px 30px #bebebe, inset -10px -10px 30px #ffffff;
   }
+
+  .imgurl {
+
+      border-radius: 20px;
+  }

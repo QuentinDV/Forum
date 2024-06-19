@@ -11,18 +11,17 @@ import (
 
 func CreateCategoryForm(w http.ResponseWriter, r *http.Request) {
 	// Parse the form data
-	err := r.ParseForm()
+	err := r.ParseMultipartForm(20 << 20) // Set maxMemory parameter to 20MB
 	if err != nil {
 		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
 		return
 	}
 
 	// Retrieve form values
-	title := r.Form.Get("categoryName")
-	description := r.Form.Get("description")
-	imageUrl := r.Form.Get("imageUrl")
-	existingTags := r.Form["existingTags[]"]
-	newTags := r.Form.Get("newTags")
+	title := r.FormValue("categoryName")
+	description := r.FormValue("description")
+	existingTags := r.MultipartForm.Value["existingTags[]"]
+	newTags := r.FormValue("newTags")
 
 	// Process existing tags (if any selected)
 	var tags []string
@@ -47,38 +46,137 @@ func CreateCategoryForm(w http.ResponseWriter, r *http.Request) {
 	// Print to console (for debugging)
 	fmt.Println("title:", title)
 	fmt.Println("description:", description)
-	fmt.Println("imageUrl:", imageUrl)
 	fmt.Println("tags:", tags)
 	fmt.Println("accountID:", accountID)
+
+	// Get the profile picture file from the form data
+	file, _, err := r.FormFile("postimage")
+	var imageUrl string
+	if err == nil {
+		// File is present, save it
+		defer file.Close()
+		filePath := fmt.Sprintf("./assets/img/category/%s.png", title)
+		imageUrl = fmt.Sprintf("./assets/img/category/%s.png", title)
+		err = database.SaveFile(filePath, file)
+		if err != nil {
+			http.Error(w, "Error saving the file", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		// File is not present, set a default or empty URL
+		imageUrl = ""
+	}
 
 	// Create the category in the database
 	db, err := database.ConnectCategoriesDB("db/database.db")
 	if err != nil {
+		http.Error(w, "Database connection error", http.StatusInternalServerError)
 		return
 	}
 	defer db.Close()
 
 	err = database.CreateCategory(db, title, description, imageUrl, tags, accountID)
 	if err != nil {
-		fmt.Println("Error creating category:", err)
+		http.Error(w, "Error creating category", http.StatusInternalServerError)
 		return
 	}
 
 	Category, err := database.GetCategoryByTitle(db, title)
 	if err != nil {
-		fmt.Println("Error getting category by title:", err)
+		http.Error(w, "Error getting category by title", http.StatusInternalServerError)
 		return
 	}
 
 	// Add the account to the subscribed category
 	err = database.AddSubscribedCategory(db, accountID, Category.CategoryID)
 	if err != nil {
-		fmt.Println("Error adding subscribed category:", err)
+		http.Error(w, "Error adding subscribed category", http.StatusInternalServerError)
 		return
 	}
 
 	// Redirect to the home page
-	http.Redirect(w, r, "/home", http.StatusSeeOther)
+	http.Redirect(w, r, "/category/"+Category.CategoryID, http.StatusSeeOther)
+}
+
+func ModifyCategoryForm(w http.ResponseWriter, r *http.Request) {
+	// Parse the form data
+	err := r.ParseMultipartForm(20 << 20) // Set maxMemory parameter to 20MB
+	if err != nil {
+		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
+		return
+	}
+
+	// Get the category ID from the form data
+	categoryID := r.FormValue("categoryID")
+	Newdescription := r.FormValue("description")
+	Newtags := strings.Split(r.FormValue("newTags"), ",")
+	NewaccountID := r.FormValue("Username")
+	fmt.Println("NewaccountID:", NewaccountID)
+	fmt.Println("categoryID:", categoryID)
+	fmt.Println("Newdescription:", Newdescription)
+	fmt.Println("Newtags:", Newtags)
+
+	//Get AccoutnID from username
+	db, err := database.ConnectUserDataDB("db/database.db")
+	if err != nil {
+		fmt.Println("Error connecting to the database:", err)
+		http.Error(w, "Database connection error", http.StatusInternalServerError)
+		return
+	}
+	defer db.Close()
+
+	Account, err := database.GetAccountByUsername(db, NewaccountID)
+	if err != nil {
+		http.Error(w, "Error getting account by username", http.StatusInternalServerError)
+		return
+	}
+	NewaccountID = Account.Id
+
+	// Process existing tags (if any selected)
+	existingTags := r.MultipartForm.Value["existingTags[]"]
+	if len(existingTags) > 0 {
+		Newtags = append(Newtags, existingTags...)
+	}
+
+	// Trim whitespace from new tags
+	for i, tag := range Newtags {
+		Newtags[i] = strings.TrimSpace(tag)
+	}
+
+	// Get the image file from the form data
+	file, _, err := r.FormFile("postimage")
+	var imageUrl string
+	if err == nil {
+		// File is present, save it
+		defer file.Close()
+		filePath := fmt.Sprintf("./assets/img/category/%s.png", categoryID)
+		imageUrl = fmt.Sprintf("./assets/img/category/%s.png", categoryID)
+		err = database.SaveFile(filePath, file)
+		if err != nil {
+			http.Error(w, "Error saving the file", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		// File is not present, set a default or empty URL
+		imageUrl = ""
+	}
+
+	// Modify the category in the database
+	err = database.ModifyCategory(db, database.Category{
+		CategoryID:  categoryID,
+		Description: Newdescription,
+		ImageUrl:    imageUrl,
+		Tags:        Newtags,
+		AccountID:   NewaccountID,
+	})
+	if err != nil {
+		http.Error(w, "Error modifying category", http.StatusInternalServerError)
+		fmt.Println("Error modifying category:", err)
+		return
+	}
+
+	// Redirect to the category page
+	http.Redirect(w, r, "/category/"+categoryID, http.StatusSeeOther)
 }
 
 // SubscribeCategoryForm handles subscribing and unsubscribing from a category.
@@ -254,7 +352,7 @@ func DislikeForm(w http.ResponseWriter, r *http.Request) {
 // CreatePostForm handles the form submission for creating a new post
 func CreatePostForm(w http.ResponseWriter, r *http.Request) {
 	// Parse the form data
-	err := r.ParseMultipartForm(4 << 20) // Set maxMemory parameter to 4MB
+	err := r.ParseMultipartForm(20 << 20) // Set maxMemory parameter to 20MB
 	if err != nil {
 		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
 		return
@@ -377,7 +475,7 @@ func SavePostForm(w http.ResponseWriter, r *http.Request) {
 // CreateCommentForm handles the form submission for creating a new comment
 func CreateCommentForm(w http.ResponseWriter, r *http.Request) {
 	// Parse the form data
-	err := r.ParseMultipartForm(4 << 20) // Set maxMemory parameter to 4MB
+	err := r.ParseMultipartForm(20 << 20) // Set maxMemory parameter to 20MB
 	if err != nil {
 		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
 		return
