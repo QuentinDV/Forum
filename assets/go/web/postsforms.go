@@ -29,12 +29,32 @@ func CreateCategoryForm(w http.ResponseWriter, r *http.Request) {
 		tags = existingTags
 	}
 
+	// GetallTags from the database
+	db, err := database.ConnectCategoriesDB("db/database.db")
+	if err != nil {
+		http.Error(w, "Database connection error", http.StatusInternalServerError)
+		return
+	}
+	defer db.Close()
+
+	AllTags, err := database.GetAllTags(db)
+	if err != nil {
+		http.Error(w, "Error getting all tags", http.StatusInternalServerError)
+		return
+	}
+
+	// Create a map to store all existing tags for quick lookup
+	existingTagsMap := make(map[string]bool)
+	for _, tag := range AllTags {
+		existingTagsMap[tag] = true
+	}
+
 	// Process new tags entered by the user
 	if newTags != "" {
 		newTagsSlice := strings.Split(newTags, ",")
 		for _, tag := range newTagsSlice {
 			trimmedTag := strings.TrimSpace(tag)
-			if trimmedTag != "" {
+			if trimmedTag != "" && !existingTagsMap[trimmedTag] {
 				tags = append(tags, trimmedTag)
 			}
 		}
@@ -66,14 +86,6 @@ func CreateCategoryForm(w http.ResponseWriter, r *http.Request) {
 		// File is not present, set a default or empty URL
 		imageUrl = ""
 	}
-
-	// Create the category in the database
-	db, err := database.ConnectCategoriesDB("db/database.db")
-	if err != nil {
-		http.Error(w, "Database connection error", http.StatusInternalServerError)
-		return
-	}
-	defer db.Close()
 
 	err = database.CreateCategory(db, title, description, imageUrl, tags, accountID)
 	if err != nil {
