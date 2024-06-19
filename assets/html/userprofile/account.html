@@ -5,46 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile | Manage Account</title>
     <link rel="stylesheet" href="/assets/css/posts.css">
+    <link rel="stylesheet" href="/assets/css/home.css">
+    <link rel="stylesheet" href="/assets/css/categories.css">
+
 </head>
 <body>
-    <img id="profilePicture" alt="Profile Picture" width="400px" src="../../{{.ImageUrl}}">
+    <img id="profilePicture" alt="Profile Picture" width="200px" src="../../{{.ImageUrl}}">
     
     <h1>{{.Username}}</h1>
     <h2>Subscribed Categories : {{.NumberofSubscribedCategories}}</h2>
     <h2>Sign up : {{.CreationDate}}</h2>
 
     <div>
-        <button onclick="location.href='/home'">Home</button>
-        <button onclick="location.href='/user/{{.Username}}'">Posts</button>
-        <button onclick="location.href='/user/{{.Username}}/liked'">Liked</button>
-        <button onclick="location.href='/user/{{.Username}}/disliked'">Disliked</button>
-        <button onclick="location.href='/user/{{.Username}}/comments'">Comments</button>
-        <button onclick="location.href='/user/{{.Username}}/savedposts'">Saved Posts</button>
+        <button class="buttonn" onclick="location.href='/home'">Home</button>
+        <button class="buttonn" onclick="location.href='/user/{{.Username}}'">Posts</button>
+        <button class="buttonn" onclick="location.href='/user/{{.Username}}/liked'">Liked</button>
+        <button class="buttonn" onclick="location.href='/user/{{.Username}}/disliked'">Disliked</button>
+        <button class="buttonn" onclick="location.href='/user/{{.Username}}/comments'">Comments</button>
+        <button class="buttonn" onclick="location.href='/user/{{.Username}}/savedposts'">Saved Posts</button>
         {{if .IsSameAccount}}
-        <button onclick="location.href='/user/{{.Username}}/account'">Manage Account</button>
+        <button class="buttonn" onclick="location.href='/user/{{.Username}}/account'">Manage Account</button>
         {{end}}
         {{if .IsAdmin}}
-        <button onclick="location.href='/admin'">Admin Panel</button>
-        <button onclick="location.href='/reportedposts'">Reports Posts</button>
+        <button class="buttonn" onclick="location.href='/admin'">Admin Panel</button>
+        <button  class="buttonn" onclick="location.href='/reportedposts'">Reports Posts</button>
         {{end}}
     </div>
 
+    <div class="manage">
     <h3>Email: {{.Email}}</h3>
+</div>
+    <div class="manage">
     <form action="/resetpfpform" method="post">
         <input type="hidden" name="UserID" value="{{.ID}}">
         <button id="submitreset" type="submit">Reset Pfp</button>
     </form>
-
+</div>
+    <div class="manage">
     <form action="/PfpImageForm" method="post" enctype="multipart/form-data">
         <input type="file" id="profilePicture" name="profilePicture" accept="image/*">
         <input type="submit" value="Upload Image" name="submit">
     </form>
-
+</div>
+    <div class="manage">
     <form action="/ChangePwForm" method="post">
         <label for="newPw">New Password:</label><br>
-        <input type="password" id="newPw" name="newPw" placeholder="New Password"><br>
+        <input class="input" type="password" id="newPw" name="newPw" placeholder="New Password"><br>
         <input type="submit" value="Submit">
     </form>
+</div>
     
 </body>
+<script src="/assets/js/"></script>
+<script src="/assets/js/settings.js"></script>
 </html>

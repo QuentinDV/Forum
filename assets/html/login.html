@@ -4,19 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forum</title>
-    <link rel="stylesheet" href="/assets/css/home.css">
+
     <link rel="stylesheet" href="/assets/css/login.css">
-    <link rel="stylesheet" href="/assets/css/caroussel.css">
-    <link rel="stylesheet" href="/assets/css/categories.css">
+    <link rel="stylesheet" href="/assets/css/login2.css">
+
 </head> 
 
 
  <body>
+<div id='stars'></div>
+<div id='stars2'></div>
+<div id='stars3'></div>
+<div id='title'>
+
+
+
     <ul>
         <div login>
             <ul id="menu">
                 <div class="form-structor">
                     <div class="signup">
+                        <form action="/guestform" method="post">
+                            <button class="buttone">Continue as Guest</button>
+                            
+                        </form>
                         <form id="register" action="/signupform" method="post">
                             <h2 class="form-title" id="signup"><span>or</span>Sign up</h2>
                             <div class="form-holder">
@@ -44,9 +55,7 @@
             </ul>
         </div>
     </ul>
-    <form action="/guestform" method="post">
-        <button class="submit-btn">Continue as Guest</button>
-    </form>
+    
  </body>
 
 

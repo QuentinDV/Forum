@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Page</title>
     <link rel="stylesheet" href="/assets/css/admin.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&display=swap">
 </head>
 <body>
     <div class="wrapper">
@@ -26,19 +27,20 @@
     </div>
     <div class="over">
         <button onclick="location.href='/home'">Home</button>
-        <h1>Liste des comptes</h1>
-        <div class="accountgrid">
-            <p><strong>ID:</strong></p>
-            <p><strong>Username:</strong></p>
-            <p><strong>Email:</strong></p>
-            <p><strong>IsBan:</strong></p>
-            <p><strong>IsModerator:</strong></p>
-            <p><strong>IsAdmin:</strong></p>
-            <p><strong>Reset Pfp:</strong></p>
-            <p><strong>Delete Account:</strong></p>
-            <p><strong>CreationDate:</strong></p>
-        </div>
+        <h1 class="Liste">Liste des comptes</h1>
+        <br><br><br><br>
         <div class="accountgrid-container">
+            <div class="accountgrid header">
+                <p><strong>ID:</strong></p>
+                <p><strong>Username:</strong></p>
+                <p><strong>Email:</strong></p>
+                <p><strong>IsBan:</strong></p>
+                <p><strong>IsModerator:</strong></p>
+                <p><strong>IsAdmin:</strong></p>
+                <p><strong>Reset Pfp:</strong></p>
+                <p><strong>Delete Account:</strong></p>
+                <p><strong>CreationDate:</strong></p>
+            </div>
             {{range .}}
             <div class="accountgrid">
                 <p>{{.Id}}</p>
@@ -65,6 +67,7 @@
                     <input type="hidden" name="username" value="{{.Username}}">
                     <button id="adminButton{{.Id}}" type="submit">{{.IsAdmin}}</button>
                 </form>
+                
                 <form class="button" action="/resetpfpform" method="post">
                     <input type="hidden" name="UserID" value="{{.Id}}">
                     <button id="submitreset" type="submit" class="reset-button">
@@ -81,14 +84,14 @@
                 <form action="/deleteUserform" method="post">
                     <input type="hidden" name="userId" value="{{.Id}}">
                     <input type="hidden" name="username" value="{{.Username}}">
-                    <button  class="ui-btn" id="deleteButton{{.Id}}" type="submit">Delete</button>
+                    <button class="ui-btn" id="deleteButton{{.Id}}" type="submit">Delete</button>
                 </form>
                 <p>{{.CreationDate}}</p>
             </div>
             {{end}}
         </div>
     </div>
-    <audio id="deleteSound" src="/assets/sounds/delete-sound.mp3"></audio>
+    <audio id="deleteSound" src="https://drive.google.com/uc?export=download&id=11cWKnTwFL7ycPIVE31BTtN-W4WvIprwcs"></audio>
     <script src="/assets/js/settings.js"></script>
 </body>
 </html>
