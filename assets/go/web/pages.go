@@ -647,7 +647,6 @@ func handleLikedPostsPage(w http.ResponseWriter, r *http.Request, db *sql.DB, ac
 	var likesComments []database.Comment
 
 	for i := 1; i < len(likedCommentsIDs); i++ {
-
 		comment, err := database.GetComment(db, likedCommentsIDs[i])
 		if err != nil {
 			fmt.Println("Error getting comment:", err)
@@ -655,6 +654,7 @@ func handleLikedPostsPage(w http.ResponseWriter, r *http.Request, db *sql.DB, ac
 		}
 		likesComments = append(likesComments, comment)
 	}
+	fmt.Println(likesComments)
 
 	// Get the favorite categories of the account
 	NumberofSubscribedCategories, err := database.GetSubscribedCategories(db, acc.Id)

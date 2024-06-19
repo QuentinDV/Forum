@@ -72,5 +72,45 @@
         {{end}}
     </div>
 
+    <h1>Liked Comments :</h1>
+    <div id="posts" style="background-color: beige;">
+        {{range .LikedComments}}
+            <div class="post">
+                <div class="comment">
+                    <button onclick="location.href='/post/{{.PostID}}'">View Post</button>
+
+                    <form action="/user/{{.AccountUsername}}" method="post">
+                        <img id="profilePicture" alt="Account Image" width="40px" src="../../{{.AccountImageUrl}}">
+                        <input type="submit" value="{{.AccountUsername}}">
+                    </form>
+
+                    <h2>{{.Content}}</h2>
+                    {{if ne .ImageUrl ""}}
+                    <img src="../../{{.ImageUrl}}" alt="Comment Image" width="200px">
+                    {{end}}
+                    <div class="post-info">
+                        <form action="/commentlikeform" method="post">
+                            <input type="hidden" id="CommentID" name="CommentID" value="{{.CommentID}}">
+                            <input type="submit" value="Likes :{{.Likes}}">
+                        </form>
+                        <form action="/commentdislikeform" method="post">
+                            <input type="hidden" id="CommentID" name="CommentID" value="{{.CommentID}}">
+                            <input type="submit" value="Dislikes :{{.Dislikes}}">
+                        </form>
+                    </div>
+
+                    {{if or .IsAdmin}}
+                    <form action="/deletecommentform" method="post">
+                        <input type="hidden" id="CommentID" name="CommentID" value="{{.CommentID}}">
+                        <input type="image" src="../../assets/img/icon/bin.png" alt="Delete this Comment Icon" width="40px">
+                    </form>
+                    {{end}}
+                    <span>Posted on: {{.CreationDate}}</span>
+
+                </div>
+            </div>
+            {{end}}
+    </div>
+
 </body>
 </html>
