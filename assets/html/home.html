@@ -181,11 +181,17 @@
 
                         <span><img src="assets/img/icon/view.png" alt="view icon" width="50px"> {{.View}}</span>
                         <a href="/post/{{.PostID}}"><img src="assets/img/icon/comment.png" alt="Comment Icon" width="40px"> {{.Responses}}</a>
+                        <form action="/reportedPostsForm" method="post">
+                            <input type="hidden" id="PostID" name="PostID" value="{{.PostID}}">
+                            <input type="image" src="assets/img/icon/report.png" alt="Report this Post" width="40px">
+                            <p>Report</p>
+                        </form>
                         <form action="/addviewform" method="post">
                             <input type="hidden" id="PostID" name="PostID" value="{{.PostID}}">
                             <input type="image" src="assets/img/icon/more.png" alt="More of this Post" width="40px">
                         </form>
                         <span>Posted on: {{.CreationDate}}</span>
+                        
                     </div>
                 </div>
                 {{end}}

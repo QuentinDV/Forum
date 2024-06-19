@@ -217,6 +217,44 @@ func Admin(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, allAcc)
 }
 
+// Handler to render the ReportePosts page
+func ReportePosts(w http.ResponseWriter, r *http.Request) {
+	// Retrieve the account from cookies
+	ConnectedAccount := RetrieveAccountfromCookie(r)
+
+	// Check if the ConnectedAccount is nil or not valid
+	if (ConnectedAccount == database.Account{}) || ConnectedAccount.Id == "" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	// Check if the user is the same as the connected account
+	if !ConnectedAccount.IsAdmin || ConnectedAccount.Username == "Guest" {
+		http.Redirect(w, r, "/notfound", http.StatusSeeOther)
+		return
+	}
+
+	// Open the database
+	db, err := sql.Open("sqlite3", "db/database.db")
+	if err != nil {
+		fmt.Println("Error opening database:", err)
+		return
+	}
+
+	// get all posts of the account
+	Reportedposts, err := database.GetReportedPosts(db)
+	if err != nil {
+		fmt.Println("Error getting posts by creator:", err)
+		return
+	}
+
+	Reportedposts = database.SortPostsByReportsDescending(Reportedposts)
+
+	// Serve the admin page
+	tmpl := template.Must(template.ParseFiles("assets/html/reportedposts.html"))
+	tmpl.Execute(w, Reportedposts)
+}
+
 // Handler to render the create post page
 func CreatePostHome(w http.ResponseWriter, r *http.Request) {
 	// Retrieve the account from cookies

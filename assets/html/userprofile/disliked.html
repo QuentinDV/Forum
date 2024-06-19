@@ -25,12 +25,13 @@
         {{end}}
         {{if .IsAdmin}}
         <button onclick="location.href='/admin'">Admin Panel</button>
+        <button onclick="location.href='/reportedposts'">Reports Posts</button>
         {{end}}
     </div>
 
     <h1>Disiked Posts :</h1>
     <div id="posts" style="background-color: beige;">
-        {{range .LikedPosts}}
+        {{range .DislikedPosts}}
         <div class="post">
             <form action="/category/{{.CategoryID}}" method="post">
                 <img id="profilePicture" alt="Profile Picture" width="40px" src="{{.CategoryImageUrl}}">

@@ -400,3 +400,38 @@ func ResetPfpForm(w http.ResponseWriter, r *http.Request) {
 	// Redirect the user to the previous page
 	http.Redirect(w, r, referer, http.StatusSeeOther)
 }
+
+func ReportedPostsForm(w http.ResponseWriter, r *http.Request) {
+	// Parse the form data
+	err := r.ParseForm()
+	if err != nil {
+		// If there is an error, return an internal server error response
+		http.Error(w, "Form data parsing error", http.StatusInternalServerError)
+		return
+	}
+
+	// Get the post ID from the form data
+	postID := r.Form.Get("PostID")
+
+	db, err := database.ConnectPostDB("db/database.db")
+	if err != nil {
+		return
+	}
+	defer db.Close()
+
+	// Increment the number of views of the post
+	err = database.IncrementNumberOfReportstoDB(db, postID)
+	if err != nil {
+		fmt.Println("Error incrementing views:", err)
+		return
+	}
+
+	// Check the referer header
+	referer := r.Header.Get("Referer")
+	if referer == "" {
+		referer = "/" // Fallback URL if Referer header is not set
+	}
+
+	// Redirect to the post page
+	http.Redirect(w, r, referer, http.StatusSeeOther)
+}
