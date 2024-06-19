@@ -14,23 +14,20 @@
     {{if ne .Username "Guest"}}
         <div class="navbars">
             
-
             <button onclick="location.href='/user/{{.Username}}'">{{.Username}}</button>
 
-            <img id="profilePicture" alt="Profile Picture" width="px" src="{{.ImageUrl}}"><h1 id="openMenu"class="Btns">
-  
-                <a href="/logoutform"><div class="sign"><svg viewBox="0 0 512 512"><path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"></path></svg></div>
-                </a>
-                <div class="logout"></div> 
-              
-              </h1> 
+            <img id="profilePicture" alt="Profile Picture" width="px" src="{{.ImageUrl}}">
+
+            <button onclick="location.href='/logoutform'" style="background: none;"> <img src="/assets/img/icon/logout.png" alt="Logout Icon" width="50px"> </button>
+            
 
         </div>
     {{else}}
         <div class="navbars">
-            <h1 class="settings" id="openMenu">LOGIN</h1> 
             <h1>Guest</h1>
             <img id="profilePicture" alt="Profile Picture" width="px" src="{{.ImageUrl}}" >
+
+            <button onclick="location.href='/'"><h1 class="settings" id="openMenu" onclick.href="/">LOGIN</h1>  </button>
         </div>
     {{end}}
 </div>
@@ -369,50 +366,7 @@
     </div>
 </div> 
 </div>  
-<body class="demo-1">
     
-        
-
-
-    
-
-
-
-</body>    
-<div id="menu" class="menu-hidden" style="display: none;">
-    <ul>
-        <div login>
-            <ul id="menu">
-                <div class="form-structor">
-                    <div class="signup">
-                        <form id="register" action="/signupform" method="post">
-                            <button onclick="location.href='/'" style="background: none;"> <img src="/assets/img/icon/logout.png" alt="Logout Icon" width="50"> </button>
-                            <h2 class="form-title" id="signup"><span>or</span>Sign up</h2>
-                            <div class="form-holder">
-                                <input autocomplete="off" type="text" class="input" name="username" placeholder="Username" required/>
-                                <input autocomplete="off" type="email" class="input" name="email" placeholder="Email" required />
-                                <input autocomplete="off" type="password" class="input" name="pswrd" placeholder="Password" required />
-                            </div>
-                            <button class="submit-btn">Sign up</button>
-                        </form>
-                    </div>
-                    <form id="login" action="/loginform" method="post">
-                        <div class="login slide-up">
-                            <div class="center">
-                                <h2 class="form-title" id="login"><span>or</span>Log in</h2>
-                                <div class="form-holder">
-                                    <input autocomplete="off" type="text" class="input" name="identif" placeholder="Email or Username" required />
-                                    <input autocomplete="off" type="password" class="input" name="pswrd" placeholder="Password" required />
-                                </div>
-                                <button class="submit-btn">Log in</button>
-                            
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-    </ul>
-</div>
     <script src="/assets/js/"></script>
     <script src="/assets/js/login.js"></script>
     <script src="/assets/js/settings.js"></script>
