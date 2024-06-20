@@ -32,6 +32,10 @@ func SignUpForm(w http.ResponseWriter, r *http.Request) {
 	// If the created account is the same as the empty account,
 	// execute the home template with the sign up error
 	Acc, signUpError, err := database.CreateAccount(email, password, username, false, false)
+	if signUpError.EmailError || signUpError.UsernameError {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
 	if err != nil {
 		return
 	}
